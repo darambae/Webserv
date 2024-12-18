@@ -1,0 +1,6 @@
+1. Korean tutorial
+    https://42seoul.gitbook.io/webserv
+
+2. Manual for Networking programming (in English)(recommanded by Dan)
+    https://beej.us/guide/bgnet/html/
+
