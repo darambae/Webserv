@@ -62,14 +62,6 @@ int main(){
     for (int i = 1; i <= MAX_CLIENTS; ++i) {
         fds[i].fd = -1;  // Set initial state as no client connected
     }
-    // new_socket = accept(server_fd, (struct sockaddr *)&address, (socklen_t *)&len_address); //(struct sockaddr *)&address: The client's address will be stored here.
-    // if (new_socket < 0){
-    //     std::cerr << "Accept failed" << std::endl;
-    //     close(server_fd);
-    //     return 1;
-    // }
-    // std::cout << "Accepted client (client sd: " << new_socket << ")" << std::endl;
-
     while (true) {
         int poll_count = poll(fds, client_count + 1, -1);  // Wait indefinitely
 
@@ -117,7 +109,7 @@ int main(){
                 } else if (bytes_received < 0) {
                     perror("Recv failed");
                 } else {
-                    std::cout << "Received: " << buffer << std::endl;
+                    std::cout << "Client's Received: " << buffer << std::endl;
 
                     // Convert message to uppercase and send it back
                     to_uppercase(buffer);
