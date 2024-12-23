@@ -33,7 +33,7 @@ int main(){
     for (int i = 0; i < 5; ++i) { // Send 5 messages for testing
         std::string message = std::to_string(i + 1) + " : Hello, Server!\n";
         send(sock, message.c_str(), message.length(), 0);
-        std::cout << "Sent: " << message << std::endl;
+        std::cout << "Client's message to server: " << message << std::endl;
 
         memset(buffer, 0, BUFFER_SIZE);
         int bytes_read = recv(sock, buffer, BUFFER_SIZE, 0);
@@ -42,14 +42,6 @@ int main(){
 
         sleep(2); // Wait 2 seconds before sending the next message
     }
-
-    // std::string message = "Hello from client";
-    // send(sock, message.c_str(), message.size(), 0);
-    // memset(buffer, 0, BUFFER_SIZE);
-    // int bytes_read = recv(sock, buffer, BUFFER_SIZE, 0);
-    // if (bytes_read > 0)
-    //     std::cout << "Message from server: " << buffer << std::endl;
-
     close(sock);
     return 0;
 }
