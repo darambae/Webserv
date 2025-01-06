@@ -4,3 +4,5 @@
 2. Manual for Networking programming (in English)(recommanded by Dan)
     https://beej.us/guide/bgnet/html/
 
+3. RFC 7230 to 7235
+    https://datatracker.ietf.org/doc/html/rfc7230#section-1.1
