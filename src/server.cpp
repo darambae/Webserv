@@ -6,11 +6,12 @@
 #include <unistd.h> //close...
 #include <poll.h>
 
-#define PORT 8080 //common port for http servers
+#define PORT 8080 //common port for http servers( under 1024 is reserved for system services)
 #define BUFFER_SIZE 1024
 #define MAX_CLIENTS 10
 
-void to_uppercase(char *str) {
+void to_uppercase(char *str)
+{
     while (*str) {
         *str = toupper(*str);
         ++str;
@@ -31,12 +32,28 @@ int main(){
     }
     std::cout << "Server socket created on sd " << server_fd << std::endl;
     int opt = 1;
-    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+    if (setsockopt(server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
         perror("setsockopt failed");
         close(server_fd);
         return 1;
     }
-
+/*
+And this is the important bit: a pointer to a struct sockaddr_in can be cast to a pointer 
+to a struct sockaddr and vice-versa. So even though connect() wants a struct sockaddr*, you
+ can still use a struct sockaddr_in and cast it at the last minute!
+// (IPv4 only--see struct sockaddr_in6 for IPv6)
+struct sockaddr_in {
+    short int          sin_family;  // Address family, AF_INET
+    unsigned short int sin_port;    // Port number
+    struct in_addr     sin_addr;    // Internet address
+    unsigned char      sin_zero[8]; // Same size as struct sockaddr
+};
+This structure makes it easy to reference elements of the socket address. Note that sin_zero 
+(which is included to pad the structure to the length of a struct sockaddr) should be set to 
+all zeros with the function memset(). Also, notice that sin_family corresponds to sa_family 
+in a struct sockaddr and should be set to “AF_INET”. Finally, the sin_port must be in Network
+ Byte Order (by using htons()!)
+*/
     address.sin_family = AF_INET; //IPv4
     address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
     address.sin_port = htons(PORT); //Converts the port number to "network byte order"
@@ -95,7 +112,15 @@ int main(){
                 close(new_socket);
             }
         }
-        const char *http_response = "HTTP/1.1 200 OK\r\nContent-Length:13\r\nHello, World!\r\n";
+        const char *http_response =
+    "HTTP/1.1 200 OK\r\n"
+    "Content-Type: text/html\r\n"
+    "Content-Length: 38\r\n"
+    "\r\n"
+    "<html>\n"
+    "    <h1>Hello, World!</h1>\n"
+    "</html>";
+;
         // Check all clients for incoming data
         for (int i = 1; i <= MAX_CLIENTS; ++i) {
             if (fds[i].fd != -1 && (fds[i].revents & POLLIN)) {
