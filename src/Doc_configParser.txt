@@ -1,0 +1,4 @@
+To do list:
+1. Grammar check - whitespace, regexp, '/', '\', ';', '{}'
+2. Validity check for each directive (working on it(13.01.2025))
+3. Add additional directives (for future)

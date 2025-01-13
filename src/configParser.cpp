@@ -1,4 +1,5 @@
-//By parsing configuration file, save the data in a struct.
+/*By parsing configuration file following the rule of nginx config file, 
+save the data in a struct and return a list of servers info.*/
 
 #pragma once
 #include "../include/configParser.hpp"
@@ -8,11 +9,18 @@
 using namespace std;
 /*Pseudo code
 1. Read the configuration file line by line.
-2. Parse the configuration file.
+2. Parse the file.
 3. Initailize a list of configServer.
-4. Check validity of the configuration file.
-5. Save the data in a struct and return it.
+4. Check format of the configuration file.
+5. Check validity of the configuration file.
+6. Save the data in a struct and return it.
 */
+void    initDirectives(configServer &server) {
+    server.ip = "*";
+    server.port = 80;
+    server.root = "";
+    server.limit_client_body_size = -1;
+}
 
 list<configServer> parseConfigFile(string configFilePath) {
     list<configServer> servers;
@@ -36,12 +44,8 @@ list<configServer> parseConfigFile(string configFilePath) {
     return servers;
 }
 
-void    initDirectives(configServer &server) {
+configLocation parseLocation(ifstream &file, string &line) {
     
-    server->ip = "*";
-    server->port = 80;
-    server->root = "";
-    server->limit_client_body_size = -1;
 }
 
 bool    validMethods(set<string> methods) {
@@ -57,56 +61,78 @@ bool    validIp(string ip) {
     size_t  pos;
     string  segment;
     int     num;
-    while ((pos = copy.find(".")) != string::npos) {
-            segment = ip.substr(0, pos);
-            num = stoi(segment);
-            if (num < 0 || num > 255)
-                throw "Invalid IP address segment.";
-            ip = ip.substr(pos + 1);
-        }
-        num = stoi(ip);
+    
+    while ((pos = ip.find(".")) != string::npos) {
+        segment = ip.substr(0, pos);
+        num = stoi(segment);
         if (num < 0 || num > 255)
-            throw "Invalid IP address segment.";
+            return false;
+        ip = ip.substr(pos + 1);
+    }
+    num = stoi(ip);
+    if (num < 0 || num > 255)
+        return false;
+    return true;
 }
-void    checkValidity(string directive, configServer server) {
-    switch (directive) {
-    case "listen":
-        if (server->port < 0 || server->port > 65535)
+
+bool    validLocation(vector<configLocation> locations) {
+    for (vector<configLocation>::iterator it = locations.begin(); it != locations.end(); ++it) {
+        //To do
+    }
+    return true;
+}
+
+//Using exception handling to check the validity of the configuration file.
+void checkValidity(string directive, configServer &server) {
+    if (directive == "listen") {
+        if (server.port < 0 || server.port > 65535)
             throw "Invalid port number.";
-        if (server->ip.find(".") == string::npos && server->ip != "localhost" && !validIp(server->ip))
-            throw "Invalid ip address.";
-        break;
-    case "server_name":
-        if (server->server_names.empty())
+        if (server.ip.find(".") == string::npos && server.ip != "localhost" && !validIp(server.ip))
+            throw "Invalid IP address.";
+    } else if (directive == "server_name") {
+        if (server.server_names.empty())
             throw "No server name specified.";
-        break;
-    case "root":
-        if (server->root.empty())
+    } else if (directive == "root") {
+        if (server.root.empty())
             throw "No root directory specified.";
-        break;
-    case "limit_client_body_size":
-        if (server->limit_client_body_size < 0)
+    } else if (directive == "limit_client_body_size") {
+        if (server.limit_client_body_size < 0)
             throw "Invalid client body size limit.";
-        break;
-    case "error_page":
-        if (server->default_error_pages.empty())
+    } else if (directive == "error_page") {
+        if (server.default_error_pages.empty())
             throw "No error page specified.";
-        break;
-    case "location":
-        if (server->locations.empty())
+    } else if (directive == "location") {
+        if (server.locations.empty() || validLocation(server.locations))
             throw "No location specified.";
-        break;
-    case "allowed_methods":
-        if (server->allowed_methods.empty() || !validMethods(server->allowed_methods))
-            throw "Invalid methods.";
-        break;
-    default:
-        break;
+    }
+    //To add more directives
+}
+
+void    checkFormat(string line, string directive) {
+    //To do
+    if (directive == "listen") {
+        if (line.find(":") == string::npos)
+            throw "Invalid " + directive + " format.";
+    } else if (directive == "server_name") {
+        if (line.find(" ") == string::npos)
+           throw "Invalid " + directive + " format.";
+    } else if (directive == "root") {
+        if (line.find(" ") == string::npos)
+           throw "Invalid " + directive + " format.";
+    } else if (directive == "limit_client_body_size") {
+        if (line.find(" ") == string::npos)
+           throw "Invalid " + directive + " format.";
+    } else if (directive == "error_page") {
+        if (line.find(" ") == string::npos)
+           throw "Invalid " + directive + " format.";
+    } else if (directive == "location") {
+        if (line.find(" ") == string::npos)
+           throw "Invalid " + directive + " format.";
     }
 }
+
 configServer parseDirectives(ifstream &file, string &line, configServer &server) {
-    configServer server;
-    initDirectives(&server);
+    initDirectives(server);
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != string::npos && line.find(";") != string::npos) {
@@ -146,6 +172,7 @@ configServer parseDirectives(ifstream &file, string &line, configServer &server)
         else if (line.find("location") != string::npos) {
             configLocation location = parseLocation(file, line);
             server.locations.push_back(location);
+
         }
         else if (line.find("}") != string::npos)
             return server;
