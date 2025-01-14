@@ -58,7 +58,6 @@ enum HttpStatus {
     TOO_MANY_REQUESTS = 429,         // RFC 6585
     REQUHEADER_FIELDS_TOO_LARGE = 431, // RFC 6585
     UNAVAILABLE_FOR_LEGAL_REASONS = 451,   // RFC 25
-{
 
  // Servinter error responses (500–599)
    INTER_SERVER_ERROR = 500,
