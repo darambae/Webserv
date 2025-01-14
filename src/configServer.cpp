@@ -1,5 +1,6 @@
 #include "../include/configServer.hpp"
 
+
 configServer::configServer() {
     ip = "*"; //OR "127.0.0.1"
     port = 80;
@@ -8,7 +9,7 @@ configServer::configServer() {
 }
 
 void    configServer::setIp(std::string ip) {
-    if (!validIp(ip))
+    if (!configParser::validIp(ip))
         throw "Invalid ip address";
     this->ip = ip;
 }
@@ -19,9 +20,9 @@ void    configServer::setPort(int port) {
     this->port = port;
 }
 
-void    configServer::setServerNames(std::vector<std::string> server_names) {
+void    configServer::setServerNames(std::string server_name) {
     //To do
-    this->server_names = server_names;
+    this->server_names.push_back(server_name);
 }
 
 void    configServer::setRoot(std::string root) {
@@ -34,33 +35,13 @@ void    configServer::setLimitClientBodySize(int limit_client_body_size) {
     this->limit_client_body_size = limit_client_body_size;
 }
 
-void    configServer::setDefaultErrorPages(std::list<errorPage> default_error_pages) {
+void    configServer::setDefaultErrorPages(errorPage default_error_page) {
     //To do
-    this->default_error_pages = default_error_pages;
+    this->default_error_pages.push_back(default_error_page);
 }
 
-void    configServer::setLocations(std::vector<configLocation> locations) {
+void    configServer::setLocations(configLocation location) {
     //To do
-    this->locations = locations;
+    this->locations.push_back(location);
 }
 
-
-bool    configServer::validIp(std::string ip) {
-    std::string  segment;
-    size_t  pos;
-    int     num;
-    
-    if (ip == "localhost")
-        return true;
-    while ((pos = ip.find(".")) != std::string::npos) {
-        segment = ip.substr(0, pos);
-        num = stoi(segment);
-        if (num < 0 || num > 255)
-            return false;
-        ip = ip.substr(pos + 1);
-    }
-    num = stoi(ip);
-    if (num < 0 || num > 255)
-        return false;
-    return true;
-}

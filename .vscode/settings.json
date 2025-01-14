@@ -1,6 +1,8 @@
 {
     "makefile.configureOnOpen": false,
     "files.associations": {
-        "istream": "cpp"
+        "istream": "cpp",
+        "iosfwd": "cpp",
+        "fstream": "cpp"
     }
 }

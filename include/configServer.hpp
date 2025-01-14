@@ -5,13 +5,13 @@
 #include <set>
 #include <vector>
 #include "../include/configLocation.hpp"
+#include "../include/configParser.hpp"
 
 struct errorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
 
-// struct to store the configuration of one server
 class configServer {
     private:
         std::string ip;
@@ -36,11 +36,9 @@ class configServer {
 
         void setIp(std::string ip);
         void setPort(int port);
-        void setServerNames(std::vector<std::string> server_names);
+        void setServerNames(std::string server_name);
         void setRoot(std::string root);
         void setLimitClientBodySize(int limit_client_body_size);
-        void setDefaultErrorPages(std::list<errorPage> default_error_pages);
-        void setLocations(std::vector<configLocation> locations);
-
-        bool validIp(std::string ip);
+        void setDefaultErrorPages(errorPage default_error_page);
+        void setLocations(configLocation locations);
 };

@@ -5,7 +5,6 @@ configLocation::configLocation() {
     path = "";
     root = "";
     autoindex = false;
-    limit_client_body_size = -1;
 }
 
 void    configLocation::setPath(std::string path) {
@@ -46,11 +45,6 @@ void    configLocation::setCgiPath(std::string cgi_path) {
 void    configLocation::setErrorPages(std::list<errorPage> error_pages) {
     //To do
     this->error_pages = error_pages;
-}
-
-void    configLocation::setLimitClientBodySize(int limit_client_body_size) {
-    //To do
-    this->limit_client_body_size = limit_client_body_size;
 }
 
 

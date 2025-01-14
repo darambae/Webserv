@@ -22,7 +22,6 @@ class configLocation {
         std::vector<std::string> cgi_extension;
         std::string cgi_path;
         std::list<errorPage> error_pages;
-        int limit_client_body_size;
 
     public:
         configLocation();
@@ -36,7 +35,6 @@ class configLocation {
         std::vector<std::string> getCgiExtension() const { return cgi_extension; };
         std::string getCgiPath() const { return cgi_path; };
         std::list<errorPage> getErrorPages() const { return error_pages; };
-        int getLimitClientBodySize() const { return limit_client_body_size; };
 
         void setPath(std::string path);
         void setRoot(std::string root);
@@ -46,7 +44,6 @@ class configLocation {
         void setCgiExtension(std::vector<std::string> cgi_extension);
         void setCgiPath(std::string cgi_path);
         void setErrorPages(std::list<errorPage> error_pages);
-        void setLimitClientBodySize(int limit_client_body_size);
 
 
 
