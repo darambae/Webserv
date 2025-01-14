@@ -1,9 +1,7 @@
 /*By parsing configuration file following the rule of nginx config file, 
 save the data in a struct and return a list of servers info.*/
 
-#pragma once
 #include "../include/configParser.hpp"
-#include <fstream>
 #include <cstring>
 
 using namespace std;
@@ -15,27 +13,21 @@ using namespace std;
 5. Check validity of the configuration file.
 6. Save the data in a struct and return it.
 */
-void    initDirectives(configServer &server) {
-    server.ip = "*";
-    server.port = 80;
-    server.root = "";
-    server.limit_client_body_size = -1;
-}
 
-list<configServer> parseConfigFile(string configFilePath) {
+
+list<configServer> parseConfigFile(string filePath) {
     list<configServer> servers;
     configServer server;
     string line;
-    ifstream file(configFilePath);
+    ifstream file(filePath);
 
-    if (!file.is_open()) {
-        cerr << "Error: Unable to open the configuration file." << endl;
-        exit(EXIT_FAILURE);
-    }
+    if (!file.is_open())
+        throw "Unable to open the file.";
+
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("server {") != string::npos) {
-            parseDirectives(file, line, server);
+            parseDirectives(file, server);
             servers.push_back(server);
         }
         else { continue; }
@@ -44,8 +36,33 @@ list<configServer> parseConfigFile(string configFilePath) {
     return servers;
 }
 
-configLocation parseLocation(ifstream &file, string &line) {
-    
+bool parseLocation(ifstream &file, string line, configLocation &location) {
+    string path = line.substr(line.find(" ") + 1, line.find("{"));
+    location.path = path;
+    while (getline(file, line)) {
+        if (line.empty() || line[0] == '#') { continue; }
+        if (line.find("root ") != string::npos)
+            location.root = line.substr(line.find(" ") + 1, line.find(";"));
+        else if (line.find("autoindex ") != string::npos) {
+            if (line.find("on") != string::npos)
+                location.autoindex = true;
+            else if (line.find("off") != string::npos)
+                location.autoindex = false;
+            else
+                throw "Invalid autoindex value.";
+        }
+            
+        if (line.find("}") != string::npos) {
+            return true;
+        }
+    }
+}
+
+bool    validLocation(vector<configLocation> locations) {
+    for (vector<configLocation>::iterator it = locations.begin(); it != locations.end(); ++it) {
+        //To do
+    }
+    return true;
 }
 
 bool    validMethods(set<string> methods) {
@@ -57,33 +74,9 @@ bool    validMethods(set<string> methods) {
     return true;
 }
 
-bool    validIp(string ip) {
-    size_t  pos;
-    string  segment;
-    int     num;
-    
-    while ((pos = ip.find(".")) != string::npos) {
-        segment = ip.substr(0, pos);
-        num = stoi(segment);
-        if (num < 0 || num > 255)
-            return false;
-        ip = ip.substr(pos + 1);
-    }
-    num = stoi(ip);
-    if (num < 0 || num > 255)
-        return false;
-    return true;
-}
-
-bool    validLocation(vector<configLocation> locations) {
-    for (vector<configLocation>::iterator it = locations.begin(); it != locations.end(); ++it) {
-        //To do
-    }
-    return true;
-}
 
 //Using exception handling to check the validity of the configuration file.
-void checkValidity(string directive, configServer &server) {
+void checkValidity(const string& directive, configServer &server) {
     if (directive == "listen") {
         if (server.port < 0 || server.port > 65535)
             throw "Invalid port number.";
@@ -108,31 +101,32 @@ void checkValidity(string directive, configServer &server) {
     //To add more directives
 }
 
-void    checkFormat(string line, string directive) {
+void    checkFormat(const string& line, const string& directive) {
     //To do
     if (directive == "listen") {
         if (line.find(":") == string::npos)
             throw "Invalid " + directive + " format.";
     } else if (directive == "server_name") {
         if (line.find(" ") == string::npos)
-           throw "Invalid " + directive + " format.";
+            throw "Invalid " + directive + " format.";
     } else if (directive == "root") {
         if (line.find(" ") == string::npos)
-           throw "Invalid " + directive + " format.";
+            throw "Invalid " + directive + " format.";
     } else if (directive == "limit_client_body_size") {
         if (line.find(" ") == string::npos)
-           throw "Invalid " + directive + " format.";
+            throw "Invalid " + directive + " format.";
     } else if (directive == "error_page") {
         if (line.find(" ") == string::npos)
-           throw "Invalid " + directive + " format.";
+            throw "Invalid " + directive + " format.";
     } else if (directive == "location") {
         if (line.find(" ") == string::npos)
-           throw "Invalid " + directive + " format.";
+            throw "Invalid " + directive + " format.";
     }
 }
 
-configServer parseDirectives(ifstream &file, string &line, configServer &server) {
+bool parseDirectives(ifstream &file, configServer &server) {
     initDirectives(server);
+    string line;
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != string::npos && line.find(";") != string::npos) {
@@ -170,13 +164,9 @@ configServer parseDirectives(ifstream &file, string &line, configServer &server)
             server.default_error_pages.push_back(error_page);
         }
         else if (line.find("location") != string::npos) {
-            configLocation location = parseLocation(file, line);
+            configLocation location;
+            parseLocation(file, line, location);
             server.locations.push_back(location);
-
         }
-        else if (line.find("}") != string::npos)
-            return server;
-        if (line.find("}") != string::npos)
-            return server;
     }
 }
