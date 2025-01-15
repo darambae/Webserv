@@ -38,7 +38,7 @@ int main(){
         return 1;
     }
 /*
-And this is the important bit: a pointer to a struct sockaddr_in can be cast to a pointer 
+And this is the important bit: a pointer to a struct sockaddr_in can be cast to a pointer
 to a struct sockaddr and vice-versa. So even though connect() wants a struct sockaddr*, you
  can still use a struct sockaddr_in and cast it at the last minute!
 // (IPv4 only--see struct sockaddr_in6 for IPv6)
@@ -48,27 +48,27 @@ struct sockaddr_in {
     struct in_addr     sin_addr;    // Internet address
     unsigned char      sin_zero[8]; // Same size as struct sockaddr
 };
-This structure makes it easy to reference elements of the socket address. Note that sin_zero 
-(which is included to pad the structure to the length of a struct sockaddr) should be set to 
-all zeros with the function memset(). Also, notice that sin_family corresponds to sa_family 
+This structure makes it easy to reference elements of the socket address. Note that sin_zero
+(which is included to pad the structure to the length of a struct sockaddr) should be set to
+all zeros with the function memset(). Also, notice that sin_family corresponds to sa_family
 in a struct sockaddr and should be set to “AF_INET”. Finally, the sin_port must be in Network
  Byte Order (by using htons()!)
 */
     address.sin_family = AF_INET; //IPv4
     address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
     address.sin_port = htons(PORT); //Converts the port number to "network byte order"
-    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0){  
+    if (bind(server_fd, (struct sockaddr *)&address, sizeof(address)) < 0){
         //std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
         perror("Bind failed");
         close(server_fd);
         return 1;
     }
 
-    if (listen(server_fd, 10) < 0){ 
+    if (listen(server_fd, 10) < 0){
         /*
-            num : Specifies the "backlog," the maximum number of queued connections waiting to be accepted. 
+            num : Specifies the "backlog," the maximum number of queued connections waiting to be accepted.
             Here, it expects 5 messages to be received.
-        */ 
+        */
         std::cerr << "Listen failed" << std::endl;
         close(server_fd);
         return 1;
