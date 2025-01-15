@@ -4,14 +4,14 @@
 #include <list>
 #include <set>
 #include <vector>
-#include "../include/configLocation.hpp"
+#include "configLocation.hpp"
+#include "configParser.hpp"
 
 struct errorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
 
-// struct to store the configuration of one server
 class configServer {
     private:
         std::string ip;
@@ -19,7 +19,7 @@ class configServer {
         std::vector<std::string> server_names;
         std::string root;
         int limit_client_body_size;
-        std::list<errorPage> default_error_pages;
+        std::list<errorPage> error_pages;
         std::vector<configLocation> locations;
     
     public:
@@ -31,16 +31,14 @@ class configServer {
         std::vector<std::string> getServerNames() const { return server_names; };
         std::string getRoot()  { return root; };
         int getLimitClientBodySize() const { return limit_client_body_size; };
-        std::list<errorPage> getDefaultErrorPages() const { return default_error_pages; };
+        std::list<errorPage> getErrorPages() const { return error_pages; };
         std::vector<configLocation> getLocations() const { return locations; };
 
-        void setIp(std::string ip);
-        void setPort(int port);
-        void setServerNames(std::vector<std::string> server_names);
-        void setRoot(std::string root);
-        void setLimitClientBodySize(int limit_client_body_size);
-        void setDefaultErrorPages(std::list<errorPage> default_error_pages);
-        void setLocations(std::vector<configLocation> locations);
-
-        bool validIp(std::string ip);
+        void setIp(const std::string& ip);
+        void setPort(const std::string& port);
+        void setServerNames(const std::string& server_name);
+        void setRoot(const std::string& root);
+        void setLimitClientBodySize(const std::string& limit_client_body_size);
+        void setErrorPages(const std::string& error_page);
+        void setLocations(configLocation location);
 };
