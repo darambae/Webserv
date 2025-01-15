@@ -26,8 +26,8 @@ void    configParser::setFilePath(const std::string& file) {
     this->filePath = file;
 }
 
-void    configParser::setServers(configServer server) {
-
+void    configParser::setServers(const configServer& server) {
+    this->servers.push_back(server);
 }
 
 bool configParser::parseFile() {
@@ -42,7 +42,7 @@ bool configParser::parseFile() {
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("server {") != std::string::npos) {
             this->parseDirectives(file, server);
-            servers.push_back(server);
+            setServers(server);
         }
     }
     if (file.is_open())
@@ -57,37 +57,20 @@ bool configParser::parseLocation(std::ifstream &file, std::string line, configLo
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos)
             location.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("autoindex ") != std::string::npos) {
-            if (line.find("on") != std::string::npos)
-                location.setAutoindex(true);
-            else if (line.find("off") != std::string::npos)
-                location.setAutoindex(false);
-            else
-                throw "Invalid autoindex value.";
-        }
-        else if (line.find("index ") != std::string::npos) {
-
-        }
-        else if (line.find("allowed_methods ") != std::string::npos) {
-
-        }
-        else if (line.find("return ") != std::string::npos) {
-
-        }
-        if (line.find("}") != std::string::npos) {
-            return true;
-        }
+        else if (line.find("autoindex ") != std::string::npos)
+            location.setAutoindex(line.substr(line.find(" ") + 1, line.find(";")));
+        else if (line.find("index ") != std::string::npos)
+            location.setIndex(line.substr(line.find(" ") + 1, line.find(";")));
+        else if (line.find("allowed_methods ") != std::string::npos)
+            location.setAllowedMethods(line.substr(line.find(" ") + 1, line.find(";")));
+        else if (line.find("return ") != std::string::npos)
+            location.setReturn(line.substr(line.find(" ") + 1, line.find(";")));
+        if (line.find("}") != std::string::npos) { return true; }
+        else { return false; }
     }
 }
 
-bool    configParser::validLocation(std::vector<configLocation> locations) {
-    for (std::vector<configLocation>::iterator it = locations.begin(); it != locations.end(); ++it) {
-        //To do
-    }
-    return true;
-}
-
-bool    configParser::validMethods(std::set<std::string> methods) {
+bool    configParser::validMethods(const std::set<std::string>& methods) {
     std::set<std::string> validMethods = {"GET", "POST", "DELETE", "PUT"};
     for (std::set<std::string>::iterator it = methods.begin(); it != methods.end(); ++it) {
         if (validMethods.find(*it) == validMethods.end())
@@ -95,6 +78,7 @@ bool    configParser::validMethods(std::set<std::string> methods) {
     }
     return true;
 }
+
 bool    configParser::validIp(std::string ip) {
     std::string  segment;
     size_t  pos;
@@ -115,53 +99,66 @@ bool    configParser::validIp(std::string ip) {
     return true;
 }
 
-//Using exception handling to check the validity of the configuration file.
-void    configParser::checkValidity(const std::string& directive, configServer &server) {
-    if (directive == "listen") {
-        if (server.getPort() < 0 || server.getPort() > 65535)
-            throw "Invalid port number.";
-        if (server.getIp().find(".") == std::string::npos && server.getIp() != "localhost" && !this->validIp(server.getIp()))
-            throw "Invalid IP address.";
-    } else if (directive == "server_name") {
-        if (server.getServerNames().empty())
-            throw "No server name specified.";
-    } else if (directive == "root") {
-        if (server.getRoot().empty())
-            throw "No root directory specified.";
-    } else if (directive == "limit_client_body_size") {
-        if (server.getLimitClientBodySize() < 0)
-            throw "Invalid client body size limit.";
-    } else if (directive == "error_page") {
-        if (server.getDefaultErrorPages().empty())
-            throw "No error page specified.";
-    } else if (directive == "location") {
-        if (server.getLocations().empty() || validLocation(server.getLocations()))
-            throw "No location specified.";
-    }
-    //To add more directives
+bool    configParser::validPort(const std::string& port) {
+    if (stoi(port) < 0 || stoi(port) > 65535)
+        return false;
+    return true;
 }
 
-void    checkFormat(const std::string& line, const std::string& directive) {
-    //To do
-    if (directive == "listen") {
-        if (line.find(":") == std::string::npos)
-            throw "Invalid " + directive + " format.";
-    } else if (directive == "server_name") {
-        if (line.find(" ") == std::string::npos)
-            throw "Invalid " + directive + " format.";
-    } else if (directive == "root") {
-        if (line.find(" ") == std::string::npos)
-            throw "Invalid " + directive + " format.";
-    } else if (directive == "limit_client_body_size") {
-        if (line.find(" ") == std::string::npos)
-            throw "Invalid " + directive + " format.";
-    } else if (directive == "error_page") {
-        if (line.find(" ") == std::string::npos)
-            throw "Invalid " + directive + " format.";
-    } else if (directive == "location") {
-        if (line.find(" ") == std::string::npos)
-            throw "Invalid " + directive + " format.";
+bool    configParser::validAutoindex(const std::string& line) {
+    if (line.find("on") != std::string::npos || line.find("off") != std::string::npos)
+        return true;
+    return false;
+}
+
+bool    configParser::validErrorPage(const std::string& line) {
+    std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
+    while (tmp_list.size() > 0) {
+        if ((!onlyDigits(tmp_list.front()) && tmp_list.front()[0] != '/') ||
+                stoi(tmp_list.front()) < 300 || stoi(tmp_list.front()) > 599)
+            return false;
+        tmp_list.pop_front();
     }
+    return true;
+}
+
+bool    configParser::validReturn(const std::string& line) {
+    std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
+    if (tmp_list.size() > 2 || tmp_list.size() == 0)
+        return false;
+    if (tmp_list.size() == 1) {
+        const std::string& value = tmp_list.front();
+        if (value.find("https://") != std::string::npos || value.find("http://") != std::string::npos)
+            return true;
+        if (onlyDigits(value) && stoi(value) >= 300 && stoi(value) <= 599)
+            return true;
+        return false;
+    }
+    if (tmp_list.size() == 2) {
+        const std::string&  status_code = tmp_list.front();
+        const std::string&  path = tmp_list.back();
+        if (!onlyDigits(status_code) || stoi(status_code) < 300 || stoi(status_code) > 599)
+            return false;
+        if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos)
+            return false;
+        return true;
+    }   
+    return false;
+}
+
+bool    configParser::validRoot(const std::string& line) {
+    struct stat buffer;
+    if (line.empty() || line[0] != '/')
+        return false;
+    if (stat(line.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
+        return false;
+    return true;
+}
+
+bool    configParser::validBodySize(const std::string& line) {
+    if (!onlyDigits(line) || std::stoi(line) < 0)
+        return false;
+    return true;
 }
 
 bool    configParser::parseDirectives(std::ifstream &file, configServer &server) {
@@ -171,13 +168,13 @@ bool    configParser::parseDirectives(std::ifstream &file, configServer &server)
         if (line.find("listen ") != std::string::npos && line.find(";") != std::string::npos) {
             if (line.find(":") != std::string::npos) {
                 server.setIp(line.substr(line.find(" ") + 1, line.find(":")));
-                server.setPort(stoi(line.substr(line.find(":") + 1, line.find(";"))));
+                server.setPort(line.substr(line.find(":") + 1, line.find(";") - line.find(":") - 1));
             }
             else { 
                 if (line.find(".") != std::string::npos)
-                    server.setIp(line.substr(line.find(" ") + 1, line.find(";"))); //will save the ip address or "localhost"
+                    server.setIp(line.substr(line.find(" ") + 1, line.find(";")));
                 else
-                    server.setPort(stoi(line.substr(line.find(" ") + 1, line.find(";"))));
+                    server.setPort(line.substr(line.find(" ") + 1, line.find(";")));
             }
         }
         else if (line.find("server_name ") != std::string::npos) {
@@ -191,16 +188,9 @@ bool    configParser::parseDirectives(std::ifstream &file, configServer &server)
         else if (line.find("root ") != std::string::npos)
             server.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
         else if (line.find("limit_client_body_size ") != std::string::npos)
-            server.setLimitClientBodySize(stoi(line.substr(line.find(" ") + 1, line.find(";"))));
+            server.setLimitClientBodySize(line.substr(line.find(" ") + 1, line.find(";")));
         else if (line.find("error_page ") != std::string::npos) {
-            errorPage error_page;
-            std::string error_codes = line.substr(line.find(" ") + 1, line.find(";"));
-            while (error_codes.find(" ") != std::string::npos) {
-                error_page.error_codes.insert(stoi(error_codes.substr(0, error_codes.find(" "))));
-                error_codes = error_codes.substr(error_codes.find(" ") + 1);
-            }
-            error_page.error_path = error_codes;
-            server.setDefaultErrorPages(error_page);
+            server.setErrorPages(line.substr(line.find(" ") + 1, line.find(";")));
         }
         else if (line.find("location") != std::string::npos) {
             configLocation location;
@@ -208,4 +198,8 @@ bool    configParser::parseDirectives(std::ifstream &file, configServer &server)
             server.setLocations(location);
         }
     }
+}
+
+bool    onlyDigits(const std::string& str) {
+    return str.find_first_not_of("0123456789") == std::string::npos;
 }

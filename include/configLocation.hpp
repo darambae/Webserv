@@ -6,6 +6,8 @@
 #include <list>
 #include <set>
 #include <vector>
+#include "sys/stat.h"
+#include "configParser.hpp"
 
 struct errorPage {
     std::set<int> error_codes;
@@ -22,7 +24,7 @@ class configLocation {
         std::vector<std::string> cgi_extension;
         std::string cgi_path;
         std::list<errorPage> error_pages;
-
+        std::string return_value;
     public:
         configLocation();
         ~configLocation() {};
@@ -36,16 +38,15 @@ class configLocation {
         std::string getCgiPath() const { return cgi_path; };
         std::list<errorPage> getErrorPages() const { return error_pages; };
 
-        void setPath(std::string path);
-        void setRoot(std::string root);
-        void setAutoindex(bool autoindex);
-        void setAllowedMethods(std::set<std::string> allowed_methods);
-        void setIndex(std::list<std::string> index);
+        void setPath(const std::string& path);
+        void setRoot(const std::string& root);
+        void setAutoindex(const std::string& line);
+        void setAllowedMethods(const std::string& line);
+        void setIndex(const std::string& line);
         void setCgiExtension(std::vector<std::string> cgi_extension);
         void setCgiPath(std::string cgi_path);
-        void setErrorPages(std::list<errorPage> error_pages);
-
-
+        void setErrorPages(const std::string& line);
+        void setReturn(const std::string& line);
 
 
 
