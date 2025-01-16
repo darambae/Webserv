@@ -22,16 +22,16 @@ ConfigParser::ConfigParser(const std::string& file) {
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test(file);
     if (!test.is_open())
-        throw   "Configuration file cannot be opened.";
+        throw "Configuration file cannot be opened.";
     this->filePath = file;
 }
 
-void    ConfigParser::setServers(const configServer& server) {
+void    ConfigParser::setServers(const ConfigServer& server) {
     this->servers.push_back(server);
 }
 
 bool ConfigParser::parseFile() {
-    configServer server;
+    ConfigServer server;
     std::string line;
     std::ifstream file(this->getFilePath());
 
@@ -50,14 +50,54 @@ bool ConfigParser::parseFile() {
     return true;
 }
 
-bool ConfigParser::parseLocation(std::ifstream &file, std::string line, configLocation &location) {
-    std::string path = line.substr(line.find(" ") + 1, line.find("{"));
+
+bool    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server) {
+    std::string line;
+    while (getline(file, line)) {
+        if (line.find("}") != std::string::npos) { return true; }
+        if (line.empty() || line[0] == '#') { continue; }
+        if (line.find("listen ") != std::string::npos && line.find(";") != std::string::npos) {
+            if (line.find(":") != std::string::npos) {
+                server.setIp(line.substr(line.find(" ") + 1, line.find(":")));
+                server.setPort(line.substr(line.find(":") + 1, line.find(";") - line.find(":") - 1));
+            }
+            else { 
+                if (line.find(".") != std::string::npos)
+                    server.setIp(line.substr(line.find(" ") + 1, line.find(";")));
+                else
+                    server.setPort(line.substr(line.find(" ") + 1, line.find(";")));
+            }
+        }
+        else if (line.find("server_name ") != std::string::npos) {
+            std::string server_name = line.substr(line.find(" ") + 1, line.find(";"));
+            server.setServerNames(server_name);
+        }
+        else if (line.find("root ") != std::string::npos)
+            server.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
+        else if (line.find("limit_client_body_size ") != std::string::npos)
+            server.setLimitClientBodySize(line.substr(line.find(" ") + 1, line.find(";")));
+        else if (line.find("error_page ") != std::string::npos) {
+            server.setErrorPages(line.substr(line.find(" ") + 1, line.find(";")));
+        }
+        else if (line.find("location {") != std::string::npos) {
+            ConfigLocation location;
+            parseLocation(file, line, location);
+            server.setLocations(location);
+        }
+        return false;
+    }
+}
+
+bool ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
+    size_t start_pos = line.find(" ") + 1;
+    size_t end_pos = line.find(";");
+    std::string path = line.substr(start_pos, line.find("{") - start_pos);
     location.setPath(path);
     while (getline(file, line)) {
         if (line.find("}") != std::string::npos) { return true; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos)
-            location.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
+            location.setRoot(line.substr(line.find(" ") + 1, end_pos - start_pos));
         else if (line.find("autoindex ") != std::string::npos)
             location.setAutoindex(line.substr(line.find(" ") + 1, line.find(";")));
         else if (line.find("index ") != std::string::npos)
@@ -67,8 +107,8 @@ bool ConfigParser::parseLocation(std::ifstream &file, std::string line, configLo
         else if (line.find("return ") != std::string::npos)
             location.setReturn(line.substr(line.find(" ") + 1, line.find(";")));
         
-        else { return false; }
     }
+    return false;
 }
 
 bool    ConfigParser::validMethods(const std::set<std::string>& methods) {
@@ -163,48 +203,13 @@ bool    ConfigParser::validRoot(const std::string& line) {
 }
 
 bool    ConfigParser::validBodySize(const std::string& line) {
-    if (!onlyDigits(line) || std::stoi(line) < 0)
+    unsigned long num = std::stoul(line);
+    if (num < 0 || std::isalpha(line[line.size() - 2]))
         return false;
-    return true;
-}
-
-bool    ConfigParser::parseDirectives(std::ifstream &file, configServer &server) {
-    std::string line;
-    while (getline(file, line)) {
-        if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && line.find(";") != std::string::npos) {
-            if (line.find(":") != std::string::npos) {
-                server.setIp(line.substr(line.find(" ") + 1, line.find(":")));
-                server.setPort(line.substr(line.find(":") + 1, line.find(";") - line.find(":") - 1));
-            }
-            else { 
-                if (line.find(".") != std::string::npos)
-                    server.setIp(line.substr(line.find(" ") + 1, line.find(";")));
-                else
-                    server.setPort(line.substr(line.find(" ") + 1, line.find(";")));
-            }
-        }
-        else if (line.find("server_name ") != std::string::npos) {
-            std::string server_name = line.substr(line.find(" ") + 1, line.find(";"));
-            while (server_name.find(" ") != std::string::npos) {
-                server.setServerNames(server_name.substr(0, server_name.find(" ")));
-                server_name = server_name.substr(server_name.find(" ") + 1);
-            }
-            server.setServerNames(server_name);
-        }
-        else if (line.find("root ") != std::string::npos)
-            server.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("limit_client_body_size ") != std::string::npos)
-            server.setLimitClientBodySize(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("error_page ") != std::string::npos) {
-            server.setErrorPages(line.substr(line.find(" ") + 1, line.find(";")));
-        }
-        else if (line.find("location") != std::string::npos) {
-            configLocation location;
-            parseLocation(file, line, location);
-            server.setLocations(location);
-        }
-    }
+    if (onlyDigits(line) || line[line.size() - 1] == 'k' || line[line.size() - 1] == 'K' ||
+            line[line.size() - 1] == 'm' || line[line.size() - 1] == 'M')
+        return true;
+    return false;
 }
 
 bool    onlyDigits(const std::string& str) {
