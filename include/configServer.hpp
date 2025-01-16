@@ -21,9 +21,10 @@ class configServer {
         int limit_client_body_size;
         std::list<errorPage> default_error_pages;
         std::vector<configLocation> locations;
-    
+
     public:
         configServer();
+		//add a constructor configServer(char ** argv);
         ~configServer() {};
 
         std::string getIp() const { return ip; };
