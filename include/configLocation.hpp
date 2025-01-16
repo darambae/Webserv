@@ -7,14 +7,13 @@
 #include <set>
 #include <vector>
 #include "sys/stat.h"
-#include "configParser.hpp"
 
 struct errorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
 
-class configLocation {
+class ConfigLocation {
     private:
         std::string path;
         std::string root;
@@ -24,10 +23,10 @@ class configLocation {
         std::vector<std::string> cgi_extension;
         std::string cgi_path;
         std::list<errorPage> error_pages;
-        std::string return_value;
+        std::list<std::string> return_value;
     public:
-        configLocation();
-        ~configLocation() {};
+        ConfigLocation();
+        ~ConfigLocation() {};
 
         std::string getPath() const { return path; };
         std::string getRoot() const { return root; };
@@ -47,7 +46,5 @@ class configLocation {
         void setCgiPath(std::string cgi_path);
         void setErrorPages(const std::string& line);
         void setReturn(const std::string& line);
-
-
 
 };

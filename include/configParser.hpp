@@ -1,8 +1,6 @@
 //By parsing configuration file, we save the data in a struct.
 #pragma once
 
-#include "configServer.hpp"
-#include "configLocation.hpp"
 #include <cstring>
 #include <fstream>
 #include <iostream>
@@ -10,29 +8,31 @@
 #include <sstream>
 #include <list>
 #include <set>
+#include "ConfigServer.hpp"
+#include "ConfigLocation.hpp"
 
-class   configServer;
-class   configLocation;
+class   ConfigServer;
+class   ConfigLocation;
 
-class   configParser {
+class   ConfigParser {
     private:
-        std::list<configServer>  servers;
+        std::list<ConfigServer>  servers;
         std::string filePath;
 
     public:
-        configParser(const std::string& filePath);
-        ~configParser() {};
+        ConfigParser(const std::string& filePath);
+        ~ConfigParser() {};
 
         void    setFilePath(const std::string& file);
-        void    setServers(const configServer& server);
+        void    setServers(const ConfigServer& server);
         const   std::string& getFilePath() const { return this->filePath; }
-        std::list<configServer>    getServers() const { return this->servers; }
+        std::list<ConfigServer>    getServers() const { return this->servers; }
 
         bool    parseFile();
-        bool    parseLocation(std::ifstream &file, std::string line, configLocation &location);
-        bool    parseDirectives(std::ifstream &file, configServer &server);
+        bool    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
+        bool    parseDirectives(std::ifstream &file, ConfigServer &server);
         
-        //void    checkValidity(const std::string& directive, configServer &server);
+        //void    checkValidity(const std::string& directive, ConfigServer &server);
         static bool    validMethods(const std::set<std::string>& methods);
         static bool    validIp(std::string ip);
         static bool    validPort(const std::string& port);

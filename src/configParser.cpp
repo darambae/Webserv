@@ -1,7 +1,7 @@
 /*By parsing configuration file following the rule of nginx config file, 
 save the data in a struct and return a list of servers info.*/
 
-#include "../include/configParser.hpp"
+#include "../include/ConfigParser.hpp"
 
 /*Pseudo code
 1. Read the configuration file line by line.
@@ -12,25 +12,25 @@ save the data in a struct and return a list of servers info.*/
 6. Save the data in a struct and return it.
 */
 
-configParser::configParser(const std::string& file) {
+ConfigParser::ConfigParser(const std::string& file) {
     if (file.empty())
         this->setFilePath("default.conf");
     else
         this->setFilePath(file);
 }
 
-void    configParser::setFilePath(const std::string& file) {
+void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test(file);
     if (!test.is_open())
         throw   "Configuration file cannot be opened.";
     this->filePath = file;
 }
 
-void    configParser::setServers(const configServer& server) {
+void    ConfigParser::setServers(const configServer& server) {
     this->servers.push_back(server);
 }
 
-bool configParser::parseFile() {
+bool ConfigParser::parseFile() {
     configServer server;
     std::string line;
     std::ifstream file(this->getFilePath());
@@ -50,10 +50,11 @@ bool configParser::parseFile() {
     return true;
 }
 
-bool configParser::parseLocation(std::ifstream &file, std::string line, configLocation &location) {
+bool ConfigParser::parseLocation(std::ifstream &file, std::string line, configLocation &location) {
     std::string path = line.substr(line.find(" ") + 1, line.find("{"));
     location.setPath(path);
     while (getline(file, line)) {
+        if (line.find("}") != std::string::npos) { return true; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos)
             location.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
@@ -65,12 +66,12 @@ bool configParser::parseLocation(std::ifstream &file, std::string line, configLo
             location.setAllowedMethods(line.substr(line.find(" ") + 1, line.find(";")));
         else if (line.find("return ") != std::string::npos)
             location.setReturn(line.substr(line.find(" ") + 1, line.find(";")));
-        if (line.find("}") != std::string::npos) { return true; }
+        
         else { return false; }
     }
 }
 
-bool    configParser::validMethods(const std::set<std::string>& methods) {
+bool    ConfigParser::validMethods(const std::set<std::string>& methods) {
     std::set<std::string> validMethods = {"GET", "POST", "DELETE", "PUT"};
     for (std::set<std::string>::iterator it = methods.begin(); it != methods.end(); ++it) {
         if (validMethods.find(*it) == validMethods.end())
@@ -79,7 +80,7 @@ bool    configParser::validMethods(const std::set<std::string>& methods) {
     return true;
 }
 
-bool    configParser::validIp(std::string ip) {
+bool    ConfigParser::validIp(std::string ip) {
     std::string  segment;
     size_t  pos;
     int     num;
@@ -99,30 +100,36 @@ bool    configParser::validIp(std::string ip) {
     return true;
 }
 
-bool    configParser::validPort(const std::string& port) {
-    if (stoi(port) < 0 || stoi(port) > 65535)
+bool    ConfigParser::validPort(const std::string& port) {
+    int num = std::stoi(port);
+    if (num < 0 || num > 65535)
         return false;
     return true;
 }
 
-bool    configParser::validAutoindex(const std::string& line) {
+bool    ConfigParser::validAutoindex(const std::string& line) {
     if (line.find("on") != std::string::npos || line.find("off") != std::string::npos)
         return true;
     return false;
 }
 
-bool    configParser::validErrorPage(const std::string& line) {
+bool    ConfigParser::validErrorPage(const std::string& line) {
     std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
-    while (tmp_list.size() > 0) {
-        if ((!onlyDigits(tmp_list.front()) && tmp_list.front()[0] != '/') ||
-                stoi(tmp_list.front()) < 300 || stoi(tmp_list.front()) > 599)
+    while (!tmp_list.empty()) {
+        const std::string& token = tmp_list.front();
+        if (token[0] == '/') {
+            if (tmp_list.size() > 1)
+                return false;
+            return true;
+        }
+        if (!onlyDigits(token)|| stoi(token) < 300 || stoi(token) > 599)
             return false;
         tmp_list.pop_front();
     }
-    return true;
+    return false;
 }
 
-bool    configParser::validReturn(const std::string& line) {
+bool    ConfigParser::validReturn(const std::string& line) {
     std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
     if (tmp_list.size() > 2 || tmp_list.size() == 0)
         return false;
@@ -146,7 +153,7 @@ bool    configParser::validReturn(const std::string& line) {
     return false;
 }
 
-bool    configParser::validRoot(const std::string& line) {
+bool    ConfigParser::validRoot(const std::string& line) {
     struct stat buffer;
     if (line.empty() || line[0] != '/')
         return false;
@@ -155,13 +162,13 @@ bool    configParser::validRoot(const std::string& line) {
     return true;
 }
 
-bool    configParser::validBodySize(const std::string& line) {
+bool    ConfigParser::validBodySize(const std::string& line) {
     if (!onlyDigits(line) || std::stoi(line) < 0)
         return false;
     return true;
 }
 
-bool    configParser::parseDirectives(std::ifstream &file, configServer &server) {
+bool    ConfigParser::parseDirectives(std::ifstream &file, configServer &server) {
     std::string line;
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
