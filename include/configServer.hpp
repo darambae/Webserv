@@ -40,5 +40,5 @@ class ConfigServer {
         void setRoot(const std::string& root);
         void setLimitClientBodySize(const std::string& limit_client_body_size);
         void setErrorPages(const std::string& error_page);
-        void setLocations(ConfigLocation location);
+        void setLocations(const ConfigLocation& location);
 };

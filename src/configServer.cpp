@@ -52,7 +52,7 @@ void    ConfigServer::setLimitClientBodySize(const std::string& value) {
         res = num * 1024 * 1024;
     else
         throw "Invalid value for limit client body size";
-    this->value = res;
+    this->limit_client_body_size = res;
 }
 
 void    ConfigServer::setErrorPages(const std::string& line) {
@@ -69,7 +69,7 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     }
     getErrorPages().push_back(error_page);}
 
-void    ConfigServer::setLocations(const configLocation& location) {
+void    ConfigServer::setLocations(const ConfigLocation& location) {
     //To do
     this->locations.push_back(location);
 }

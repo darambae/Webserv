@@ -59,7 +59,7 @@ void    ConfigLocation::setCgiPath(std::string cgi_path) {
 void    ConfigLocation::setErrorPages(const std::string& line) {
     std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
     errorPage error_page;
-    if (ConfigPasrser::validErrorPage(line) == false)
+    if (ConfigParser::validErrorPage(line) == false)
         throw "Invalid error page";
     while (!tmp_list.empty()) {
         const std::string& token = tmp_list.front();
