@@ -5,7 +5,7 @@
 #include <netinet/in.h> // sockaddr_in
 #include <unistd.h> //close...
 #include <poll.h>
-#include "configServer.hpp"
+#include "ConfigServer.hpp"
 
 
 #pragma once
@@ -14,7 +14,7 @@ class	Server {
 	private:
 		struct sockaddr_in	_address;//sockaddr_in is more specific structure than 'sockaddr'
 		int _server_fd, _new_socket, _client_count, _len_address, _max_clients;//new_socket: fd for the accepted client connection
-		configServer	_config;
+		ConfigServer	_config;
 		Server() {}
 	public:
 	class ServerException : public std::exception {
@@ -26,7 +26,7 @@ class	Server {
 		virtual const char* what() const throw() {return _message.c_str();}
 	};
 	~Server() {}
-	Server(configServer const & config) : _config(config) {
+	Server(ConfigServer const & config) : _config(config) {
 		_server_fd, _new_socket, _client_count = 0;
 		_len_address = sizeof(_address);
 		_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
