@@ -6,7 +6,8 @@
 #include <unistd.h> //close...
 #include <poll.h>
 #include <vector>
-#include "configServer.hpp"
+#include "ConfigServer.hpp"
+#include <algorithm>
 
 
 #pragma once
@@ -15,7 +16,7 @@ class	Server {
 	private:
 		struct sockaddr_in	_address;//sockaddr_in is more specific structure than 'sockaddr'
 		int _server_fd, _new_socket, _client_count,_bufferSize, _len_address, _max_clients;//new_socket: fd for the accepted client connection
-		configServer	_config;
+		ConfigServer	_config;
 		std::string		_buffer;
 		std::vector<struct pollfd> _fds;
 		Server() {}
@@ -29,7 +30,7 @@ class	Server {
 		virtual const char* what() const throw() {return _message.c_str();}
 	};
 	~Server();
-	Server(configServer const & config);
+	Server(ConfigServer const & config);
 	void	addFdToFds(int fd_to_add);
 	void	initServerSocket();
 	void	createNewSocket();

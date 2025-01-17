@@ -19,7 +19,7 @@
 //     }
 // }
 
-Server::Server(configServer const & config) : _config(config) {
+Server::Server(ConfigServer const & config) : _config(config) {
 	_server_fd, _new_socket, _client_count = 0;
 	_len_address = sizeof(_address);
 	_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
@@ -28,14 +28,14 @@ Server::Server(configServer const & config) : _config(config) {
 
 	initServerSocket();
     while (true) {
-        int poll_count = poll(fds.data(), fds.size(), -1);  // Wait indefinitely
+        int poll_count = poll(_fds.data(), _fds.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
             ServerException("Poll failed");
-        if (fds[0].revents & POLLIN)//means new connection to port 8080
+        if (_fds[0].revents & POLLIN)//means new connection to port 8080
 			createNewSocket();
         // Check all clients for incoming data
         for (int i = 1; i <= _fds.size(); ++i) {
-            if (fds[i].revents & POLLIN)//a socket client receive a message
+            if (_fds[i].revents & POLLIN)//a socket client receive a message
 				manageRequest(i);
         }
     }
@@ -49,15 +49,15 @@ Server::~Server() {
 }
 
 void	Server::addFdToFds(int fd_to_add) {
-	if (_fds.size() >= _max_client) {
+	if (_fds.size() >= _max_clients) {
         std::cout << "Max clients reached, rejecting connection\n";
         close(fd_to_add);
 		return;
 	}
 	struct pollfd new_socket;
-    new_socket.fd = _fd_to_add;
+    new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
-    _fds.pushback(new_socket);
+    _fds.push_back(new_socket);
 	_client_count++;
 }
 
@@ -85,7 +85,7 @@ void	Server::initServerSocket() {
         close(_server_fd);
         throw ServerException("Listen failed");
     }
-    std::cout << "Server is listening on port " << config.getPort() << std::endl;
+    std::cout << "Server is listening on port " << _config.getPort() << std::endl;
 	addFdToFds(_server_fd);
 	//maybe not necessary if we use vector
 	//for (int i = 1; i <= _max_clients; ++i) {
@@ -95,41 +95,40 @@ void	Server::initServerSocket() {
 
 void	Server::createNewSocket() {
 	//if we want to save data from each client, create a sockaddr_in for each
-	new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t *)&len_address);
-        if (new_socket < 0) {
-            perror("Accept failed");
-            return;
-        }
-        std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
-        addFdtoFds(new_socket);
+	int new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
+    if (new_socket < 0) {
+        perror("Accept failed");
+        return;
+    }
+    std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
+    addFdToFds(new_socket);
 }
 
 void	Server::manageRequest(int i) {
-	_buffer.fill(_buffer.begin(), _buffer.end(), '\0');
-    int bytes_received = recv(fds[i].fd, _buffer.c_str(), _bufferSize, 0);
+	std::fill(_buffer.begin(), _buffer.end(), '\0');
+    int bytes_received = recv(_fds[i].fd, const_cast<char *>(_buffer.c_str()), _bufferSize, 0);
     if (bytes_received == 0) {//client closed properly the connection
         std::cout << "Client disconnected\n";
-        close(fds[i].fd);
-        _fds.erase(fds.begin() + i);
-        client_count--;
+        close(_fds[i].fd);
+        _fds.erase(_fds.begin() + i);
+        _client_count--;
         } else if (bytes_received < 0) {
             perror("Recv failed");
         } else {
-			//         const char *http_response =
-//     "HTTP/1.1 200 OK\r\n"
-//     "Content-Type: text/html\r\n"
-//     "Content-Length: 38\r\n"
-//     "\r\n"
-//     "<html>\n"
-//     "    <h1>Hello, World!</h1>\n"
-//     "</html>";
-// ;
+			const char *http_response =
+			"HTTP/1.1 200 OK\r\n"
+			"Content-Type: text/html\r\n"
+			"Content-Length: 38\r\n"
+			"\r\n"
+			"<html>\n"
+			"    <h1>Hello, World!</h1>\n"
+			"</html>";
             std::cout << "Client's Received: " << _buffer << std::endl;
             // Convert message to uppercase and send it back
             std::transform(_buffer.begin(), _buffer.end(), _buffer.begin(), ::toupper);
             //send(fds[i].fd, buffer, strlen(buffer), 0);
-            send(fds[i].fd, http_response, strlen(http_response), 0);
-            std::cout << "HTTP response sent to client " << fds[i].fd << std::endl;
+            send(_fds[i].fd, http_response, strlen(http_response), 0);
+            std::cout << "HTTP response sent to client " << _fds[i].fd << std::endl;
             //std::cout << "Echoed back: " << buffer << "\n";
         }
 }
@@ -173,7 +172,7 @@ in a struct sockaddr and should be set to “AF_INET”. Finally, the sin_port m
 		-1 = infinite wait until event;
 		> 0 = wait .. ms before to return;
 	- int return is the number of events wich occur
-	!!!to check is revents contain POLLIN we cannot do :
+	!!!to check if revents contain POLLIN we cannot do :
 	X if (revents == POLLIN)//because POLLIN correspond to a byte in revents
 	and revents can contain the byte of POLLIN and the byte of POLLOUT
 	so to check if revents contain one of them we do :

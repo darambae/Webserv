@@ -31,8 +31,8 @@ class   ConfigParser {
         bool    parseFile();
         bool    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
         bool    parseDirectives(std::ifstream &file, ConfigServer &server);
-        
- 
+
+
         static bool    validMethods(const std::set<std::string>& methods);
         static bool    validIp(std::string ip);
         static bool    validPort(const std::string& port);
