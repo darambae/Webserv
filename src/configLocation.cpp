@@ -1,57 +1,80 @@
 
-#include "../include/configLocation.hpp"
+#include "../include/ConfigLocation.hpp"
+#include "../include/ConfigParser.hpp"
 
-configLocation::configLocation() {
+ConfigLocation::ConfigLocation() {
     path = "";
     root = "";
     autoindex = false;
-    limit_client_body_size = -1;
 }
 
-void    configLocation::setPath(std::string path) {
-    //To do
+void    ConfigLocation::setPath(const std::string& path) {
+    struct stat buffer;
+    if (path.empty() || path[0] != '/') //Checking if the path is empty or doesn't start with '/'
+        throw "Invalid path";
+    else if (stat(path.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0) //Checking if the path is valid and a directory
+        throw "Invalid path";
     this->path = path;
 }
 
-void    configLocation::setRoot(std::string root) {
-    //To do
+void    ConfigLocation::setRoot(const std::string& root) {
+    struct stat buffer;
+    if (root.empty() || root[0] != '/') //Checking if the root is empty or doesn't start with '/'
+        throw "Invalid root";
+    else if (stat(root.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0) //Checking if the root is valid and a directory
+        throw "Invalid root";
     this->root = root;
 }
 
-void    configLocation::setAutoindex(bool autoindex) {
-    //To do
-    this->autoindex = autoindex;
+void    ConfigLocation::setAutoindex(const std::string& line) {
+    //its default value is off
+    if (line.find("on") != std::string::npos)
+        this->autoindex = true;    
+    else if (line.find("off") == std::string::npos)
+        throw "Invalid autoindex value.";
 }
 
-void    configLocation::setAllowedMethods(std::set<std::string> allowed_methods) {
-    //To do
-    this->allowed_methods = allowed_methods;
+void    ConfigLocation::setAllowedMethods(const std::string& line) {
+    std::set<std::string> tmp_methods = splitString<std::set<std::string>>(line, ' ');
+    if (!ConfigParser::validMethods(tmp_methods))
+        throw "Invalid methods";
+    this->allowed_methods = tmp_methods;
 }
 
-void    configLocation::setIndex(std::list<std::string> index) {
-    //To do
-    this->index = index;
+void    ConfigLocation::setIndex(const std::string& line) {
+    this->index = splitString<std::list<std::string>>(line, ' ');
 }
 
-void    configLocation::setCgiExtension(std::vector<std::string> cgi_extension) {
+void    ConfigLocation::setCgiExtension(std::vector<std::string> cgi_extension) {
     //To do
     this->cgi_extension = cgi_extension;
 }
 
-void    configLocation::setCgiPath(std::string cgi_path) {
+void    ConfigLocation::setCgiPath(std::string cgi_path) {
     //To do
     this->cgi_path = cgi_path;
 }
 
-void    configLocation::setErrorPages(std::list<errorPage> error_pages) {
-    //To do
-    this->error_pages = error_pages;
+//loop through several status codes for one error page and save them in a set
+void    ConfigLocation::setErrorPages(const std::string& line) {
+    std::list<std::string> tmp_list = splitString<std::list<std::string>>(line, ' ');
+    errorPage error_page;
+    if (ConfigParser::validErrorPage(line) == false)
+        throw "Invalid error page";
+    while (!tmp_list.empty()) {
+        const std::string& token = tmp_list.front();
+        if (token[0] == '/')
+            error_page.error_path = token;
+        else
+            error_page.error_codes.insert(stoi(token));
+        tmp_list.pop_front();
+    }
+    getErrorPages().push_back(error_page);
 }
 
-void    configLocation::setLimitClientBodySize(int limit_client_body_size) {
-    //To do
-    this->limit_client_body_size = limit_client_body_size;
+void    ConfigLocation::setReturn(const std::string& line) {
+    if (ConfigParser::validReturn(line) == false)
+        throw "Invalid return";
+    this->return_value = splitString<std::list<std::string>>(line, ' ');
 }
-
-
 

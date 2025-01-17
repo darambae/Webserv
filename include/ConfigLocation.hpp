@@ -6,13 +6,14 @@
 #include <list>
 #include <set>
 #include <vector>
+#include "sys/stat.h"
 
 struct errorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
 
-class configLocation {
+class ConfigLocation {
     private:
         std::string path;
         std::string root;
@@ -22,11 +23,10 @@ class configLocation {
         std::vector<std::string> cgi_extension;
         std::string cgi_path;
         std::list<errorPage> error_pages;
-        int limit_client_body_size;
-
+        std::list<std::string> return_value;
     public:
-        configLocation();
-        ~configLocation() {};
+        ConfigLocation();
+        ~ConfigLocation() {};
 
         std::string getPath() const { return path; };
         std::string getRoot() const { return root; };
@@ -36,20 +36,15 @@ class configLocation {
         std::vector<std::string> getCgiExtension() const { return cgi_extension; };
         std::string getCgiPath() const { return cgi_path; };
         std::list<errorPage> getErrorPages() const { return error_pages; };
-        int getLimitClientBodySize() const { return limit_client_body_size; };
 
-        void setPath(std::string path);
-        void setRoot(std::string root);
-        void setAutoindex(bool autoindex);
-        void setAllowedMethods(std::set<std::string> allowed_methods);
-        void setIndex(std::list<std::string> index);
+        void setPath(const std::string& path);
+        void setRoot(const std::string& root);
+        void setAutoindex(const std::string& line);
+        void setAllowedMethods(const std::string& line);
+        void setIndex(const std::string& line);
         void setCgiExtension(std::vector<std::string> cgi_extension);
         void setCgiPath(std::string cgi_path);
-        void setErrorPages(std::list<errorPage> error_pages);
-        void setLimitClientBodySize(int limit_client_body_size);
-
-
-
-
+        void setErrorPages(const std::string& line);
+        void setReturn(const std::string& line);
 
 };
