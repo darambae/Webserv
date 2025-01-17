@@ -21,7 +21,7 @@ class ConfigServer {
         unsigned long limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
         std::list<errorPage> error_pages;
         std::vector<ConfigLocation> locations;
-    
+
     public:
         ConfigServer();
         ~ConfigServer() {};
