@@ -54,6 +54,8 @@ void	Server::addFdToFds(int fd_to_add) {
         close(fd_to_add);
 		return;
 	}
+	if (_fds.size() == 0)
+		_client_count--;
 	struct pollfd new_socket;
     new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
