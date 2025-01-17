@@ -1,0 +1,18 @@
+KELLY: 
+- handle confif list
+
+GAUTIER: 
+
+
+DARAM:
+
+
+
+GAUDALY: 
+- Where is Buffer_size defined ? 
+	=> Buffer_size of the buffer we read in the request fd.
+
+- Nb of Max_clients to define.
+
+- Does a new connection means a request with content ? 
+	=> do we make a map<fd, request class> directly ?
