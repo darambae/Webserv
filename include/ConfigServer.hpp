@@ -12,6 +12,8 @@ struct errorPage {
     std::string error_path;
 };
 
+class ConfigLocation;
+
 class ConfigServer {
     private:
         std::string ip;
@@ -29,7 +31,7 @@ class ConfigServer {
         std::string getIp() const { return ip; };
         int getPort() const { return port; };
         std::vector<std::string> getServerNames() const { return server_names; };
-        std::string getRoot()  { return root; };
+        std::string getRoot() const { return root; };
         int getLimitClientBodySize() const { return limit_client_body_size; };
         std::list<errorPage> getErrorPages() const { return error_pages; };
         std::vector<ConfigLocation> getLocations() const { return locations; };
@@ -42,3 +44,5 @@ class ConfigServer {
         void setErrorPages(const std::string& error_page);
         void setLocations(const ConfigLocation& location);
 };
+
+std::ostream& operator<<(std::ostream& os, const ConfigServer& c);
