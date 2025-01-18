@@ -18,9 +18,9 @@ int	main(int argc, char **argv) {
 	if (argc == 2)
 		configFile = argv[1];
 	ConfigParser	config(configFile);
-	Server	server(config.getServers())
+	Server servers(config.getServers());
 }
-    5.2 
+    5.2
 */
 
 // #include "../include/ConfigParser.hpp"
