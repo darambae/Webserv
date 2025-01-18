@@ -27,11 +27,10 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 */
 
 Server::Server(std::list<ConfigServer> & config) : _config(config) {
-	std::vector<Server>	servers;
-	while (configServers.size() > 0) {
-		Server	new_server(configServers.front());
-		configServers.pop_front();
-		servers.push_back(new_server);
+	std::list<ConfigServer>::iterator	it;
+	for (it = _config.begin(); it != _config.end(); ++it) {
+		addServer(*it);
+	}
 }
 
 Server::~Server() {
@@ -42,7 +41,8 @@ Server::~Server() {
 }
 
 void	Server::addServer(ConfigServer config) {
-	_server_fd, _new_socket, _client_count = 0;
+	t_fd_data	*data_new_server = new t_fd_data;
+	data_new_server.fd_server, data_new_server.client_count = 0;
 	_len_address = sizeof(_address);
 	_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
 	_bufferSize = _config.getLimitClientBodySize();
