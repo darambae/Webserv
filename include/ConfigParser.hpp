@@ -1,7 +1,6 @@
 //By parsing configuration file, we save the data in a struct.
 #pragma once
 
-#include <cstring>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -11,8 +10,8 @@
 #include "ConfigServer.hpp"
 #include "ConfigLocation.hpp"
 
-class   ConfigServer;
-class   ConfigLocation;
+class ConfigServer;
+class ConfigLocation;
 
 class   ConfigParser {
     private:
@@ -25,14 +24,14 @@ class   ConfigParser {
 
         void    setFilePath(const std::string& file);
         void    setServers(const ConfigServer& server);
-        const   std::string& getFilePath() const { return this->filePath; }
+        const   std::string&    getFilePath() const { return this->filePath; }
         std::list<ConfigServer>    getServers() const { return this->servers; }
 
-        bool    parseFile();
-        bool    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
-        bool    parseDirectives(std::ifstream &file, ConfigServer &server);
-
-
+        void    parseFile();
+        void    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
+        void    parseDirectives(std::ifstream &file, ConfigServer &server);
+        
+ 
         static bool    validMethods(const std::set<std::string>& methods);
         static bool    validIp(std::string ip);
         static bool    validPort(const std::string& port);
@@ -41,6 +40,7 @@ class   ConfigParser {
         static bool    validReturn(const std::string& line);
         static bool    validRoot(const std::string& line);
         static bool    validBodySize(const std::string& line);
+
 
 };
 

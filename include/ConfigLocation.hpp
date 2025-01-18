@@ -7,11 +7,9 @@
 #include <set>
 #include <vector>
 #include "sys/stat.h"
+#include "ConfigParser.hpp"
 
-struct errorPage {
-    std::set<int> error_codes;
-    std::string error_path;
-};
+struct errorPage;
 
 class ConfigLocation {
     private:
@@ -36,6 +34,7 @@ class ConfigLocation {
         std::vector<std::string> getCgiExtension() const { return cgi_extension; };
         std::string getCgiPath() const { return cgi_path; };
         std::list<errorPage> getErrorPages() const { return error_pages; };
+        std::list<std::string> getReturn() const { return return_value; };
 
         void setPath(const std::string& path);
         void setRoot(const std::string& root);
@@ -48,3 +47,5 @@ class ConfigLocation {
         void setReturn(const std::string& line);
 
 };
+
+std::ostream& operator<<(std::ostream& os, const ConfigLocation& c);
