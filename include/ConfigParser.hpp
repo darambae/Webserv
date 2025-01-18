@@ -55,4 +55,6 @@ Container splitString(const std::string& line, char delimiter) {
     return result;
 }
 
+void    removeWhitespaces(std::string& str); //Remove whitespaces from a string in the beginning and the end
+bool    endingSemicolon(const std::string& line);
 bool    onlyDigits(const std::string& str); //Check if a string contains only digits

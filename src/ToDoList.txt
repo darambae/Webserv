@@ -10,7 +10,8 @@ DARAM:
 
 GAUDALY: 
 - Where is Buffer_size defined ? 
-	=> Buffer_size of the buffer we read in the request fd.
+	=> Buffer_size of the buffer we read in the request fd. 
+	->(Daram) : Don't we have to assign as we want??
 
 - Nb of Max_clients to define.
 

@@ -75,5 +75,14 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     os << "Location path: " << location.getPath() << std::endl;
     os << "Root: " << location.getRoot() << std::endl;
     os << "Auto_index: " << location.getAutoindex() << std::endl;
+    os << "Allowed methods: ";
+    for (std::set<std::string>::iterator it = location.getAllowedMethods().begin(); it != location.getAllowedMethods().end(); ++it)
+        os << *it << " ";
+    os << std::endl;
+    os << "Index: ";
+    for (std::list<std::string>::const_iterator it = location.getIndex().begin(); it != location.getIndex().end(); ++it)
+        os << *it << " ";
+    os << std::endl;
+    
     return os;
 }

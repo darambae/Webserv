@@ -49,29 +49,30 @@ void    ConfigParser::parseFile() {
 void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server) {
     std::string line;
     while (getline(file, line)) {
+        removeWhitespaces(line);
         if (line.find("}") != std::string::npos) { break; }
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && line.find(";") != std::string::npos) {
+        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
             if (line.find(":") != std::string::npos) {
                 server.setIp(line.substr(line.find(" ") + 1, line.find(":")));
                 server.setPort(line.substr(line.find(":") + 1, line.find(";") - line.find(":") - 1));
             }
-            else { 
+            else {
                 if (line.find(".") != std::string::npos)
                     server.setIp(line.substr(line.find(" ") + 1, line.find(";")));
                 else
                     server.setPort(line.substr(line.find(" ") + 1, line.find(";")));
             }
         }
-        else if (line.find("server_name ") != std::string::npos) {
+        else if (line.find("server_name ") != std::string::npos && endingSemicolon(line)) {
             std::string server_name = line.substr(line.find(" ") + 1, line.find(";"));
             server.setServerNames(server_name);
         }
-        else if (line.find("root ") != std::string::npos)
+        else if (line.find("root ") != std::string::npos && endingSemicolon(line))
             server.setRoot(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("limit_client_body_size ") != std::string::npos)
+        else if (line.find("limit_client_body_size ") != std::string::npos && endingSemicolon(line))
             server.setLimitClientBodySize(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("error_page ") != std::string::npos) {
+        else if (line.find("error_page ") != std::string::npos && endingSemicolon(line)) {
             server.setErrorPages(line.substr(line.find(" ") + 1, line.find(";")));
         }
         else if (line.find("location {") != std::string::npos) {
@@ -88,17 +89,18 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
     std::string path = line.substr(start_pos, line.find("{") - start_pos);
     location.setPath(path);
     while (getline(file, line)) {
+        removeWhitespaces(line);
         if (line.find("}") != std::string::npos) { break; }
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("root ") != std::string::npos)
+        if (line.find("root ") != std::string::npos && endingSemicolon(line))
             location.setRoot(line.substr(line.find(" ") + 1, end_pos - start_pos));
-        else if (line.find("autoindex ") != std::string::npos)
+        else if (line.find("autoindex ") != std::string::npos && endingSemicolon(line))
             location.setAutoindex(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("index ") != std::string::npos)
+        else if (line.find("index ") != std::string::npos && endingSemicolon(line))
             location.setIndex(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("allowed_methods ") != std::string::npos)
+        else if (line.find("allowed_methods ") != std::string::npos && endingSemicolon(line))
             location.setAllowedMethods(line.substr(line.find(" ") + 1, line.find(";")));
-        else if (line.find("return ") != std::string::npos)
+        else if (line.find("return ") != std::string::npos && endingSemicolon(line))
             location.setReturn(line.substr(line.find(" ") + 1, line.find(";")));
         
     }
@@ -151,18 +153,16 @@ bool    ConfigParser::validAutoindex(const std::string& line) {
 }
 
 bool    ConfigParser::validErrorPage(const std::string& line) {
-    std::cout << line << std::endl;
     std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
-    while (tmp_list.size() > 0) {
+    while (!tmp_list.empty()) {
         const std::string& token = tmp_list.front();
         if (onlyDigits(token) && std::atoi(token.c_str()) >= 300 && std::atoi(token.c_str()) <= 599) {
             tmp_list.pop_front();
             continue;
         }
-        if (token[0] == '/' && tmp_list.size() == 1) {
-            tmp_list.pop_front();
+        if (token[0] == '/' && tmp_list.size() == 1)
             return true;
-        }
+        tmp_list.pop_front();
     }
     return false;
 }
@@ -195,8 +195,8 @@ bool    ConfigParser::validRoot(const std::string& line) {
     struct stat buffer;
     if (line.empty() || line[0] != '/')
         return false;
-    if (stat(line.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
-        return false;
+    // if (stat(line.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
+    //     return false;
     return true;
 }
 
@@ -212,4 +212,18 @@ bool    ConfigParser::validBodySize(const std::string& line) {
 
 bool    onlyDigits(const std::string& str) {
     return str.find_first_not_of("0123456789") == std::string::npos;
+}
+
+void    removeWhitespaces(std::string& str) { 
+    size_t  start = str.find_first_not_of(" \t");
+    size_t  end = str.find_last_not_of(" \t");
+
+    if (start == std::string::npos)
+        str = "";
+    else
+        str = str.substr(start, end - start + 1);
+}
+
+bool    endingSemicolon(const std::string& str) {
+    return str[str.size() - 1] == ';';
 }

@@ -78,20 +78,20 @@ std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
     os << "Root: " << server.getRoot() << std::endl;
     os << "Limit client body size: " << server.getLimitClientBodySize() << std::endl;
     os << "Error pages: " << std::endl;
-    // std::vector<ErrorPage>::const_iterator it;
-    // for (it = server.getErrorPages().begin(); it != server.getErrorPages().end(); ++it) {
-    //     os << "Error path: " << it->error_path << std::endl;
-    //     os << "Error codes: ";
+    std::vector<ErrorPage>::const_iterator it;
+    for (it = server.getErrorPages().begin(); it != server.getErrorPages().end(); ++it) {
+        os << "Error path: " << it->error_path << std::endl;
+        os << "Error codes: ";
 
-    //     std::vector<int>::const_iterator it2;
-    //     for (it2 = it->error_codes.begin(); it2 != it->error_codes.end(); ++it2) {
-    //         os << *it2 << " ";
-    //     }
-    //     os << std::endl;
-    // }
-    // os << "Locations: " << std::endl;
-    // std::vector<ConfigLocation>::const_iterator it;
-    // for (it = server.getLocations().begin(); it != server.getLocations().end(); ++it)
-    //     os << *it << std::endl;
+        std::vector<int>::const_iterator it2;
+        for (it2 = it->error_codes.begin(); it2 != it->error_codes.end(); ++it2) {
+            os << *it2 << " ";
+        }
+        os << std::endl;
+    }
+    os << "Locations: " << std::endl;
+    std::vector<ConfigLocation>::const_iterator it;
+    for (it = server.getLocations().begin(); it != server.getLocations().end(); ++it)
+        os << *it << std::endl;
     return os;
 }
