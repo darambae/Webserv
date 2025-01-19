@@ -38,7 +38,12 @@ int main(int ac, char **av)
     try {
         ConfigParser parser(file);
         parser.parseFile();
-        std::cout << parser.getServers().size() << " servers found" << std::endl;
+        const std::list<ConfigServer>& servers = parser.getServers();
+        std::cout << servers.size() << " servers found" << std::endl;
+        std::list<ConfigServer>::const_iterator  it = servers.begin();
+        for (it = servers.begin(); it != servers.end(); ++it)
+            std::cout << *it << std::endl;
+        
     } catch (const char *e) {
         std::cerr << "Error: " << e << std::endl;
         return 1;

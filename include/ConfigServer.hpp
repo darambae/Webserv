@@ -6,11 +6,7 @@
 #include <vector>
 #include "ConfigLocation.hpp"
 #include "ConfigParser.hpp"
-
-struct errorPage {
-    std::set<int> error_codes;
-    std::string error_path;
-};
+#include "webserv.hpp"
 
 class ConfigLocation;
 
@@ -21,7 +17,7 @@ class ConfigServer {
         std::vector<std::string> server_names;
         std::string root;
         unsigned long limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
-        std::list<errorPage> error_pages;
+        std::list<ErrorPage> error_pages;
         std::vector<ConfigLocation> locations;
 
     public:
@@ -33,7 +29,7 @@ class ConfigServer {
         std::vector<std::string> getServerNames() const { return server_names; };
         std::string getRoot() const { return root; };
         int getLimitClientBodySize() const { return limit_client_body_size; };
-        std::list<errorPage> getErrorPages() const { return error_pages; };
+        std::list<ErrorPage> getErrorPages() const { return error_pages; };
         std::vector<ConfigLocation> getLocations() const { return locations; };
 
         void setIp(const std::string& ip);

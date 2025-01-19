@@ -1,6 +1,5 @@
 
 #include "../include/ConfigLocation.hpp"
-#include "../include/ConfigParser.hpp"
 
 ConfigLocation::ConfigLocation() {
     path = "";
@@ -27,11 +26,10 @@ void    ConfigLocation::setAutoindex(const std::string& line) {
         this->autoindex = true;
 }
 
-void    ConfigLocation::setAllowedMethods(const std::string& line) {
-    std::set<std::string> tmp_methods = splitString<std::set<std::string> >(line, ' ');
-    if (!ConfigParser::validMethods(tmp_methods))
+void    ConfigLocation::setAllowMethods(const std::string& line) {
+    if (!ConfigParser::validMethods(line))
         throw "Invalid methods";
-    this->allowed_methods = tmp_methods;
+    this->allowed_methods = splitString<std::set<std::string> >(line, ' ');
 }
 
 void    ConfigLocation::setIndex(const std::string& line) {
@@ -51,7 +49,7 @@ void    ConfigLocation::setCgiPath(std::string cgi_path) {
 //loop through several status codes for one error page and save them in a set
 void    ConfigLocation::setErrorPages(const std::string& line) {
     std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
-    errorPage error_page;
+    ErrorPage error_page;
     if (ConfigParser::validErrorPage(line) == false)
         throw "Invalid error page";
     while (!tmp_list.empty()) {
@@ -72,17 +70,62 @@ void    ConfigLocation::setReturn(const std::string& line) {
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
-    os << "Location path: " << location.getPath() << std::endl;
-    os << "Root: " << location.getRoot() << std::endl;
-    os << "Auto_index: " << location.getAutoindex() << std::endl;
-    os << "Allowed methods: ";
-    for (std::set<std::string>::iterator it = location.getAllowedMethods().begin(); it != location.getAllowedMethods().end(); ++it)
-        os << *it << " ";
-    os << std::endl;
-    os << "Index: ";
-    for (std::list<std::string>::const_iterator it = location.getIndex().begin(); it != location.getIndex().end(); ++it)
-        os << *it << " ";
-    os << std::endl;
-    
+    os << "Location: " << std::endl;
+    if (!location.getPath().empty()) {
+        os << "Path: " << location.getPath() << std::endl;
+    }
+    if (!location.getRoot().empty()) {
+        os << "Root: " << location.getRoot() << std::endl;
+    }
+    os << "Autoindex: " << (location.getAutoindex() ? "on" : "off") << std::endl;
+
+    std::set<std::string> allowed_methods = location.getAllowMethods();
+    if (!allowed_methods.empty()) {
+        os << "Allowed methods: ";
+        for (std::set<std::string>::const_iterator it = allowed_methods.begin(); it != allowed_methods.end(); ++it)
+            os << *it << " ";
+        os << std::endl;
+    }
+
+    std::list<std::string> index = location.getIndex();
+    if (!index.empty()) {
+        os << "Index: ";
+        for (std::list<std::string>::const_iterator it = index.begin(); it != index.end(); ++it)
+            os << *it << " ";
+        os << std::endl;
+    }
+
+    std::vector<std::string> cgi_extension = location.getCgiExtension();
+    if (!cgi_extension.empty()) {
+        os << "CGI Extensions: ";
+        for (std::vector<std::string>::const_iterator it = cgi_extension.begin(); it != cgi_extension.end(); ++it)
+            os << *it << " ";
+        os << std::endl;
+    }
+
+    if (!location.getCgiPath().empty()) {
+        os << "CGI Path: " << location.getCgiPath() << std::endl;
+    }
+
+    std::list<ErrorPage> error_pages = location.getErrorPages();
+    if (!error_pages.empty()) {
+        os << "Error pages: " << std::endl;
+        for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+            os << "Error codes: ";
+            for (std::set<int>::const_iterator it_code = it->error_codes.begin(); it_code != it->error_codes.end(); ++it_code)
+                os << *it_code << " ";
+            os << std::endl;
+            os << "Error path: " << it->error_path << std::endl;
+        }
+    }
+
+    std::list<std::string> return_value = location.getReturn();
+    if (!return_value.empty()) {
+        os << "Return: ";
+        for (std::list<std::string>::const_iterator it = return_value.begin(); it != return_value.end(); ++it)
+            os << *it << " ";
+        os << std::endl;
+    }
+
     return os;
 }
