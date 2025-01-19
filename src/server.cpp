@@ -19,7 +19,29 @@
 //     }
 // }
 
-Server::Server(ConfigServer const & config) : _config(config) {
+/*TO DO :
+• Votre serveur doit pouvoir écouter sur plusieurs ports (cf. Fichier de configuration).
+• Il doit être non bloquant et n’utiliser qu’un seul poll() (ou équivalent) pour
+toutes les opérations entrées/sorties entre le client et le serveur (listen inclus).
+
+*/
+
+Server::Server(std::list<ConfigServer> & config) : _config(config) {
+	std::vector<Server>	servers;
+	while (configServers.size() > 0) {
+		Server	new_server(configServers.front());
+		configServers.pop_front();
+		servers.push_back(new_server);
+}
+
+Server::~Server() {
+	for (int i = _fds.size(); i > 0; ++i) {
+		close(_fds[i].fd);
+		_fds.erase(_fds.begin() + i);
+	}
+}
+
+void	Server::addServer(ConfigServer config) {
 	_server_fd, _new_socket, _client_count = 0;
 	_len_address = sizeof(_address);
 	_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
@@ -39,13 +61,6 @@ Server::Server(ConfigServer const & config) : _config(config) {
 				manageRequest(i);
         }
     }
-}
-
-Server::~Server() {
-	for (int i = _fds.size(); i > 0; ++i) {
-		close(_fds[i].fd);
-		_fds.erase(_fds.begin() + i);
-	}
 }
 
 void	Server::addFdToFds(int fd_to_add) {

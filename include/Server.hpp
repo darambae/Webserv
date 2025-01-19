@@ -8,7 +8,7 @@
 #include <vector>
 #include "ConfigServer.hpp"
 #include <algorithm>
-
+#include <list>
 
 #pragma once
 
@@ -16,7 +16,7 @@ class	Server {
 	private:
 		struct sockaddr_in	_address;//sockaddr_in is more specific structure than 'sockaddr'
 		int _server_fd, _new_socket, _client_count,_bufferSize, _len_address, _max_clients;//new_socket: fd for the accepted client connection
-		ConfigServer	_config;
+		std::list<ConfigServer>	_config;
 		std::string		_buffer;
 		std::vector<struct pollfd> _fds;
 		Server() {}
@@ -30,7 +30,8 @@ class	Server {
 		virtual const char* what() const throw() {return _message.c_str();}
 	};
 	~Server();
-	Server(ConfigServer const & config);
+	Server(std::list<ConfigServer> & config);
+	void	addServer(ConfigServer config);
 	void	addFdToFds(int fd_to_add);
 	void	initServerSocket();
 	void	createNewSocket();
