@@ -16,8 +16,8 @@ class ConfigLocation;
 
 class   ConfigParser {
     private:
-        std::list<ConfigServer>  servers;
-        std::string filePath;
+        std::list<ConfigServer>  _servers;
+        std::string _filePath;
 
     public:
         ConfigParser(const std::string& filePath);
@@ -25,8 +25,8 @@ class   ConfigParser {
 
         void    setFilePath(const std::string& file);
         void    setServers(const ConfigServer& server);
-        const   std::string&    getFilePath() const { return this->filePath; }
-        std::list<ConfigServer>    getServers() const { return this->servers; }
+        const   std::string&    getFilePath() const { return this->_filePath; }
+        std::list<ConfigServer>    getServers() const { return this->_servers; }
 
         void    parseFile();
         void    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
@@ -56,11 +56,12 @@ Container splitString(const std::string& line, char delimiter) {
     return result;
 }
 
-template <typename Container> //Print a container of strings
+template <typename Container> //Print a container
 void printContainer(const Container& container) {
     typename Container::const_iterator it = container.begin();
     for (it = container.begin(); it != container.end(); ++it)
-        std::cout << *it << std::endl;
+        std::cout << *it << " ";
+    std::cout << std::endl;
 }
 
 void    removeWhitespaces(std::string& str); //Remove whitespaces from a string in the beginning and the end

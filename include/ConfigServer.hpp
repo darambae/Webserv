@@ -3,7 +3,6 @@
 #include <iostream>
 #include <list>
 #include <set>
-#include <vector>
 #include "ConfigLocation.hpp"
 #include "ConfigParser.hpp"
 #include "webserv.hpp"
@@ -12,25 +11,25 @@ class ConfigLocation;
 
 class ConfigServer {
     private:
-        std::string ip;
-        int port;
-        std::vector<std::string> server_names;
-        std::string root;
-        unsigned long limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
-        std::list<ErrorPage> error_pages;
-        std::vector<ConfigLocation> locations;
+        std::string _ip;
+        int _port;
+        std::list<std::string> _server_names;
+        std::string _root;
+        unsigned long _limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
+        std::list<ErrorPage> _error_pages;
+        std::list<ConfigLocation> _locations;
 
     public:
         ConfigServer();
         ~ConfigServer() {};
 
-        std::string getIp() const { return ip; };
-        int getPort() const { return port; };
-        std::vector<std::string> getServerNames() const { return server_names; };
-        std::string getRoot() const { return root; };
-        int getLimitClientBodySize() const { return limit_client_body_size; };
-        std::list<ErrorPage> getErrorPages() const { return error_pages; };
-        std::vector<ConfigLocation> getLocations() const { return locations; };
+        std::string getIp() const { return _ip; };
+        int getPort() const { return _port; };
+        std::list<std::string> getServerNames() const { return _server_names; };
+        std::string getRoot() const { return _root; };
+        int getLimitClientBodySize() const { return _limit_client_body_size; };
+        std::list<ErrorPage> getErrorPages() const { return _error_pages; };
+        std::list<ConfigLocation> getLocations() const { return _locations; };
 
         void setIp(const std::string& ip);
         void setPort(const std::string& port);
@@ -39,6 +38,6 @@ class ConfigServer {
         void setLimitClientBodySize(const std::string& limit_client_body_size);
         void setErrorPages(const std::string& error_page);
         void setLocations(const ConfigLocation& location);
-};
+};;
 
 std::ostream& operator<<(std::ostream& os, const ConfigServer& c);

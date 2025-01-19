@@ -20,11 +20,11 @@ void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test(file);
     if (!test.is_open())
         throw "Configuration file cannot be opened.";
-    this->filePath = file;
+    this->_filePath = file;
 }
 
 void    ConfigParser::setServers(const ConfigServer& server) {
-    this->servers.push_back(server);
+    this->_servers.push_back(server);
 }
 
 void    ConfigParser::parseFile() {
