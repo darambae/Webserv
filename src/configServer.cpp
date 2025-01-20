@@ -96,36 +96,38 @@ std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
     return os;
 }
 
-int	ConfigServer::createServerFd() {
+std::vector<int> &	ConfigServer::createServerFd() {
 	_client_count = 0;
 	_len_address = sizeof(_address);
 	_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
 	std::vector<int>	serverFD;
 	for (int i = 0; i != _port.size(); ++i) {
 		if (std::find(mapPortFd.begin(), mapPortFd.end(), _port[i]) == mapPortFd.end()) {
-			serverFD[i] = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-			if (serverFD[i] == -1)
+			serverFD.push_back(socket(AF_INET, SOCK_STREAM, 0)); // SOCK_STREAM : TCP socket
+			int index = serverFD.size() - 1;
+			if (serverFD[index] == -1)
         		throw ServerException("Socket creation failed");
-    		std::cout << "Server socket created on sd " << serverFD[i] << std::endl;
+    		std::cout << "Server socket created on sd " << serverFD[index] << std::endl;
 		/*in case of server crach, this setting allow to reuse the port */
 			int opt = 1;
-    		if (setsockopt(serverFD[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
-        		close(serverFD[i]);
+    		if (setsockopt(serverFD[index], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
+        		close(serverFD[index]);
 				throw ServerException("setsockopt failed");
 			}
 	/*init server socket*/
 			_address.sin_family = AF_INET; //IPv4
     		_address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
     		_address.sin_port = htons(getPort()); //Converts the port number to "network byte order"
-    		if (bind(serverFD[i], (struct sockaddr *)&_address, sizeof(_address)) < 0){
+    		if (bind(serverFD[index], (struct sockaddr *)&_address, sizeof(_address)) < 0){
         //std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-        		close(serverFD[i]);
+        		close(serverFD[index]);
 				throw ServerException("Bind failed");
     		}
-    		if (listen(serverFD[i], 10) < 0){//make serverfd listening new connections, 10 connections max can wait to be accepted
-    		    close(serverFD[i]);
+    		if (listen(serverFD[index], 10) < 0){//make serverfd listening new connections, 10 connections max can wait to be accepted
+    		    close(serverFD[index]);
     		    throw ServerException("Listen failed");
     		}
+			mapPortFd[_port[i]] = serverFD[index];
     		std::cout << "Server is listening on port " << _port[i] << std::endl;
 		}
 	}

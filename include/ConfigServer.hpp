@@ -60,7 +60,7 @@ class ConfigServer {
         void setErrorPages(const std::string& error_page);
         void setLocations(const ConfigLocation& location);
 
-		int	createServerFd();
+		std::vector<int> &	createServerFd();
 		class ServerException : public std::exception {
 		private:
 		std::string	_message;

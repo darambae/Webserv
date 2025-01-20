@@ -1,5 +1,6 @@
 KELLY:
 - handle confif list
+- parse request have to return int to manage deconnection or not
 
 GAUTIER:
 

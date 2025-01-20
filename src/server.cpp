@@ -63,7 +63,8 @@ void	Server::addServer(ConfigServer config) {
     }
 }
 
-void	Server::addFdToFds(int fd_to_add) {
+void	Server::addFdToFds(std::vector<int> fd_to_add) {
+	/*only for client
 	if (_fds.size() >= _max_clients) {
         std::cout << "Max clients reached, rejecting connection\n";
         close(fd_to_add);
@@ -71,11 +72,14 @@ void	Server::addFdToFds(int fd_to_add) {
 	}
 	if (_fds.size() == 0)
 		_client_count--;
-	struct pollfd new_socket;
-    new_socket.fd = fd_to_add;
-    new_socket.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
-    _fds.push_back(new_socket);
-	_client_count++;
+	*/
+	for (int i = 0; i < fd_to_add.size(); ++i) {
+		struct pollfd new_socket;
+	    new_socket.fd = fd_to_add[i];
+	    new_socket.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
+	    _all_fds.push_back(new_socket);
+	}
+	//_client_count++;
 }
 
 void	Server::initServerSocket() {
@@ -110,15 +114,26 @@ void	Server::initServerSocket() {
     // }
 }
 
-void	Server::createNewSocket() {
-	//if we want to save data from each client, create a sockaddr_in for each
-	int new_socket = accept(_server_fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
+void	Server::createNewSocket(int fd) {
+	int new_socket = accept(fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
     if (new_socket < 0) {
         perror("Accept failed");
         return;
     }
     std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
-    addFdToFds(new_socket);
+    //if we want to save data from each client, create a sockaddr_in for each
+	if (_fds.size() >= _max_clients) {//of one server
+        std::cout << "Max clients reached, rejecting connection\n";
+        close(new_socket);
+		return;
+	}
+	struct pollfd new_poll;
+    new_poll.fd = new_socket;
+    new_poll.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
+    _all_fds.push_back(new_poll);
+	_client_count++;
+	Request	request(new_socket);
+	_mapFdRequest[new_socket] = request;
 }
 
 void	Server::manageRequest(int i) {
