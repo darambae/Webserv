@@ -28,7 +28,35 @@ class	DataServer {
 	_bufferSize = _config_server.getLimitClientBodySize();
 	_buffer.reserve(_bufferSize);//reserve a memory place
 
-	initServerSocket();
+	_server_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
+    if (_server_fd == -1)
+        throw ServerException("Socket creation failed");
+    std::cout << "Server socket created on sd " << _server_fd << std::endl;
+/*in case of server crach, this setting allow to reuse the port */
+	int opt = 1;
+    if (setsockopt(_server_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
+        close(_server_fd);
+		throw ServerException("setsockopt failed");
+	}
+/*init server socket*/
+	_address.sin_family = AF_INET; //IPv4
+    _address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
+    _address.sin_port = htons(_config.getPort()); //Converts the port number to "network byte order"
+    if (bind(_server_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0){
+        //std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
+        close(_server_fd);
+		throw ServerException("Bind failed");
+    }
+    if (listen(_server_fd, 10) < 0){//make serverfd listening new connections, 10 connections max can wait to be accepted
+        close(_server_fd);
+        throw ServerException("Listen failed");
+    }
+    std::cout << "Server is listening on port " << _config.getPort() << std::endl;
+	addFdToFds(_server_fd);
+	//maybe not necessary if we use vector
+	//for (int i = 1; i <= _max_clients; ++i) {
+    //     fds[i].fd = -1;  // Set initial state as no client connected
+    // }
     while (true) {
         int poll_count = poll(_fds.data(), _fds.size(), -1);  // Wait indefinitely
         if (poll_count == -1)

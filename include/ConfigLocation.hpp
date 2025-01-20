@@ -16,7 +16,7 @@ class ConfigLocation {
         std::string path;
         std::string root;
         bool autoindex;
-        std::set<std::string> allowed_methods; 
+        std::set<std::string> allowed_methods;
         std::list<std::string> index;
         std::vector<std::string> cgi_extension;
         std::string cgi_path;

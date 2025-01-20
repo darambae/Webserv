@@ -6,6 +6,15 @@
 #include <vector>
 #include "ConfigLocation.hpp"
 #include "ConfigParser.hpp"
+#include <cstring> //memset...
+#include <cstdlib> //exit ...
+#include <sys/socket.h> // socket, bind, accept...
+#include <netinet/in.h> // sockaddr_in
+#include <unistd.h> //close...
+#include <poll.h>
+#include <algorithm>
+#include <map>
+#include "Request.hpp"
 
 struct errorPage {
     std::set<int> error_codes;
@@ -16,25 +25,28 @@ class ConfigLocation;
 
 class ConfigServer {
     private:
-        std::string ip;
-        int port;
-        std::vector<std::string> server_names;
-        std::string root;
-        unsigned long limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
-        std::list<errorPage> error_pages;
-        std::vector<ConfigLocation> locations;
+        std::string _ip;
+        int _port;
+        std::vector<std::string> _server_names;
+        std::string _root;
+        unsigned long _limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
+        std::list<errorPage> _error_pages;
+        std::vector<ConfigLocation> _locations;
+		struct sockaddr_in	_address;
+		int _fd_server, _client_count, _len_address, _max_clients;
+		Request	_request;
 
     public:
         ConfigServer();
         ~ConfigServer() {};
 
-        std::string getIp() const { return ip; };
-        int getPort() const { return port; };
-        std::vector<std::string> getServerNames() const { return server_names; };
-        std::string getRoot() const { return root; };
-        int getLimitClientBodySize() const { return limit_client_body_size; };
-        std::list<errorPage> getErrorPages() const { return error_pages; };
-        std::vector<ConfigLocation> getLocations() const { return locations; };
+        std::string getIp() const { return _ip; };
+        int getPort() const { return _port; };
+        std::vector<std::string> getServerNames() const { return _server_names; };
+        std::string getRoot() const { return _root; };
+        int getLimitClientBodySize() const { return _limit_client_body_size; };
+        std::list<errorPage> getErrorPages() const { return _error_pages; };
+        std::vector<ConfigLocation> getLocations() const { return _locations; };
 
         void setIp(const std::string& ip);
         void setPort(const std::string& port);
@@ -43,6 +55,15 @@ class ConfigServer {
         void setLimitClientBodySize(const std::string& limit_client_body_size);
         void setErrorPages(const std::string& error_page);
         void setLocations(const ConfigLocation& location);
+		int	createServerFd();
+		class ServerException : public std::exception {
+		private:
+		std::string	_message;
+		public:
+		ServerException(std::string const & message) : _message(message) {}
+		virtual ~ServerException() throw() {}
+		virtual const char* what() const throw() {return _message.c_str();}
+	};
 };
 
 std::ostream& operator<<(std::ostream& os, const ConfigServer& c);
