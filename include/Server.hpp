@@ -18,7 +18,8 @@
 class	Server {
 	private:
 		std::vector<ConfigServer>	_config;
-		std::vector<struct pollfd> _fds;
+		std::vector<struct pollfd> _all_fds;//stock all fds of all servers
+		int	_number_of_server;//number of door, entries, port where clients can connect
 
 		Server() {}
 	public:
@@ -35,7 +36,10 @@ class	Server {
 	void	launchServers() {
 		for (int i = 0; i != _config.size(); ++i) {
 			addFdToFds(_config[i].createServerFd());
+			//ajouter autant de fd que de port pour chaque server
+			//verifier que deux servers n'aient pas le ou les memes ports, sinon 1er server servi
 		}
+		_number_of_server = _fds.size();
     while (true) {
         int poll_count = poll(_fds.data(), _fds.size(), -1);  // Wait indefinitely
         if (poll_count == -1)

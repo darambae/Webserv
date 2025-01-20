@@ -97,33 +97,36 @@ std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
 }
 
 int	ConfigServer::createServerFd() {
-	_fd_server, _client_count = 0;
+	_client_count = 0;
 	_len_address = sizeof(_address);
 	_max_clients = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
-
-	_fd_server = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-    if (_fd_server == -1)
-        throw ServerException("Socket creation failed");
-    std::cout << "Server socket created on sd " << _fd_server << std::endl;
-/*in case of server crach, this setting allow to reuse the port */
-	int opt = 1;
-    if (setsockopt(_fd_server, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
-        close(_fd_server);
-		throw ServerException("setsockopt failed");
-	}
-/*init server socket*/
-	_address.sin_family = AF_INET; //IPv4
-    _address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
-    _address.sin_port = htons(getPort()); //Converts the port number to "network byte order"
-    if (bind(_fd_server, (struct sockaddr *)&_address, sizeof(_address)) < 0){
+	std::vector<int>	serverFD;
+	for (int i = 0; i != _port.size(); ++i) {
+		if (std::find(mapPortFd.begin(), mapPortFd.end(), _port[i]) == mapPortFd.end()) {
+			serverFD[i] = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
+			if (serverFD[i] == -1)
+        		throw ServerException("Socket creation failed");
+    		std::cout << "Server socket created on sd " << serverFD[i] << std::endl;
+		/*in case of server crach, this setting allow to reuse the port */
+			int opt = 1;
+    		if (setsockopt(serverFD[i], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
+        		close(serverFD[i]);
+				throw ServerException("setsockopt failed");
+			}
+	/*init server socket*/
+			_address.sin_family = AF_INET; //IPv4
+    		_address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
+    		_address.sin_port = htons(getPort()); //Converts the port number to "network byte order"
+    		if (bind(serverFD[i], (struct sockaddr *)&_address, sizeof(_address)) < 0){
         //std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-        close(_fd_server);
-		throw ServerException("Bind failed");
-    }
-    if (listen(_fd_server, 10) < 0){//make serverfd listening new connections, 10 connections max can wait to be accepted
-        close(_fd_server);
-        throw ServerException("Listen failed");
-    }
-    std::cout << "Server is listening on port " << _port << std::endl;
-	return (_fd_server);
+        		close(serverFD[i]);
+				throw ServerException("Bind failed");
+    		}
+    		if (listen(serverFD[i], 10) < 0){//make serverfd listening new connections, 10 connections max can wait to be accepted
+    		    close(serverFD[i]);
+    		    throw ServerException("Listen failed");
+    		}
+    		std::cout << "Server is listening on port " << _port[i] << std::endl;
+		}
+	}
 };

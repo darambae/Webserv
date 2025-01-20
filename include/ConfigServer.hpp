@@ -25,15 +25,19 @@ class ConfigLocation;
 
 class ConfigServer {
     private:
+		static	std::map<int, int>	mapPortFd;
         std::string _ip;
-        int _port;
+        std::vector<int> _port;
         std::vector<std::string> _server_names;
         std::string _root;
         unsigned long _limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
         std::list<errorPage> _error_pages;
         std::vector<ConfigLocation> _locations;
 		struct sockaddr_in	_address;
-		int _fd_server, _client_count, _len_address, _max_clients;
+		int _client_count, _len_address, _max_clients, _indexServer, _indexClient;
+		//indexServer = in fds between index = 0 and index = indexServer, all fd are serverFd
+		//indexClient = in fds since this index, all fd are for client
+		std::vector<struct pollfd>	_fds;//stock all fd (server + client)
 		Request	_request;
 
     public:
@@ -55,6 +59,7 @@ class ConfigServer {
         void setLimitClientBodySize(const std::string& limit_client_body_size);
         void setErrorPages(const std::string& error_page);
         void setLocations(const ConfigLocation& location);
+
 		int	createServerFd();
 		class ServerException : public std::exception {
 		private:
