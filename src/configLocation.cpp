@@ -8,7 +8,7 @@ ConfigLocation::ConfigLocation() {
 }
 
 void    ConfigLocation::setPath(const std::string& path) {
-    if (ConfigParser::validRoot(path) == false)
+    if (path.empty() || path[0] != '/')
         throw "Invalid path";
     this->_path = path;
 }
@@ -72,47 +72,47 @@ void    ConfigLocation::setReturn(const std::string& line) {
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     os << "Location: " << std::endl;
     if (!location.getPath().empty()) {
-        os << "Path: " << location.getPath() << std::endl;
+        os << "\tPath: " << location.getPath() << std::endl;
     }
     if (!location.getRoot().empty()) {
-        os << "Root: " << location.getRoot() << std::endl;
+        os << "\tRoot: " << location.getRoot() << std::endl;
     }
-    os << "Autoindex: " << (location.getAutoindex() ? "on" : "off") << std::endl;
+    os << "\tAutoindex: " << (location.getAutoindex() ? "on" : "off") << std::endl;
 
     std::set<std::string> allowed_methods = location.getAllowMethods();
     if (!allowed_methods.empty()) {
-        os << "Allowed methods: ";
+        os << "\tAllowed methods: ";
         printContainer(allowed_methods);
     }
 
     std::list<std::string> index = location.getIndex();
     if (!index.empty()) {
-        os << "Index: ";
+        os << "\tIndex: ";
         printContainer(index);
     }
 
     std::list<std::string> cgi_extension = location.getCgiExtension();
     if (!cgi_extension.empty()) {
-        os << "CGI Extensions: ";
+        os << "\tCGI Extensions: ";
         printContainer(cgi_extension);
     }
 
     if (!location.getCgiPath().empty())
-        os << "CGI Path: " << location.getCgiPath() << std::endl;
+        os << "\tCGI Path: " << location.getCgiPath() << std::endl;
 
     std::list<ErrorPage> error_pages = location.getErrorPages();
     if (!error_pages.empty()) {
-        os << "Error pages: " << std::endl;
+        os << "\tError pages: " << std::endl;
         for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
-            os << "Error codes: ";
+            os << "\tError codes: ";
             printContainer(it->error_codes);
-            os << "Error path: " << it->error_path << std::endl;
+            os << "\tError path: " << it->error_path << std::endl;
         }
     }
 
     std::list<std::string> return_value = location.getReturn();
     if (!return_value.empty()) {
-        os << "Return: ";
+        os << "\tReturn: ";
         printContainer(return_value);
     }
     std::cout << std::endl;

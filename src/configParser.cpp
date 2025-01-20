@@ -87,7 +87,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
 }
 
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
-    std::string path = line.substr(line.find(" ") + 1, line.find("{") - line.find(" ") - 1);
+    std::string path = line.substr(line.find(" ") + 1, line.find(" {") - line.find(" ") - 1);
     location.setPath(path);
     while (getline(file, line)) {
         removeWhitespaces(line);
@@ -193,10 +193,23 @@ bool    ConfigParser::validReturn(const std::string& line) {
 
 bool    ConfigParser::validRoot(const std::string& line) {
     struct stat buffer;
+    char resolved_path[100];
+    std::string path = line.length() > 1 ? line.substr(1) : line;
+
     if (line.empty() || line[0] != '/')
         return false;
-    // if (stat(line.c_str(), &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
-    //     return false;
+    if (realpath(path.c_str(), resolved_path) == NULL)
+    {
+        if (errno == ENOENT)
+            std::cerr << "File or directory does not exist" << std::endl;
+        else if (errno == EACCES)
+            std::cerr << "Permission denied" << std::endl;
+        else if (errno == EINVAL)
+            std::cerr << "Invalid path" << std::endl;
+        return false;
+    }
+    if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
+        return false;
     return true;
 }
 

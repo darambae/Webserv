@@ -7,6 +7,7 @@
 #include <sstream>
 #include <list>
 #include <set>
+#include <cstdlib>
 #include "ConfigServer.hpp"
 #include "ConfigLocation.hpp"
 #include "webserv.hpp"

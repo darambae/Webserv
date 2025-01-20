@@ -5,7 +5,9 @@ GAUTIER:
 
 
 DARAM:
-
+- bracket checking
+- root validity
+- logger class
 
 
 GAUDALY: 

@@ -10,7 +10,7 @@ ConfigServer::ConfigServer() {
 void    ConfigServer::setIp(const std::string& ip) {
     if (!ConfigParser::validIp(ip))
         throw "Invalid ip address";
-    this->_ip = ip;
+    this->_ip = ip == "localhost" ? "127:0:0:1" : ip;
 }
 
 void    ConfigServer::setPort(const std::string& port) {
@@ -74,17 +74,20 @@ std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
         os << "Server names: ";
         printContainer(server.getServerNames());
     }
-    os << "Root: " << server.getRoot() << std::endl;
-    os << "Limit client body size: " << server.getLimitClientBodySize() << std::endl;
-    os << "Error pages: " << std::endl;
-
-    std::list<ErrorPage> error_pages = server.getErrorPages();
-    for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
-        os << "\tError codes: ";
-        printContainer(it->error_codes);
-        os << "\tError path: " << it->error_path << std::endl;
+    if (!server.getRoot().empty())
+        os << "Root: " << server.getRoot() << std::endl;
+    if (server.getLimitClientBodySize() != -1)
+        os << "Limit client body size: " << server.getLimitClientBodySize() << std::endl;
+    if (!server.getErrorPages().empty()) {
+        os << "Error pages: " << std::endl;
+        std::list<ErrorPage> error_pages = server.getErrorPages();
+        for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+            os << "\tError codes: ";
+            printContainer(it->error_codes);
+            os << "\tError path: " << it->error_path << std::endl;
+        }
+        std::cout << std::endl;
     }
-    std::cout << std::endl;
     printContainer(server.getLocations());
 
     return os;
