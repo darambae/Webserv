@@ -1,5 +1,5 @@
 /*By parsing configuration file following the rule of nginx config file, 
-save the data in a struct and return a list of servers info.*/
+save the data in a struct and return a vector of servers info.*/
 
 #include "../include/ConfigParser.hpp"
 
@@ -47,7 +47,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t len = end_pos - start_pos; //string length from space to semicolon
         if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
+        if (line.find("vectoren ") != std::string::npos && endingSemicolon(line)) {
             if (line.find(":") != std::string::npos) {
                 server.setIp(line.substr(start_pos, line.find(":") - start_pos));
                 server.setPort(line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
@@ -103,12 +103,12 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
 }
 
 bool    ConfigParser::validMethods(const std::string& methods) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(methods, ' ');
-    while (!tmp_list.empty()) {
-        const std::string& token = tmp_list.front();
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(methods, ' ');
+    while (!tmp_vector.empty()) {
+        const std::string& token = tmp_vector.front();
         if (token != "GET" && token != "POST" && token != "DELETE" && token != "PUT")
             return false;
-        tmp_list.pop_front();
+        tmp_vector.erase(tmp_vector.begin());
     }
     return true;
 }
@@ -147,33 +147,33 @@ bool    ConfigParser::validAutoindex(const std::string& line) {
 }
 
 bool    ConfigParser::validErrorPage(const std::string& line) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
-    while (!tmp_list.empty()) {
-        const std::string& token = tmp_list.front();
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    while (!tmp_vector.empty()) {
+        const std::string& token = tmp_vector.front();
         if (onlyDigits(token) && std::atoi(token.c_str()) >= 300 && std::atoi(token.c_str()) <= 599) {
-            tmp_list.pop_front();
+            tmp_vector.erase(tmp_vector.begin());
             continue;
         }
-        if (token[0] == '/' && tmp_list.size() == 1)
+        if (token[0] == '/' && tmp_vector.size() == 1)
             return true;
-        tmp_list.pop_front();
+        tmp_vector.erase(tmp_vector.begin());
     }
     return false;
 }
 
 bool    ConfigParser::validReturn(const std::string& line) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
-    if (tmp_list.size() > 2 || tmp_list.size() == 0)
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
         return false;
-    if (tmp_list.size() == 1) {
-        const std::string& value = tmp_list.front();
+    if (tmp_vector.size() == 1) {
+        const std::string& value = tmp_vector.front();
         if (onlyDigits(value) && std::atoi(value.c_str()) >= 300 && atoi(value.c_str()) <= 599)
             return true;
         return false;
     }
-    if (tmp_list.size() == 2) {
-        const std::string&  status_code = tmp_list.front();
-        const std::string&  path = tmp_list.back();
+    if (tmp_vector.size() == 2) {
+        const std::string&  status_code = tmp_vector.front();
+        const std::string&  path = tmp_vector.back();
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
             return false;
         if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos && !validRoot(path))

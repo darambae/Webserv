@@ -33,10 +33,10 @@ void    ConfigLocation::setAllowMethods(const std::string& line) {
 }
 
 void    ConfigLocation::setIndex(const std::string& line) {
-    this->_index = splitString<std::list<std::string> >(line, ' ');
+    this->_index = splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiExtension(std::list<std::string> cgi_extension) {
+void    ConfigLocation::setCgiExtension(std::vector<std::string> cgi_extension) {
     //To do
     this->_cgi_extension = cgi_extension;
 }
@@ -48,17 +48,17 @@ void    ConfigLocation::setCgiPath(std::string cgi_path) {
 
 //loop through several status codes for one error page and save them in a set
 void    ConfigLocation::setErrorPages(const std::string& line) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     if (ConfigParser::validErrorPage(line) == false)
         throw "Invalid error page";
-    while (!tmp_list.empty()) {
-        const std::string& token = tmp_list.front();
+    while (!tmp_vector.empty()) {
+        const std::string& token = tmp_vector.front();
         if (token[0] == '/')
             error_page.error_path = token;
         else
             error_page.error_codes.insert(atoi(token.c_str()));
-        tmp_list.pop_front();
+        tmp_vector.erase(tmp_vector.begin());
     }
     _error_pages.push_back(error_page);
 }
@@ -66,7 +66,7 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
 void    ConfigLocation::setReturn(const std::string& line) {
     if (ConfigParser::validReturn(line) == false)
         throw "Invalid return";
-    this->_return_value = splitString<std::list<std::string> >(line, ' ');
+    this->_return_value = splitString<std::vector<std::string> >(line, ' ');
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
@@ -85,13 +85,13 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
         printContainer(allowed_methods);
     }
 
-    std::list<std::string> index = location.getIndex();
+    std::vector<std::string> index = location.getIndex();
     if (!index.empty()) {
         os << "\tIndex: ";
         printContainer(index);
     }
 
-    std::list<std::string> cgi_extension = location.getCgiExtension();
+    std::vector<std::string> cgi_extension = location.getCgiExtension();
     if (!cgi_extension.empty()) {
         os << "\tCGI Extensions: ";
         printContainer(cgi_extension);
@@ -100,17 +100,17 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     if (!location.getCgiPath().empty())
         os << "\tCGI Path: " << location.getCgiPath() << std::endl;
 
-    std::list<ErrorPage> error_pages = location.getErrorPages();
+    std::vector<ErrorPage> error_pages = location.getErrorPages();
     if (!error_pages.empty()) {
         os << "\tError pages: " << std::endl;
-        for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+        for (std::vector<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
             os << "\tError codes: ";
             printContainer(it->error_codes);
             os << "\tError path: " << it->error_path << std::endl;
         }
     }
 
-    std::list<std::string> return_value = location.getReturn();
+    std::vector<std::string> return_value = location.getReturn();
     if (!return_value.empty()) {
         os << "\tReturn: ";
         printContainer(return_value);

@@ -21,7 +21,7 @@ void    ConfigServer::setPort(const std::string& port) {
 }
 
 void    ConfigServer::setServerNames(const std::string& server_name) {
-    this->_server_names = splitString<std::list<std::string> >(server_name, ' ');
+    this->_server_names = splitString<std::vector<std::string> >(server_name, ' ');
 }
 
 void    ConfigServer::setRoot(const std::string& root) {
@@ -47,16 +47,16 @@ void    ConfigServer::setLimitClientBodySize(const std::string& value) {
 }
 
 void    ConfigServer::setErrorPages(const std::string& line) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     if (ConfigParser::validErrorPage(line) == false)
         throw "Invalid error page";
-    while (tmp_list.size() > 0) {
-        if (onlyDigits(tmp_list.front()))
-            error_page.error_codes.insert(atoi(tmp_list.front().c_str()));
+    while (tmp_vector.size() > 0) {
+        if (onlyDigits(tmp_vector.front()))
+            error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
         else
-            error_page.error_path = tmp_list.front();
-        tmp_list.pop_front();
+            error_page.error_path = tmp_vector.front();
+        tmp_vector.erase(tmp_vector.begin());
     }
     this->_error_pages.push_back(error_page);
 }
@@ -79,8 +79,8 @@ std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
         os << "Limit client body size: " << server.getLimitClientBodySize() << std::endl;
     if (!server.getErrorPages().empty()) {
         os << "Error pages: " << std::endl;
-        std::list<ErrorPage> error_pages = server.getErrorPages();
-        for (std::list<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+        std::vector<ErrorPage> error_pages = server.getErrorPages();
+        for (std::vector<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
             os << "\tError codes: ";
             printContainer(it->error_codes);
             os << "\tError path: " << it->error_path << std::endl;

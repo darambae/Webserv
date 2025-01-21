@@ -5,7 +5,7 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <list>
+#include <vector>
 #include <set>
 #include <cstdlib>
 #include "ConfigServer.hpp"
@@ -17,7 +17,7 @@ class ConfigLocation;
 
 class   ConfigParser {
     private:
-        std::list<ConfigServer>  _servers;
+        std::vector<ConfigServer>  _servers;
         std::string _filePath;
 
     public:
@@ -27,7 +27,7 @@ class   ConfigParser {
         void    setFilePath(const std::string& file);
         void    setServers(const ConfigServer& server);
         const   std::string&    getFilePath() const { return this->_filePath; }
-        std::list<ConfigServer>    getServers() const { return this->_servers; }
+        std::vector<ConfigServer>    getServers() const { return this->_servers; }
 
         void    parseFile();
         void    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
@@ -42,7 +42,6 @@ class   ConfigParser {
         static bool    validReturn(const std::string& line);
         static bool    validRoot(const std::string& line);
         static bool    validBodySize(const std::string& line);
-
 
 };
 
