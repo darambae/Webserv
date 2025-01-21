@@ -45,7 +45,7 @@ class ConfigServer {
         ~ConfigServer() {};
 
         std::string getIp() const { return _ip; };
-        int getPort() const { return _port; };
+        std::vector<int> getPort() const { return _port; };
         std::vector<std::string> getServerNames() const { return _server_names; };
         std::string getRoot() const { return _root; };
         int getLimitClientBodySize() const { return _limit_client_body_size; };
