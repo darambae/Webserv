@@ -37,7 +37,7 @@ void    ConfigParser::parseFile() {
 
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("server {") != std::string::npos) {
+        if (line.find("server") != std::string::npos && validBracket(line, '{', '}')) {
             parseDirectives(file, server);
             setServers(server);
         }
@@ -53,7 +53,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
-        if (line.find("}") != std::string::npos) { break; }
+        if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
             if (line.find(":") != std::string::npos) {
@@ -78,7 +78,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         else if (line.find("error_page ") != std::string::npos && endingSemicolon(line)) {
             server.setErrorPages(line.substr(start_pos, len));
         }
-        else if (line.find("location ") != std::string::npos) {
+        else if (line.find("location ") != std::string::npos && validBracket(line, '{', '}')) {
             ConfigLocation location;
             parseLocation(file, line, location);
             server.setLocations(location);
@@ -94,7 +94,7 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos;
-        if (line.find("}") != std::string::npos) { break; }
+        if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos && endingSemicolon(line))
             location.setRoot(line.substr(start_pos, len));
@@ -193,19 +193,19 @@ bool    ConfigParser::validReturn(const std::string& line) {
 
 bool    ConfigParser::validRoot(const std::string& line) {
     struct stat buffer;
-    char resolved_path[100];
+    char resolved_path[100]; //possible memory leak
     std::string path = line.length() > 1 ? line.substr(1) : line;
 
     if (line.empty() || line[0] != '/')
         return false;
     if (realpath(path.c_str(), resolved_path) == NULL)
     {
-        if (errno == ENOENT)
-            std::cerr << "File or directory does not exist" << std::endl;
-        else if (errno == EACCES)
-            std::cerr << "Permission denied" << std::endl;
-        else if (errno == EINVAL)
-            std::cerr << "Invalid path" << std::endl;
+        // if (errno == ENOENT)
+        //     std::cerr << "File or directory does not exist" << std::endl;
+        // else if (errno == EACCES)
+        //     std::cerr << "Permission denied" << std::endl;
+        // else if (errno == EINVAL)
+        //     std::cerr << "Invalid path" << std::endl;
         return false;
     }
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
@@ -243,4 +243,10 @@ void    removeWhitespaces(std::string& str) {
 
 bool    endingSemicolon(const std::string& str) {
     return str[str.size() - 1] == ';';
+}
+
+//Checking if a string contains a single valid bracket(a) and not contains another bracket(b) in the string
+bool    validBracket(const std::string& str, char a, char b) {
+    return str.find(a) != std::string::npos && str.find(b) == std::string::npos &&
+            str.find_first_of(a) == str.find_last_of(a);
 }
