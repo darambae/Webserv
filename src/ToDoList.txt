@@ -1,17 +1,22 @@
 KELLY:
-- handle confif list
 - parse request have to return int to manage deconnection or not
 
 GAUTIER:
 
 
 DARAM:
-
+- bracket checking (DONE)(Only bracket in one line, either open or closed)
+- root validity (DONE)
+- logger class
 
 
 GAUDALY:
 - Where is Buffer_size defined ?
 	=> Buffer_size of the buffer we read in the request fd.
+GAUDALY:
+- Where is Buffer_size defined ?
+	=> Buffer_size of the buffer we read in the request fd.
+	->(Daram) : Don't we have to assign as we want??
 
 - Nb of Max_clients to define. The same for every sever ?
 

@@ -1,6 +1,6 @@
 To do list:
-1. Grammar check - whitespace, regexp, '/', '\', ';', '{}'
-2. Validity check for each directive (test ongoing)
+1. Grammar check - whitespace, '/', ';', '{}' (DONE)
+2. Validity check for each directive (done for principal directives)
 3. Add additional directives (for future)
 
-compile command line for config classes : g++ -Iinclude -o config.out src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp
+compile command line for config classes : c++ -std=c++98 -Iinclude -o config.out src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp

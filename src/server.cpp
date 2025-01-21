@@ -6,6 +6,7 @@
 #include <unistd.h> //close...
 #include <poll.h>
 #include "../include/Server.hpp"
+#include "arpa/inet.h"
 
 // #define PORT 8080 //common port for http servers( under 1024 is reserved for system services)
 // #define BUFFER_SIZE 1024
@@ -26,35 +27,36 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 
 */
 
-Server::Server(ConfigServer & config, std::vector<int> & ports) : _config(config), _ports(ports) {
+Server::Server(ConfigServer & config, std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
 	_len_address = sizeof(_address);
-	for (int i = 0; i != _ports.size(); ++i) {
-		initServerSocket(_ports[i]);//create one FD by port, bind it and make it listening
+	for (int i = 0; i != _listen.size(); ++i) {
+		initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
 	}
 }
 
-void	Server::initServerSocket(int port) {
-	if (std::find(mapPortFd.begin(), mapPortFd.end(), port) == mapPortFd.end()) {
+void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
+	if (std::find(mapPortFd.begin(), mapPortFd.end(), ipPort.second) == mapPortFd.end()) {
 			/*create the FD*/
-			mapPortFd[port] = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-			if (mapPortFd[port] == -1)
+			mapPortFd[ipPort.second] = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
+			if (mapPortFd[ipPort.second] == -1)
 				throw ServerException("Socket creation failed");
 			/*in case of server crach, this setting allow to reuse the port */
 			int opt = 1;
-			if (setsockopt(mapPortFd[port], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
+			if (setsockopt(mapPortFd[ipPort.second], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
 				throw ServerException("setsockopt failed");
 			}
 			/*init server socket*/
 			_address.sin_family = AF_INET; //IPv4
-			_address.sin_addr.s_addr = INADDR_ANY; //Tells the server to bind to all available network interfaces (not just a specific IP)
-			_address.sin_port = htons(port); //Converts the port number to "network byte order"
-			if (bind(mapPortFd[port], (struct sockaddr *)&_address, sizeof(_address)) < 0)
+			if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
+    			throw ServerException("Erreur : adresse IP invalide ou conversion échouée\n");
+			_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
+			if (bind(mapPortFd[ipPort.second], (struct sockaddr *)&_address, sizeof(_address)) < 0)
 			//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
 				throw ServerException("Bind failed");
-			if (listen(mapPortFd[port], 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
+			if (listen(mapPortFd[ipPort.second], 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
 			    throw ServerException("Listen failed");
-			std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << _ports[i] << " on FD " << mapPortFd[_ports[i]] << std::endl;
-			addFdToServerFds(mapPortFd[port]);
+			std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << mapPortFd[ipPort.second] << std::endl;
+			addFdToServerFds(mapPortFd[ipPort.second]);
 		}
 }
 

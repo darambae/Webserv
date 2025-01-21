@@ -5,18 +5,20 @@
 #include <iostream>
 #include <string>
 #include <sstream>
-#include <list>
+#include <vector>
 #include <set>
+#include <cstdlib>
 #include "ConfigServer.hpp"
 #include "ConfigLocation.hpp"
+#include "webserv.hpp"
 
 class ConfigServer;
 class ConfigLocation;
 
 class   ConfigParser {
     private:
-        std::list<ConfigServer>  servers;
-        std::string filePath;
+        std::vector<ConfigServer>  _servers;
+        std::string _filePath;
 
     public:
         ConfigParser(const std::string& filePath);
@@ -24,15 +26,15 @@ class   ConfigParser {
 
         void    setFilePath(const std::string& file);
         void    setServers(const ConfigServer& server);
-        const   std::string&    getFilePath() const { return this->filePath; }
-        std::list<ConfigServer>    getServers() const { return this->servers; }
+        const   std::string&    getFilePath() const { return this->_filePath; }
+        std::vector<ConfigServer>    getServers() const { return this->_servers; }
 
         void    parseFile();
         void    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);
         void    parseDirectives(std::ifstream &file, ConfigServer &server);
         
- 
-        static bool    validMethods(const std::set<std::string>& methods);
+
+        static bool    validMethods(const std::string& methods);
         static bool    validIp(std::string ip);
         static bool    validPort(const std::string& port);
         static bool    validAutoindex(const std::string& line);
@@ -40,7 +42,6 @@ class   ConfigParser {
         static bool    validReturn(const std::string& line);
         static bool    validRoot(const std::string& line);
         static bool    validBodySize(const std::string& line);
-
 
 };
 
@@ -55,4 +56,15 @@ Container splitString(const std::string& line, char delimiter) {
     return result;
 }
 
+template <typename Container> //Print a container
+void printContainer(const Container& container) {
+    typename Container::const_iterator it = container.begin();
+    for (it = container.begin(); it != container.end(); ++it)
+        std::cout << *it << " ";
+    std::cout << std::endl;
+}
+
+void    removeWhitespaces(std::string& str); //Remove whitespaces from a string in the beginning and the end
+bool    endingSemicolon(const std::string& line);
 bool    onlyDigits(const std::string& str); //Check if a string contains only digits
+bool    validBracket(const std::string& line, char a, char b); //Check if a string contains a valid bracket(a), not b

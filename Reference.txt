@@ -9,3 +9,7 @@
 
 4. RFC in french:
     https://www.bortzmeyer.org/7230.html
+
+5. Git repos
+    1> https://github.com/Kaydooo/Webserv_42/tree/main
+    2> https://github.com/JayZ66/Webserv_copy/tree/main

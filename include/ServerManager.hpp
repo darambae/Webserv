@@ -13,7 +13,6 @@
 #include <list>
 #include <map>
 #include "Request.hpp"
-#include "DataServer.hpp"
 #include "Server.hpp"
 
 class	ServerManager {
@@ -25,7 +24,7 @@ class	ServerManager {
 		std::map<int, Request>	_mapFdRequest;
 		std::map<int, Server*>	_mapFDServer;
 	public:
-		ServerManager(std::vector<ConfigServer> & configs) : _configs(configs) {}
+		ServerManager(std::vector<ConfigServer> & configs);
 		~ServerManager() {}
 		class ServerManagerException : public std::exception {
 		private:
@@ -38,9 +37,5 @@ class	ServerManager {
 		void	launchServers();
 		void	addFdsToMapFdServer(Server* server,std::vector<struct pollfd> pollfd_vector);
 		void	addClientToMapFdServer(Server* server, int new_client);
-	void	addServer(ConfigServer config);
-	void	addFdToFds(std::vector<int> fd_to_add);
-	void	initServerSocket();
-	void	createNewSocket(int fd);
-	void	manageRequest(int i);
+		void	cleanClientFd(int	FD);
 };
