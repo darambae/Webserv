@@ -11,8 +11,7 @@ class ConfigLocation;
 
 class ConfigServer {
     private:
-        std::string _ip;
-        int _port;
+        std::vector<std::pair<std::string, int> > _listen;
         std::vector<std::string> _server_names;
         std::string _root;
         unsigned long _limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
@@ -23,14 +22,14 @@ class ConfigServer {
         ConfigServer();
         ~ConfigServer() {};
 
-        std::string getIp() const { return _ip; };
-        int getPort() const { return _port; };
+        std::vector<std::pair<std::string, int> > getListen() const { return _listen; };
         std::vector<std::string> getServerNames() const { return _server_names; };
         std::string getRoot() const { return _root; };
         int getLimitClientBodySize() const { return _limit_client_body_size; };
         std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
         std::vector<ConfigLocation> getLocations() const { return _locations; };
 
+        void setListen(const std::string& ip, const std::string& port);
         void setIp(const std::string& ip);
         void setPort(const std::string& port);
         void setServerNames(const std::string& server_name);

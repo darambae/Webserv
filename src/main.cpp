@@ -29,7 +29,7 @@ int main(int ac, char **av)
     try {
         ConfigParser parser(file);
         parser.parseFile();
-        const std::list<ConfigServer>& servers = parser.getServers();
+        const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
         printContainer(servers);
     } catch (const char *e) {

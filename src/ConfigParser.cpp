@@ -47,16 +47,15 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t len = end_pos - start_pos; //string length from space to semicolon
         if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("vectoren ") != std::string::npos && endingSemicolon(line)) {
-            if (line.find(":") != std::string::npos) {
-                server.setIp(line.substr(start_pos, line.find(":") - start_pos));
-                server.setPort(line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
-            }
+        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
+            if (line.find(":") != std::string::npos)
+                server.setListen(line.substr(start_pos, line.find(":") - start_pos), 
+                    line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
             else {
                 if (line.find(".") != std::string::npos)
-                    server.setIp(line.substr(start_pos, len));
+                    server.setListen(line.substr(start_pos, len), "80");
                 else
-                    server.setPort(line.substr(start_pos, len));
+                    server.setListen("0.0.0.0" ,line.substr(start_pos, len));
             }
         }
         else if (line.find("server_name ") != std::string::npos && endingSemicolon(line)) {
@@ -190,7 +189,6 @@ bool    ConfigParser::validRoot(const std::string& line) {
 
     if (line.empty() || line[0] != '/')
         return false;
-    std::cout << path << std::endl;
     if (realpath(path.c_str(), resolved_path) == NULL)
     {
         if (errno == ENOENT)
