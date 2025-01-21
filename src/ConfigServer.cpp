@@ -33,7 +33,7 @@ void    ConfigServer::setRoot(const std::string& root) {
 
 
 void    ConfigServer::setLimitClientBodySize(const std::string& value) {
-    unsigned long num = std::stoul(value.c_str());
+    unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;
     if (ConfigParser::validBodySize(value) == false)
         throw "Invalid body size or format";
@@ -62,7 +62,6 @@ void    ConfigServer::setErrorPages(const std::string& line) {
 }
 
 void    ConfigServer::setLocations(const ConfigLocation& location) {
-    //To do
     this->_locations.push_back(location);
 }
 

@@ -3,21 +3,13 @@ save the data in a struct and return a list of servers info.*/
 
 #include "../include/ConfigParser.hpp"
 
-/*Pseudo code
-1. Read the configuration file line by line.
-2. Parse the file.
-3. Initailize a list of configServer.
-4. Check format of the configuration file.
-5. Check validity of the configuration file.
-6. Save the data in a struct and return it.
-*/
 
 ConfigParser::ConfigParser(const std::string& file) {
     this->setFilePath(file);
 }
 
 void    ConfigParser::setFilePath(const std::string& file) {
-    std::ifstream   test(file);
+    std::ifstream   test(file.c_str());
     if (!test.is_open())
         throw "Configuration file cannot be opened.";
     this->_filePath = file;
@@ -30,7 +22,7 @@ void    ConfigParser::setServers(const ConfigServer& server) {
 void    ConfigParser::parseFile() {
     ConfigServer server;
     std::string line;
-    std::ifstream file(this->getFilePath());
+    std::ifstream file(this->getFilePath().c_str());
 
     if (!file.is_open())
         throw "Configuration file cannot be opened.";
@@ -198,14 +190,15 @@ bool    ConfigParser::validRoot(const std::string& line) {
 
     if (line.empty() || line[0] != '/')
         return false;
+    std::cout << path << std::endl;
     if (realpath(path.c_str(), resolved_path) == NULL)
     {
-        // if (errno == ENOENT)
-        //     std::cerr << "File or directory does not exist" << std::endl;
-        // else if (errno == EACCES)
-        //     std::cerr << "Permission denied" << std::endl;
-        // else if (errno == EINVAL)
-        //     std::cerr << "Invalid path" << std::endl;
+        if (errno == ENOENT)
+            std::cerr << "File or directory does not exist" << std::endl;
+        else if (errno == EACCES)
+            std::cerr << "Permission denied" << std::endl;
+        else if (errno == EINVAL)
+            std::cerr << "Invalid path" << std::endl;
         return false;
     }
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
@@ -214,7 +207,7 @@ bool    ConfigParser::validRoot(const std::string& line) {
 }
 
 bool    ConfigParser::validBodySize(const std::string& line) {
-    unsigned long num = std::stoul(line);
+    unsigned long num = std::strtoul(line.c_str(), NULL, 10);
     if (num < 0 || std::isalpha(line[line.size() - 2]))
         return false;
     if (onlyDigits(line) || line[line.size() - 1] == 'k' || line[line.size() - 1] == 'K' ||
