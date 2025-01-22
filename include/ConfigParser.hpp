@@ -8,6 +8,8 @@
 #include <vector>
 #include <set>
 #include <cstdlib>
+#include <cstring>
+#include <cerrno>
 #include "ConfigServer.hpp"
 #include "ConfigLocation.hpp"
 #include "webserv.hpp"

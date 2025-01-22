@@ -191,12 +191,13 @@ bool    ConfigParser::validRoot(const std::string& line) {
         return false;
     if (realpath(path.c_str(), resolved_path) == NULL)
     {
-        if (errno == ENOENT)
-            std::cerr << "File or directory does not exist" << std::endl;
-        else if (errno == EACCES)
-            std::cerr << "Permission denied" << std::endl;
-        else if (errno == EINVAL)
-            std::cerr << "Invalid path" << std::endl;
+        std::cerr << "Failed to get realpath " << strerror(errno) << std::endl;
+        // if (errno == ENOENT)
+        //     std::cerr << "File or directory does not exist" << std::endl;
+        // else if (errno == EACCES)
+        //     std::cerr << "Permission denied" << std::endl;
+        // else if (errno == EINVAL)
+        //     std::cerr << "Invalid path" << std::endl;
         return false;
     }
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)

@@ -1,33 +1,21 @@
 #include "../include/ConfigServer.hpp"
 
-
 ConfigServer::ConfigServer() {
-    _ip = "*"; //OR "127.0.0.1"
-    _port = 80;
-    _root = "";
-    _limit_client_body_size = -1;
+    this->_root = "";
+    this->_limit_client_body_size = -1;
 }
 
-void    ConfigServer::setIp(const std::string& ip) {
+void    ConfigServer::setListen(const std::string& ip, const std::string& port) {
+    int num = std::atoi(port.c_str());
     if (!ConfigParser::validIp(ip))
         throw "Invalid ip address";
-    this->_ip = ip;
-}
-
-void    ConfigServer::setPort(const std::string& port) {
-    int num = std::atoi(port.c_str());
     if (!ConfigParser::validPort(port))
         throw "Invalid port";
-    this->_port = num;
+    this->_listen.push_back(std::make_pair(ip, num));
 }
 
 void    ConfigServer::setServerNames(const std::string& server_name) {
-    if (server_name.empty())
-        this->_server_names.push_back("");
-    else {
-        std::vector<std::string> tmp_list = splitString<std::vector<std::string> >(server_name, ' ');
-        this->_server_names.insert(getServerNames().end(), tmp_list.begin(), tmp_list.end());
-    }
+    this->_server_names = splitString<std::vector<std::string> >(server_name, ' ');
 }
 
 void    ConfigServer::setRoot(const std::string& root) {
@@ -37,63 +25,67 @@ void    ConfigServer::setRoot(const std::string& root) {
     this->_root = root;
 }
 
-
 void    ConfigServer::setLimitClientBodySize(const std::string& value) {
-    int num = std::atoi(value.c_str());
+    unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;
-
     if (ConfigParser::validBodySize(value) == false)
         throw "Invalid body size or format";
-    if (onlyDigits(value))
-        res = num;
-    else if (value[value.size() - 1] == 'k' || value[value.size() - 1] == 'K')
+    if (value[value.size() - 1] == 'k' || value[value.size() - 1] == 'K')
         res = num * 1024;
     else if (value[value.size() - 1] == 'm' || value[value.size() - 1] == 'M')
         res = num * 1024 * 1024;
+    else
+        res = num;
     this->_limit_client_body_size = res;
 }
 
 void    ConfigServer::setErrorPages(const std::string& line) {
-    std::list<std::string> tmp_list = splitString<std::list<std::string> >(line, ' ');
-    errorPage error_page;
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    ErrorPage error_page;
     if (ConfigParser::validErrorPage(line) == false)
         throw "Invalid error page";
-    while (tmp_list.size() > 0) {
-        if (onlyDigits(tmp_list.front()))
-            error_page.error_codes.insert(atoi(tmp_list.front().c_str()));
+    while (tmp_vector.size() > 0) {
+        if (onlyDigits(tmp_vector.front()))
+            error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
         else
-            error_page.error_path = tmp_list.front();
-        tmp_list.pop_front();
+            error_page.error_path = tmp_vector.front();
+        tmp_vector.erase(tmp_vector.begin());
     }
     this->_error_pages.push_back(error_page);
 }
 
 void    ConfigServer::setLocations(const ConfigLocation& location) {
-    //To do
     this->_locations.push_back(location);
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
-    os << "Server: " << server.getIp() << ":" << server.getPort() << std::endl;
-    os << "Root: " << server.getRoot() << std::endl;
-    os << "Limit client body size: " << server.getLimitClientBodySize() << std::endl;
-    os << "Error pages: " << std::endl;
-    // std::vector<ErrorPage>::const_iterator it;
-    // for (it = server.getErrorPages().begin(); it != server.getErrorPages().end(); ++it) {
-    //     os << "Error path: " << it->error_path << std::endl;
-    //     os << "Error codes: ";
-
-    //     std::vector<int>::const_iterator it2;
-    //     for (it2 = it->error_codes.begin(); it2 != it->error_codes.end(); ++it2) {
-    //         os << *it2 << " ";
-    //     }
-    //     os << std::endl;
-    // }
-    // os << "Locations: " << std::endl;
-    // std::vector<ConfigLocation>::const_iterator it;
-    // for (it = server.getLocations().begin(); it != server.getLocations().end(); ++it)
-    //     os << *it << std::endl;
+    os << "Server : " << std::endl;
+    if (!server.getListen().empty()) {
+        std::vector<std::pair<std::string, int> > listens = server.getListen();
+        for (std::vector<std::pair<std::string, int> >::const_iterator it = listens.begin(); it != listens.end(); ++it) {
+            os << "\tListen: " << it->first << ":" << it->second << std::endl;
+        }
+    }
+    if (server.getServerNames().empty())
+        os << "\tServer names: none" << std::endl;
+    else {
+        os << "\tServer names: ";
+        printContainer(server.getServerNames());
+    }
+    if (!server.getRoot().empty())
+        os << "\tRoot: " << server.getRoot() << std::endl;
+    if (server.getLimitClientBodySize() != -1)
+        os << "\tLimit client body size: " << server.getLimitClientBodySize() << std::endl;
+    if (!server.getErrorPages().empty()) {
+        os << "\tError pages: " << std::endl;
+        std::vector<ErrorPage> error_pages = server.getErrorPages();
+        for (std::vector<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
+            os << "\t\tError codes: ";
+            printContainer(it->error_codes);
+            os << "\t\tError path: " << it->error_path << std::endl;
+        }
+        std::cout << std::endl;
+    }
+    printContainer(server.getLocations());
     return os;
 }
-
-
