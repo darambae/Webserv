@@ -11,28 +11,49 @@ void	ServerManager::launchServers() {
 			//cree une classe server par configServer
 			Server	server(_configs[i], _configs[i].getListen());
 			_servers.push_back(server);
-			//addFdsToMapFdServer(&server, server.getServerFds());
-			_all_fds.insert(_all_fds.end(), server.getServerFds().begin(), server.getServerFds().end());
 		}
-		//_serverFds = _all_fds.size();
     while (true) {
-        int poll_count = poll(_all_fds.data(), _all_fds.size(), -1);  // Wait indefinitely
+        int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
             throw ServerManagerException("Poll failed");
 		//if new connection on one port of one server
-		for (int i = 0; i < _all_fds.size(); ++i) {
-			if (_all_fds[i].revents & POLLIN) {
-				if (FD_DATA[_all_fds[i].fd].status == SERVER) {
-					int new_client = FD_DATA[_all_fds[i].fd].server.createClientSocket(_all_fds[i].fd);
-					FD_DATA[new_client].request->parseRequest();
+		for (int i = 0; i < ALL_FDS.size(); ++i) {
+			if (ALL_FDS[i].revents & POLLIN) {
+				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
+					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
+					if (FD_DATA[new_client]->request->parseRequest() == -1)
+						cleanClientFd(new_client);
 				}
-				else if (FD_DATA[_all_fds[i].fd].request->parseRequest() == -1)
-					cleanClientFd(_all_fds[i].fd);
+				else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
+					cleanClientFd(ALL_FDS[i].fd);
 			}
 		}
     }
 }
 
-void	ServerManager::cleanClientFd(int	FD) {
+void	ServerManager::cleanClientFd(int FD) {
 	//clean fd in _all_fds; _mapFd_data;
+	close(FD);
+	std::map<int, t_Fd_data*>::iterator	it = find(FD_DATA.begin(), FD_DATA.end(), FD);
+	it->second->server->decreaseClientCount();
+	FD_DATA.erase(it);
+	for (int i = 0; i < ALL_FDS.size(); ++i) {
+		if (ALL_FDS[i].fd == FD) {
+			ALL_FDS.erase(ALL_FDS.begin() + i);
+			break;
+		}
+	}
+}
+
+ServerManager::~ServerManager() {
+	if (FD_DATA.size() > 0) {
+		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+			close(it->first);
+			delete it->second;
+		}
+		FD_DATA.clear();
+	}
+	if (ALL_FDS.size() > 0)
+		ALL_FDS.clear();
+	std::cout<<"the ServerManager is closed"<<std::endl;
 }

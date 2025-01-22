@@ -23,6 +23,7 @@ class	Server {
 		std::vector<std::pair<std::string, int> > &	_listen;
 		struct sockaddr_in	_address;
 		int	_len_address;
+		int	_client_count;
 		//std::vector<struct pollfd> _ServerFds;//stock all fds of all servers
 		//std::vector<struct pollfd> _ClientFds;
 		//std::map<int, Request>	_clientFdRequest;
@@ -39,8 +40,8 @@ class	Server {
 				virtual const char* what() const throw() {return _message.c_str();}
 		};
 		void	initServerSocket(std::pair<std::string, int> ipPort);
-		void	initFdData(int fd, std::string & ip,int port, Server & server, int status, bool request);
-		void	addFdToServerFds(int fd_to_add);
-		std::vector<struct pollfd> &	getServerFds() {return _ServerFds;}
-		int	createClientSocket(int fd);
+		void	addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request);
+		void	addFdToFds(int fd_to_add);
+		int		createClientSocket(int fd);
+		void	decreaseClientCount();
 };

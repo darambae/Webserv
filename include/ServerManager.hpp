@@ -32,15 +32,12 @@ typedef struct s_FD_data
 }			t_Fd_data;
 
 std::map<int, t_Fd_data*>	FD_DATA;
+std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
 
 class	ServerManager {
 	private:
 		std::vector<ConfigServer> &	_configs;
 		std::vector<Server>	_servers;
-		std::vector<struct pollfd> _all_fds;//stock all fds of all servers
-		//int	_serverFds;//number of door, entries, port where clients can connect
-		//std::map<int, Request>	_mapFdRequest;
-		//std::map<int, Server*>	_mapFDServer;
 	public:
 		ServerManager(std::vector<ConfigServer> & configs);
 		~ServerManager() {}
