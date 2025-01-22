@@ -9,10 +9,8 @@ void    ConfigServer::setListen(const std::string& ip, const std::string& port) 
     int num = std::atoi(port.c_str());
     if (!ConfigParser::validIp(ip))
         throw "Invalid ip address";
-    if (!ConfigParser::validPort(port)) {
-        Logger::setErrorLocation("setListen");
+    if (!ConfigParser::validPort(port))
         throw "Invalid port";
-    }
     this->_listen.push_back(std::make_pair(ip, num));
 }
 

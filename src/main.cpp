@@ -15,11 +15,8 @@
 #include "../include/ConfigParser.hpp"
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
-
 int main(int ac, char **av)
 {
-    Logger logger;
-
     if (ac > 2)
     {
         std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -35,7 +32,7 @@ int main(int ac, char **av)
         std::cout << servers.size() << " servers found" << std::endl;
         printContainer(servers);
     } catch (const char* e) {
-        Logger::log(ERROR, e, 0);
+        Logger::getInstance().log(ERROR, e, 1);
         return 1;
     }
     return 0;
