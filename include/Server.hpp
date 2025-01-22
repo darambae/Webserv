@@ -9,31 +9,36 @@
 #include "ConfigServer.hpp"
 #include <algorithm>
 #include <list>
+#include <map>
+#include "Request.hpp"
+
+int MAX_CLIENT = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
 
 #pragma once
 
 class	Server {
 	private:
-		struct sockaddr_in	_address;//sockaddr_in is more specific structure than 'sockaddr'
-		int _server_fd, _new_socket, _client_count,_bufferSize, _len_address, _max_clients;//new_socket: fd for the accepted client connection
-		std::list<ConfigServer>	_config;
-		std::string		_buffer;
-		std::vector<struct pollfd> _fds;
-		Server() {}
+		ConfigServer &	_config;
+		std::vector<std::pair<std::string, int> > &	_listen;
+		struct sockaddr_in	_address;
+		int	_len_address;
+		std::vector<struct pollfd> _ServerFds;//stock all fds of all servers
+		std::vector<struct pollfd> _ClientFds;
+		std::map<int, Request>	_clientFdRequest;
+		static std::map<int, int>	mapPortFd;
 	public:
-	class ServerException : public std::exception {
-		private:
-		std::string	_message;
-		public:
-		ServerException(std::string const & message) : _message(message) {}
-		virtual ~ServerException() throw() {}
-		virtual const char* what() const throw() {return _message.c_str();}
-	};
-	~Server();
-	Server(std::list<ConfigServer> & config);
-	void	addServer(ConfigServer config);
-	void	addFdToFds(int fd_to_add);
-	void	initServerSocket();
-	void	createNewSocket();
-	void	manageRequest(int i);
+		Server(ConfigServer & config, std::vector<std::pair<std::string, int> > & listen);
+		~Server();
+		class ServerException : public std::exception {
+			private:
+				std::string	_message;
+			public:
+				ServerException(std::string const & message) : _message(message) {}
+				virtual ~ServerException() throw() {}
+				virtual const char* what() const throw() {return _message.c_str();}
+		};
+		void	initServerSocket(std::pair<std::string, int> ipPort);
+		void	addFdToServerFds(int fd_to_add);
+		std::vector<struct pollfd> &	getServerFds() {return _ServerFds;}
+		int	createClientSocket(int fd);
 };
