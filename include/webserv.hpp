@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include "../include/Logger.hpp"
 
 struct ErrorPage {
     std::set<int> error_codes;
