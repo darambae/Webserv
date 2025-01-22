@@ -34,8 +34,8 @@ int main(int ac, char **av)
         const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
         printContainer(servers);
-    } catch (const std::exception& e) {
-        Logger::log(ERROR, "main", e.what(), 0);
+    } catch (const char* e) {
+        Logger::log(ERROR, e, 0);
         return 1;
     }
     return 0;

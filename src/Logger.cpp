@@ -1,10 +1,12 @@
 #include "../include/Logger.hpp"
 
-const std::string& Logger::getTime() {
+std::string Logger::error_from = ""; //Initializing a static variable
 
+std::string Logger::getTime() {
+    return "date and time";
 }
 
-void    Logger::log(LogType type, const std::string& location, const std::string& msg, int errno_set = 0) {
+void    Logger::log(LogType type, const std::string& msg, int errno_set = 0) {
     std::string log_type;
     switch (type) {
     case 0: //DEBUG
@@ -21,7 +23,7 @@ void    Logger::log(LogType type, const std::string& location, const std::string
         break;
     }
 
-    std::cout << "[" << type << "]   " << "[" << getTime() << "]  " << "AT " << location << " : ";
+    std::cout << "[" << log_type << "] " << "[" << getTime() << "] " << error_from << " : ";
     if (errno_set && type == 2) {
         std::cout << strerror(errno) << std::endl;
     } else {

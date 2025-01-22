@@ -3,6 +3,7 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include <cerrno>
 #include "../include/Logger.hpp"
 
 struct ErrorPage {
