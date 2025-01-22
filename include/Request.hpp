@@ -35,7 +35,7 @@ class Request {
 	std::string	getVersion() const { return _version; }
 
 	/* methods */
-	void	parseRequest();
+	int	parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
 };

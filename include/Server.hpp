@@ -11,6 +11,7 @@
 #include <list>
 #include <map>
 #include "Request.hpp"
+#include "ServerManager.hpp"
 
 int MAX_CLIENT = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
 
@@ -22,10 +23,10 @@ class	Server {
 		std::vector<std::pair<std::string, int> > &	_listen;
 		struct sockaddr_in	_address;
 		int	_len_address;
-		std::vector<struct pollfd> _ServerFds;//stock all fds of all servers
-		std::vector<struct pollfd> _ClientFds;
-		std::map<int, Request>	_clientFdRequest;
-		static std::map<int, int>	mapPortFd;
+		//std::vector<struct pollfd> _ServerFds;//stock all fds of all servers
+		//std::vector<struct pollfd> _ClientFds;
+		//std::map<int, Request>	_clientFdRequest;
+		//static std::map<int, int>	mapPortFd;
 	public:
 		Server(ConfigServer & config, std::vector<std::pair<std::string, int> > & listen);
 		~Server();
@@ -38,6 +39,7 @@ class	Server {
 				virtual const char* what() const throw() {return _message.c_str();}
 		};
 		void	initServerSocket(std::pair<std::string, int> ipPort);
+		void	initFdData(int fd, std::string & ip,int port, Server & server, int status, bool request);
 		void	addFdToServerFds(int fd_to_add);
 		std::vector<struct pollfd> &	getServerFds() {return _ServerFds;}
 		int	createClientSocket(int fd);

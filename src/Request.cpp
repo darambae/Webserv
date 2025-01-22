@@ -3,12 +3,12 @@
 //a request is always made of :
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (/index.html) ; protocol_version (HTTP/1.1)
 // - Header containing extra data
-// - Body 
-void	Request::parseRequest() {
+// - Body
+int	Request::parseRequest() {
 
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-	
+
 	if (bytes <= 0) {
 		return ; //socket is closed or error. Behavior to define
 	}
