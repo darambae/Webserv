@@ -63,8 +63,10 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 	new_fd_data->port = port;
 	new_fd_data->server = server;
 	new_fd_data->status = status;
-	if (request == true)
-		new_fd_data->request = &Request(fd);
+	if (request == true){
+		Request*	request = new Request(fd);
+		new_fd_data->request = request;
+	}
 	else
 		new_fd_data->request = NULL;
 	FD_DATA[fd] = new_fd_data;
@@ -79,17 +81,20 @@ void	Server::addFdToFds(int fd_to_add) {
 
 int	Server::createClientSocket(int fd) {
     //if we want to save data from each client, create a sockaddr_in for each
-	if (_client_count >= MAX_CLIENT)//of one server
+	if (_client_count >= MAX_CLIENT) {
         std::cout << "Max clients reached, rejecting connection\n";
+		return -1;
+	}
 	int new_socket = accept(fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
     if (new_socket < 0) {
         perror("Accept failed");
-        return;
+        return -1;
     }
 	_client_count++;
     std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
 	addFdToFds(new_socket);
 	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, true);
+	return new_socket;
 }
 
 void	Server::decreaseClientCount() {_client_count--;}

@@ -15,6 +15,10 @@
 #include "../include/ConfigParser.hpp"
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
+#include "../include/ServerManager.hpp"
+#include "../include/webserv.hpp"
+
+int MAX_CLIENT = 1024;
 
 int main(int ac, char **av)
 {
@@ -32,6 +36,8 @@ int main(int ac, char **av)
         const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
         printContainer(servers);
+		ServerManager	manager(servers);
+		manager.launchServers();
     } catch (const char *e) {
         std::cerr << "Error: " << e << std::endl;
         return 1;

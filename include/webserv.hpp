@@ -3,11 +3,38 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include <map>
+#include "Server.hpp"
+#include "Request.hpp"
+#include <string>
+
 
 struct ErrorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
+
+enum fd_status
+{
+	CLIENT,
+	SERVER,
+};
+
+typedef struct s_FD_data
+{
+	enum fd_status	status;
+	Server*			server;
+	Request*		request;
+	int				port;
+	std::string		ip;
+}			t_Fd_data;
+
+
+extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)
+extern std::map<int, t_Fd_data*>	FD_DATA;
+extern std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
+
+
 
 // enum HttpStatus {
 //     // Informational responses (100–199)

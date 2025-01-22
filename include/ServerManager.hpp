@@ -13,34 +13,17 @@
 #include <list>
 #include <map>
 #include "Request.hpp"
+#include "webserv.hpp"
 
 class	Server;
 
-enum fd_status
-{
-	CLIENT,
-	SERVER,
-};
-
-typedef struct s_FD_data
-{
-	enum fd_status	status;
-	Server*			server;
-	Request*		request;
-	int				port;
-	std::string		ip;
-}			t_Fd_data;
-
-std::map<int, t_Fd_data*>	FD_DATA;
-std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
-
 class	ServerManager {
 	private:
-		std::vector<ConfigServer> &	_configs;
+		const std::vector<ConfigServer> &	_configs;
 		std::vector<Server>	_servers;
 	public:
-		ServerManager(std::vector<ConfigServer> & configs);
-		~ServerManager() {}
+		ServerManager(const std::vector<ConfigServer> & configs);
+		~ServerManager();
 		class ServerManagerException : public std::exception {
 		private:
 		std::string	_message;

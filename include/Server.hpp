@@ -13,9 +13,7 @@
 #include "Request.hpp"
 #include "ServerManager.hpp"
 #include "arpa/inet.h"
-
-
-int MAX_CLIENT = 1024;//by default but max is defined by system parameters(bash = ulimit -n)
+#include "webserv.hpp"
 
 #pragma once
 
@@ -40,6 +38,6 @@ class	Server {
 		void	initServerSocket(std::pair<std::string, int> ipPort);
 		void	addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request);
 		void	addFdToFds(int fd_to_add);
-		int		createClientSocket(int fd);
+		int	createClientSocket(int fd);
 		void	decreaseClientCount();
 };
