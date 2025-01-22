@@ -3,21 +3,20 @@
 #include <iostream>
 #include <cstring>
 
-enum    LogType {
+enum LogType{
     DEBUG,
     INFO,
     ERROR
-}
+};
 
-class   Logger  {
-    private:
-        
+class Logger {
+
     public:
-        Logger(/* args */);
-        ~Logger();
+        // Logger() {};
+        // ~Logger() {};
 
         const std::string&  getTime();
-        void    log(LogType type, const std::string& location, const std::string& msg, int errno_set);
+        static void    log(LogType type, const std::string& location, const std::string& msg, int errno_set);
 
 };
 

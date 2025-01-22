@@ -5,9 +5,7 @@ GAUTIER:
 
 
 DARAM:
-- bracket checking (DONE)(Only bracket in one line, either open or closed)
-- root validity (DONE)
-- logger class
+- logger class (ongoing)
 
 
 GAUDALY:
