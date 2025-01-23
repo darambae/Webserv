@@ -1,4 +1,4 @@
-#include "Request.hpp"
+#include "../include/Request.hpp"
 
 //a request is always made of :
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (/index.html) ; protocol_version (HTTP/1.1)
@@ -62,5 +62,16 @@ void	Request::parseHeader(std::string headerPart) {
 			if (key == "Content-Length")
 				_contentLength = std::atoi(value.c_str());
 		}
+	}
+}
+
+void	Request::handleRequest(ConfigServer const& config) {
+
+	parseRequest();
+
+	if (isRequestComplete) {
+		Response*	response = new Response(*this, config);
+		response->handleResponse();
+		//delete response;
 	}
 }
