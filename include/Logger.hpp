@@ -9,29 +9,23 @@
 enum LogType {
     DEBUG,
     INFO,
-    ERROR
+    ERROR,
+    OFF
 };
 
 class Logger {
     private:
         Logger() {};
         Logger(const Logger&);
-        Logger& operator=(const Logger&);
-
-        std::string _errorLocation;
-        std::string _errorFunction;
+        Logger& operator=(const Logger&); 
 
     public:
         static Logger& getInstance() {
             static Logger instance;
             return instance;
         }
-        void    log(LogType type, const char* file, const char* func, const char* msg, int errno_set);
-        void    log(LogType type, const char* msg, int errno_set = 0);
+        void log(LogType type, const char *msg);
         static std::string  getTime();
-        std::string getErrorLocation() const { return _errorLocation; }
-        std::string getErrorFunction() const { return _errorFunction; }
-        void    setErrorLocation(const char* file, const char* func);
 };
 
 

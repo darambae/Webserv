@@ -5,7 +5,7 @@ GAUTIER:
 
 
 DARAM:
-- logger class (ongoing)
+- logger class + Exception class (Done - if needed, additional functionality can be added afterwards)
 
 
 GAUDALY:

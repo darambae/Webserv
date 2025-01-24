@@ -27,7 +27,8 @@ class	Server {
 		std::map<int, Request>	_clientFdRequest;
 		static std::map<int, int>	mapPortFd;
 	public:
-		Server(ConfigServer & config, std::vector<std::pair<std::string, int> > & listen);
+		Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > & listen);
+
 		~Server();
 		class ServerException : public std::exception {
 			private:

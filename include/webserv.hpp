@@ -5,6 +5,11 @@
 #include <set>
 #include <cerrno>
 #include "../include/Logger.hpp"
+#include "../include/Exception.hpp"
+
+#define LOG(msg) Logger::getInstance().log(DEBUG, msg)
+#define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
+
 
 struct ErrorPage {
     std::set<int> error_codes;

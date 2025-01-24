@@ -11,7 +11,7 @@ ConfigParser::ConfigParser(const std::string& file) {
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test(file.c_str());
     if (!test.is_open())
-        throw "Configuration file cannot be opened.";
+        THROW("Configuration file cannot be opened.");
     this->_filePath = file;
 }
 
@@ -25,7 +25,7 @@ void    ConfigParser::parseFile() {
     std::ifstream file(this->getFilePath().c_str());
 
     if (!file.is_open())
-        throw "Configuration file cannot be opened.";
+        THROW("Configuration file cannot be opened.");
 
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
@@ -190,16 +190,7 @@ bool    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         return false;
     if (realpath(path.c_str(), resolved_path) == NULL)
-    {
-        std::cerr << "Failed to get realpath " << strerror(errno) << std::endl;
-        // if (errno == ENOENT)
-        //     std::cerr << "File or directory does not exist" << std::endl;
-        // else if (errno == EACCES)
-        //     std::cerr << "Permission denied" << std::endl;
-        // else if (errno == EINVAL)
-        //     std::cerr << "Invalid path" << std::endl;
         return false;
-    }
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
         return false;
     return true;

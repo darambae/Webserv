@@ -1,40 +1,28 @@
 #include "../include/Logger.hpp"
 
 std::string Logger::getTime() {
-    return "date and time";
+    time_t  now = time(0);
+    struct tm tstruct;
+    char    buf[80];
+
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    return buf;
 }
 
-void    Logger::log(LogType type, const char* file, const char* func, const char* msg, int errno_set = 0) {
+void    Logger::log(LogType type, const char* msg) {
     std::string log_type;
-    switch (type) {
-    case 0: //DEBUG
+    if (type == 0)
         log_type = "DEBUG";
-        break;
-    case 1: //INFO
+    else if (type == 1)
         log_type = "INFO";
-        break;
-    case 2: //ERROR
+    else if (type == 2)
         log_type = "ERROR";
-        break;
-    default:
-        log_type = "UNKNOWN";
-        break;
-    }
+    
+    if (type == 3) //LogType::OFF
+        return;
 
     std::cout << "[" << log_type << "] " << "[" << getTime() << "] ";
-    if (errno_set && (type == 2 || type == 0)) {
-        std::cout << func << " in " << file << ": " << strerror(errno) << std::endl;
-    } else {
-        std::cout << msg << std::endl;
-    }
+    std::cout << msg << std::endl;
 }
 
-void    Logger::log(LogType type, const char* msg, int errno_set) {
-    log(type, getErrorLocation().c_str(), __FUNCTION__, msg, errno_set);
-}
-
-
-void    Logger::setErrorLocation(const char* file, const char* func) {
-    _errorLocation = file;
-    _errorFunction = func;
-}
