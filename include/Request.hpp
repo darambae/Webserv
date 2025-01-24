@@ -39,7 +39,7 @@ class Request {
 
 	/* methods */
 	void	handleRequest(ConfigServer const& config);
-	void	parseRequest();
+	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
 };
