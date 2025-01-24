@@ -6,7 +6,7 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
 	for (; it != config.getLocations().end(); ++it) {
-		if (requestPath == it->getPath()) {
+		if (requestPath.find(it->getPath()) == 0) {
 			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size())
 				bestMatch = &(*it);
 		}
@@ -51,10 +51,29 @@ void	Response::handleResponse() {
 	}
 }
 
+bool	Response::findIndex(ConfigLocation const* location) {
+	
+	std::string indexPath = _request.getPath();
+
+	if (!_request.getIsRequestPathDirectory())
+		indexPath += "/";
+		
+	std::vector<std::string>::const_iterator it = location->getIndex().begin();
+	for (; it != location->getIndex().end(); ++it) {
+		std::string	tryIndex = *it;
+		std::string	tryCompletePath = indexPath + tryIndex;
+
+		if (access(tryCompletePath.c_str(), F_OK) == -1) {
+			return true;
+		}
+	}
+	return false;
+}
+
 //IF request path is a directory 
 //	=> IF index page exist, serve it
 //	=> ELSE => IF auto index is ON, file list is generated
-//			=> ELSE (auto-index off), error 403 Forbidden.
+//			=> ELSE (auto-index off), error 404 Not found.
 //ELSE IF request path is a file
 //	=> IF file exist, serve it
 //	=> ELSE, error 404 not found
@@ -62,11 +81,25 @@ void	Response::handleGet(ConfigLocation const* location) {
 
 	struct stat	pathStat;
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
-		std::string	indexPath = _request.getPath() + "/" + location->getIndex();
-		//here, implement a while/for loop that try all index that could be in location._index;
+		if (findIndex(location)) {
+			setCodeStatus(200);
+			setReasonPhrase("OK");
+			sendResponse();
+		}
+		else {
+			if (location->getAutoindex()) {
+				//generate content listing
+			}
+			else {
+				setCodeStatus(404);
+				setReasonPhrase("Not found");
+				handleError();
+			}
+		}
 	}
-	else {
 
+	else {
+		// request path is a file
 	}
 
 }
