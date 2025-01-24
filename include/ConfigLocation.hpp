@@ -11,15 +11,7 @@
 
 class ConfigLocation {
     private:
-        std::string path;
-        std::string root;
-        bool autoindex;
-        std::set<std::string> allowed_methods;
-        std::list<std::string> index;
-        std::vector<std::string> cgi_extension;
-        std::string cgi_path;
-        std::list<ErrorPage> error_pages;
-        std::list<std::string> return_value;
+
         std::string _path;
         std::string _root;
         bool _autoindex;

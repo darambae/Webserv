@@ -1,11 +1,14 @@
 
 #pragma once
 
+#include "Response.hpp"
+#include "ConfigServer.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
 #include <unistd.h>
 #include <map>
+
 
 class Request {
 
@@ -21,7 +24,7 @@ class Request {
 	std::string	_tempBuffer;
 	std::map<std::string, std::string>	_header;
 	std::string	_body;
-	Request() {}
+	Request();
 
 	public:
 
@@ -35,7 +38,8 @@ class Request {
 	std::string	getVersion() const { return _version; }
 
 	/* methods */
-	int	parseRequest();
+	void	handleRequest(ConfigServer const& config);
+	void	parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
 };

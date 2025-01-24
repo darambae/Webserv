@@ -17,6 +17,7 @@
 
 class	Server;
 class	Request;
+#include "../include/Logger.hpp"
 
 struct ErrorPage {
     std::set<int> error_codes;

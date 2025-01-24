@@ -11,7 +11,7 @@
 // 	ConfigParser	config(configFile);
 // 	Server	server(config.getServers())
 // }
-
+#include "../include/webserv.hpp"
 #include "../include/ConfigParser.hpp"
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
@@ -26,6 +26,8 @@ std::vector<struct pollfd> ALL_FDS;
 
 int main(int ac, char **av)
 {
+    Logger logger;
+
     if (ac > 2)
     {
         std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -44,6 +46,8 @@ int main(int ac, char **av)
 		manager.launchServers();
     } catch (const char *e) {
         std::cerr << "Error: " << e << std::endl;
+    } catch (const std::exception& e) {
+        Logger::log(ERROR, "main", e.what(), 0);
         return 1;
     }
     return 0;
