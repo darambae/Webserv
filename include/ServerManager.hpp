@@ -1,17 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <cstring> //memset...
-#include <cstdlib> //exit ...
-#include <sys/socket.h> // socket, bind, accept...
-#include <netinet/in.h> // sockaddr_in
-#include <unistd.h> //close...
-#include <poll.h>
-#include <vector>
 #include "ConfigServer.hpp"
-#include <algorithm>
-#include <list>
-#include <map>
 #include "Request.hpp"
 #include "webserv.hpp"
 

@@ -4,10 +4,19 @@
 #include <list>
 #include <set>
 #include <map>
-#include "Server.hpp"
-#include "Request.hpp"
 #include <string>
+#include <cstring> //memset...
+#include <cstdlib> //exit ...
+#include <sys/socket.h> // socket, bind, accept...
+#include <netinet/in.h> // sockaddr_in
+#include <unistd.h> //close...
+#include <poll.h>
+#include <vector>
+#include <algorithm>
+#include <arpa/inet.h>
 
+class	Server;
+class	Request;
 
 struct ErrorPage {
     std::set<int> error_codes;

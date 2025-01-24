@@ -20,6 +20,10 @@
 
 int MAX_CLIENT = 1024;
 
+std::map<int, t_Fd_data*>	FD_DATA;
+std::vector<struct pollfd> ALL_FDS;
+
+
 int main(int ac, char **av)
 {
     if (ac > 2)
