@@ -18,8 +18,6 @@
 
 int main(int ac, char **av)
 {
-    Logger logger;
-
     if (ac > 2)
     {
         std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -32,10 +30,10 @@ int main(int ac, char **av)
         ConfigParser parser(file);
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
-        std::cout << servers.size() << " servers found" << std::endl;
-        printContainer(servers);
-    } catch (const std::exception& e) {
-        Logger::log(ERROR, "main", e.what(), 0);
+        Logger::getInstance().log(INFO, "Configuration file parsed successfully");
+        //printContainer(servers);
+    } catch (const Exception& e) {
+        LOG(e.what());
         return 1;
     }
     return 0;

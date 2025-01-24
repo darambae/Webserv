@@ -30,8 +30,6 @@ class ConfigServer {
         std::vector<ConfigLocation> getLocations() const { return _locations; };
 
         void setListen(const std::string& ip, const std::string& port);
-        void setIp(const std::string& ip);
-        void setPort(const std::string& port);
         void setServerNames(const std::string& server_name);
         void setRoot(const std::string& root);
         void setLimitClientBodySize(const std::string& limit_client_body_size);

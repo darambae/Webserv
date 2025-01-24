@@ -11,7 +11,6 @@
 
 class ConfigLocation {
     private:
-        
         std::string _path;
         std::string _root;
         bool _autoindex;

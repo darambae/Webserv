@@ -2,5 +2,15 @@ To do list:
 1. Grammar check - whitespace, '/', ';', '{}' (DONE)
 2. Validity check for each directive (done for principal directives)
 3. Add additional directives (for future)
+4. Logger class & Exception class (DONE)
 
-compile command line for config classes : c++ -std=c++98 -Iinclude -o config.out src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp
+
+Compile command line for config classes : c++ -std=c++98 -Iinclude -o config.out src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp src/Logger.cpp
+
+
+>>How to use Logger and Exception classes
+    1> For informational logs = Logger::getInstance().log(INFO, "Message to print");
+    (The program won't stop, but it only prints the msg)
+    
+    2> For debugging logs = THROW("Message to print");
+    (The program will stop with the information about the error(where it happened and msg you specify))

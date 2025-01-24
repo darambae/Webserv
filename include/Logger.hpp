@@ -2,22 +2,30 @@
 
 #include <iostream>
 #include <cstring>
+#include <cerrno>
+#include <ctime>
 
-enum LogType{
+
+enum LogType {
     DEBUG,
     INFO,
-    ERROR
+    ERROR,
+    OFF
 };
 
 class Logger {
+    private:
+        Logger() {};
+        Logger(const Logger&);
+        Logger& operator=(const Logger&); 
 
     public:
-        // Logger() {};
-        // ~Logger() {};
-
-        const std::string&  getTime();
-        static void    log(LogType type, const std::string& location, const std::string& msg, int errno_set);
-
+        static Logger& getInstance() {
+            static Logger instance;
+            return instance;
+        }
+        void log(LogType type, const char *msg);
+        static std::string  getTime();
 };
 
 

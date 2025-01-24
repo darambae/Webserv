@@ -1,30 +1,28 @@
 #include "../include/Logger.hpp"
 
-const std::string& Logger::getTime() {
+std::string Logger::getTime() {
+    time_t  now = time(0);
+    struct tm tstruct;
+    char    buf[80];
 
+    tstruct = *localtime(&now);
+    strftime(buf, sizeof(buf), "%Y-%m-%d %X", &tstruct);
+    return buf;
 }
 
-void    Logger::log(LogType type, const std::string& location, const std::string& msg, int errno_set = 0) {
+void    Logger::log(LogType type, const char* msg) {
     std::string log_type;
-    switch (type) {
-    case 0: //DEBUG
+    if (type == 0)
         log_type = "DEBUG";
-        break;
-    case 1: //INFO
+    else if (type == 1)
         log_type = "INFO";
-        break;
-    case 2: //ERROR
+    else if (type == 2)
         log_type = "ERROR";
-        break;
-    default:
-        log_type = "UNKNOWN";
-        break;
-    }
+    
+    if (type == 3) //LogType::OFF
+        return;
 
-    std::cout << "[" << type << "]   " << "[" << getTime() << "]  " << "AT " << location << " : ";
-    if (errno_set && type == 2) {
-        std::cout << strerror(errno) << std::endl;
-    } else {
-        std::cout << msg << std::endl;
-    }
+    std::cout << "[" << log_type << "] " << "[" << getTime() << "] ";
+    std::cout << msg << std::endl;
 }
+
