@@ -4,10 +4,10 @@
 #include <list>
 #include <set>
 #include <cerrno>
-#include "../include/Logger.hpp"
 #include "../include/Exception.hpp"
+#include "../include/Logger.hpp"
 
-#define LOG(msg) Logger::getInstance().log(DEBUG, msg)
+#define LOG(msg) Logger::getInstance(CONSOLE_OUTPUT).log(DEBUG, msg)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 
 

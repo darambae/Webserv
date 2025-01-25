@@ -16,6 +16,7 @@
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
 
+
 int main(int ac, char **av)
 {
     if (ac > 2)
@@ -30,7 +31,7 @@ int main(int ac, char **av)
         ConfigParser parser(file);
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
-        Logger::getInstance().log(INFO, "Configuration file parsed successfully");
+        Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
         //printContainer(servers);
     } catch (const Exception& e) {
         LOG(e.what());
