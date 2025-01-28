@@ -1,8 +1,9 @@
 
 #pragma once
 
-#include "Response.hpp"
+#include "SetupResponse.hpp"
 #include "ConfigServer.hpp"
+#include "Utils.hpp"
 #include <iostream>
 #include <string>
 #include <sstream>
@@ -14,11 +15,12 @@ class Request {
 
 	private:
 
-	bool		isRequestComplete;
-	bool		isHeaderRead;
-	bool		isRequestPathDirectory;
-	int			_clientFd;
-	int			_contentLength;
+	SetupResponse*	_setupResponse;
+	bool			isRequestComplete;
+	bool			isHeaderRead;
+	bool			isRequestPathDirectory;
+	int				_clientFd;
+	int				_contentLength;
 
 	std::string	_firstLine;
 	std::string	_method, _path, _version; //1st line parts (GET/POST/DELETE ; / /index.html ; HTTP/1.1)
@@ -31,7 +33,7 @@ class Request {
 
 	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false),
 					_contentLength(0), isRequestPathDirectory(false) {}
-	~Request() {}
+	~Request() { delete _setupResponse; }
 
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }
@@ -41,8 +43,8 @@ class Request {
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
 	/* methods */
-	void	handleRequest(ConfigServer const& config);
-	void	parseRequest();
+	int		handleRequest(ConfigServer const& config);
+	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
 };

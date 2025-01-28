@@ -2,7 +2,7 @@ KELLY:
 - parse request have to return int to manage deconnection or not
 
 GAUTIER:
-
+chill and watch others work
 
 DARAM:
 - logger class (ongoing)
