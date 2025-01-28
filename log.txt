@@ -1,0 +1,1 @@
+[INFO] [2025-01-28 07:49:21] Configuration file parsed successfully
