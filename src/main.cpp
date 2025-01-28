@@ -24,10 +24,9 @@ std::map<int, t_Fd_data*>	FD_DATA;
 std::vector<struct pollfd> ALL_FDS;
 
 
+
 int main(int ac, char **av)
 {
-    Logger logger;
-
     if (ac > 2)
     {
         std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -48,6 +47,10 @@ int main(int ac, char **av)
         std::cerr << "Error: " << e << std::endl;
     } catch (const std::exception& e) {
         Logger::log(ERROR, "main", e.what(), 0);
+        Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
+        //printContainer(servers);
+    } catch (const Exception& e) {
+        LOG(e.what());
         return 1;
     }
     return 0;

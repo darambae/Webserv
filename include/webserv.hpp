@@ -17,7 +17,13 @@
 
 class	Server;
 class	Request;
+#include <cerrno>
+#include "../include/Exception.hpp"
 #include "../include/Logger.hpp"
+
+#define LOG(msg) Logger::getInstance(CONSOLE_OUTPUT).log(DEBUG, msg)
+#define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
+
 
 struct ErrorPage {
     std::set<int> error_codes;

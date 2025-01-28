@@ -16,6 +16,7 @@ class Request {
 
 	bool		isRequestComplete;
 	bool		isHeaderRead;
+	bool		isRequestPathDirectory;
 	int			_clientFd;
 	int			_contentLength;
 
@@ -28,7 +29,8 @@ class Request {
 
 	public:
 
-	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false), _contentLength(0) {}
+	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false),
+					_contentLength(0), isRequestPathDirectory(false) {}
 	~Request() {}
 
 	/* getters */
@@ -36,6 +38,7 @@ class Request {
 	std::string	getMethod() const { return _path; }
 	std::string	getPath() const { return _method; }
 	std::string	getVersion() const { return _version; }
+	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
 	/* methods */
 	void	handleRequest(ConfigServer const& config);

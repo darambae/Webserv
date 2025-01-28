@@ -11,7 +11,7 @@ ConfigParser::ConfigParser(const std::string& file) {
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test(file.c_str());
     if (!test.is_open())
-        throw "Configuration file cannot be opened.";
+        THROW("Configuration file cannot be opened.");
     this->_filePath = file;
 }
 
@@ -25,7 +25,7 @@ void    ConfigParser::parseFile() {
     std::ifstream file(this->getFilePath().c_str());
 
     if (!file.is_open())
-        throw "Configuration file cannot be opened.";
+        THROW("Configuration file cannot be opened.");
 
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
@@ -101,51 +101,52 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
     }
 }
 
-bool    ConfigParser::validMethods(const std::string& methods) {
+void    ConfigParser::validMethods(const std::string& methods) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(methods, ' ');
     while (!tmp_vector.empty()) {
         const std::string& token = tmp_vector.front();
         if (token != "GET" && token != "POST" && token != "DELETE" && token != "PUT")
-            return false;
+            THROW("Invalid methods");
         tmp_vector.erase(tmp_vector.begin());
     }
-    return true;
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid methods");
 }
 
-bool    ConfigParser::validIp(std::string ip) {
+void    ConfigParser::validIp(std::string ip) {
     std::string  segment;
     size_t  pos;
     int     num;
     
     if (ip == "localhost")
-        return true;
+        Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "");
     while ((pos = ip.find(".")) != std::string::npos) {
         segment = ip.substr(0, pos);
         num = std::atoi(segment.c_str());
         if (num < 0 || num > 255)
-            return false;
+            THROW("The given IP is Out of range");
         ip = ip.substr(pos + 1);
     }
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
-        return false;
-    return true;
+        THROW("The given IP is Out of range");
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid ip");
 }
 
-bool    ConfigParser::validPort(const std::string& port) {
+void    ConfigParser::validPort(const std::string& port) {
     int num = std::atoi(port.c_str());
     if (num < 0 || num > 65535)
-        return false;
-    return true;
+        THROW("");
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid port");
 }
 
-bool    ConfigParser::validAutoindex(const std::string& line) {
+void    ConfigParser::validAutoindex(const std::string& line) {
     if (line.find("on") != std::string::npos || line.find("off") != std::string::npos)
-        return true;
-    return false;
+        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid autoindex");
+        return;
+    THROW("Invalid autoindex");
 }
 
-bool    ConfigParser::validErrorPage(const std::string& line) {
+void    ConfigParser::validErrorPage(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     while (!tmp_vector.empty()) {
         const std::string& token = tmp_vector.front();
@@ -154,65 +155,66 @@ bool    ConfigParser::validErrorPage(const std::string& line) {
             continue;
         }
         if (token[0] == '/' && tmp_vector.size() == 1)
-            return true;
+            //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid error page");
+            return;
         tmp_vector.erase(tmp_vector.begin());
     }
-    return false;
+    THROW("Invalid error page");
 }
 
-bool    ConfigParser::validReturn(const std::string& line) {
+void    ConfigParser::validReturn(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
-        return false;
+        THROW("Invalid return format");
     if (tmp_vector.size() == 1) {
         const std::string& value = tmp_vector.front();
         if (onlyDigits(value) && std::atoi(value.c_str()) >= 300 && atoi(value.c_str()) <= 599)
-            return true;
-        return false;
+        {
+            //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid return");
+            return;
+        }
+        THROW("Invalid return");
     }
     if (tmp_vector.size() == 2) {
         const std::string&  status_code = tmp_vector.front();
         const std::string&  path = tmp_vector.back();
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
-            return false;
-        if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos && !validRoot(path))
-            return false;
-        return true;
+            THROW("Invalid return status code");
+        validRoot(path);
+        // if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos)
+        //     THROW("Invalid return path");
+        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid return");
+        return;
     }   
-    return false;
+    THROW("Invalid return");
 }
 
-bool    ConfigParser::validRoot(const std::string& line) {
+void    ConfigParser::validRoot(const std::string& line) {
     struct stat buffer;
     char resolved_path[100]; //possible memory leak
     std::string path = line.length() > 1 ? line.substr(1) : line;
 
     if (line.empty() || line[0] != '/')
-        return false;
+        THROW ("Invalid root");
     if (realpath(path.c_str(), resolved_path) == NULL)
-    {
-        std::cerr << "Failed to get realpath " << strerror(errno) << std::endl;
-        // if (errno == ENOENT)
-        //     std::cerr << "File or directory does not exist" << std::endl;
-        // else if (errno == EACCES)
-        //     std::cerr << "Permission denied" << std::endl;
-        // else if (errno == EINVAL)
-        //     std::cerr << "Invalid path" << std::endl;
-        return false;
-    }
+        {
+            std::cout << path << std::endl;
+            THROW ("Realpath failed");
+        }
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
-        return false;
-    return true;
+        THROW ("Invalid root");
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid root");
 }
 
-bool    ConfigParser::validBodySize(const std::string& line) {
+void    ConfigParser::validBodySize(const std::string& line) {
     unsigned long num = std::strtoul(line.c_str(), NULL, 10);
     if (num < 0 || std::isalpha(line[line.size() - 2]))
-        return false;
+        THROW("Invalid body size");
     if (onlyDigits(line) || line[line.size() - 1] == 'k' || line[line.size() - 1] == 'K' ||
             line[line.size() - 1] == 'm' || line[line.size() - 1] == 'M')
-        return true;
-    return false;
+        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid body size");
+        return;
+    THROW("Invalid body size format");
 }
 
 bool    onlyDigits(const std::string& str) {

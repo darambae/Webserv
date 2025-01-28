@@ -19,7 +19,7 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 
 */
 
-Server::Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > & listen) : _config(config), _listen(listen) {
+Server::Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
 	_len_address = sizeof(_address);
 	_client_count = 0;
 	for (int i = 0; i != _listen.size(); ++i) {

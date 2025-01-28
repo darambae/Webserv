@@ -49,6 +49,9 @@ int	Request::parseRequest() {
 void	Request::parseFirstLine() {
 	std::istringstream	firstLineStream(_firstLine);
 	firstLineStream >> _method >> _path >> _version;
+
+	if (_path[_path.size() - 1] == '/')
+		isRequestPathDirectory = true;
 }
 
 void	Request::parseHeader(std::string headerPart) {

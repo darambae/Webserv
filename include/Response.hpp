@@ -29,8 +29,10 @@ class Response {
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */
-	void	handleResponse();
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
+	void	handleResponse();
+	bool	findIndex(ConfigLocation const* location);
+	void	sendResponse();
 	void	handleGet(ConfigLocation const* location);
 	void	handlePost();
 	void	handleDelete();
