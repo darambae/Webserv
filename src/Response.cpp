@@ -1,106 +1,51 @@
 #include "../include/Response.hpp"
 
-ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
-	
-	const	ConfigLocation*	bestMatch = NULL;
-	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
+void	Response::buildResponse() {
 
-	for (; it != config.getLocations().end(); ++it) {
-		if (requestPath.find(it->getPath()) == 0) {
-			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size())
-				bestMatch = &(*it);
-		}
-	}
-	return bestMatch;
+	std::stringstream buffer;
+	buffer << _setup.getRequestedFile().rdbuf();
+	_body = buffer.str();
+
+	_builtResponse = buildFirstLine();
+	_builtResponse += buildHeaders();
+	_builtResponse += _body;
 }
 
-
-void	Response::handleResponse() {
-
-	std::string requestPath = _request.getPath();
-	std::string requestMethod = _request.getMethod();
-
-	//find the proper location block to read depending on the path given in the request
-	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
-	if (!location) {
-		setCodeStatus(404);
-		setReasonPhrase("Not found");
-		return ;
-	}
-
-	//check if the request's method is allowed in location block of server configuration
-	std::set<std::string> allowedMethods = location->getAllowMethods();
-	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
-		setCodeStatus(405);
-		setReasonPhrase("Method not allowed");
-		handleError();
-		return ;
-	}
-
-	if (requestMethod == "GET")
-		handleGet(location);
-	else if (requestMethod == "POST")
-		handlePost();
-	else if (requestMethod == "DELETE")
-		handleDelete();
-	else {
-		setCodeStatus(501);
-		setReasonPhrase("method not implemented");
-		handleError();
-		return ;
-	}
+std::string	Response::buildHeaders() {
+	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
+	_headers._contentType = buildContentType() + "\r\n";
 }
 
-bool	Response::findIndex(ConfigLocation const* location) {
-	
-	std::string indexPath = _request.getPath();
+std::string	Response::buildFirstLine() {
 
-	if (!_request.getIsRequestPathDirectory())
-		indexPath += "/";
-		
-	std::vector<std::string>::const_iterator it = location->getIndex().begin();
-	for (; it != location->getIndex().end(); ++it) {
-		std::string	tryIndex = *it;
-		std::string	tryCompletePath = indexPath + tryIndex;
-
-		if (access(tryCompletePath.c_str(), F_OK) == -1) {
-			return true;
-		}
-	}
-	return false;
+	std::string	firstLine = _setup.getRequest().getVersion() + " " + to_string(_setup.getCodeStatus()) + " " + _setup.getReasonPhrase() + "\r\n";
+	return firstLine;
 }
 
-//IF request path is a directory 
-//	=> IF index page exist, serve it
-//	=> ELSE => IF auto index is ON, file list is generated
-//			=> ELSE (auto-index off), error 404 Not found.
-//ELSE IF request path is a file
-//	=> IF file exist, serve it
-//	=> ELSE, error 404 not found
-void	Response::handleGet(ConfigLocation const* location) {
-
-	struct stat	pathStat;
-	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
-		if (findIndex(location)) {
-			setCodeStatus(200);
-			setReasonPhrase("OK");
-			sendResponse();
-		}
-		else {
-			if (location->getAutoindex()) {
-				//generate content listing
-			}
-			else {
-				setCodeStatus(404);
-				setReasonPhrase("Not found");
-				handleError();
-			}
-		}
-	}
-
-	else {
-		// request path is a file
-	}
-
+std::string	Response::buildContentType() {
+	//to do
 }
 
+std::string	Response::buildTime(void) {
+
+	time_t _timestamp;
+
+	std::stringstream result;
+	std::string weekDay, month, day, hours, year;
+	std::string	timeZone = "GMT";
+
+	// Get the current time.
+	time(&_timestamp);
+	std::stringstream buffTime;
+	buffTime << ctime(&_timestamp);
+
+	// Dispatch the ctime format accross the corresponding strings
+	// ? ctime format = Sat Oct 19 10:31:54 2024
+	buffTime >> weekDay >> month >> day >> hours >> year;
+
+	// Rearrange time to match HTTP standarts.
+	// ? ex : Wed, 11 Oct 2024 10:24:12 GMT
+	result	<< weekDay << ", " << day << " " << month << " " << year << " " << hours << " " << timeZone;
+
+	return result.str();
+}

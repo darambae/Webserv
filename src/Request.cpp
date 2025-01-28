@@ -3,14 +3,14 @@
 //a request is always made of :
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (/index.html) ; protocol_version (HTTP/1.1)
 // - Header containing extra data
-// - Body
+// - Body 
 int	Request::parseRequest() {
 
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 
 	if (bytes <= 0) {
-		return -1; //socket is closed or error. Behavior to define
+		return 1; //socket is closed or error. Behavior to define
 	}
 
 	_tempBuffer.append(buffer, bytes);
@@ -69,13 +69,15 @@ void	Request::parseHeader(std::string headerPart) {
 	}
 }
 
-void	Request::handleRequest(ConfigServer const& config) {
+int	Request::handleRequest(ConfigServer const& config) {
 
-	parseRequest();
+	if (parseRequest() == 1)
+		return 1;
 
 	if (isRequestComplete) {
-		Response*	response = new Response(*this, config);
-		response->handleResponse();
-		//delete response;
+		_setupResponse = new SetupResponse(*this, config);
+		_setupResponse->handleResponse();
 	}
+	return 0;
 }
+
