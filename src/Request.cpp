@@ -8,7 +8,7 @@ int	Request::parseRequest() {
 
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-	
+
 	if (bytes <= 0) {
 		return 1; //socket is closed or error. Behavior to define
 	}
@@ -43,6 +43,7 @@ int	Request::parseRequest() {
 	}
 	else if (isHeaderRead && _contentLength == 0)
 		isRequestComplete = true;
+	return 0;
 }
 
 void	Request::parseFirstLine() {
@@ -79,3 +80,4 @@ int	Request::handleRequest(ConfigServer const& config) {
 	}
 	return 0;
 }
+

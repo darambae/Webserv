@@ -11,7 +11,6 @@
 
 class ConfigLocation {
     private:
-        
         std::string _path;
         std::string _root;
         bool _autoindex;
@@ -44,6 +43,6 @@ class ConfigLocation {
         void setCgiPath(std::string cgi_path);
         void setErrorPages(const std::string& line);
         void setReturn(const std::string& line);
-};;
+};
 
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& c);

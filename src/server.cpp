@@ -1,12 +1,4 @@
-#include <iostream>
-#include <cstring> //memset...
-#include <cstdlib> //exit ...
-#include <sys/socket.h> // socket, bind, accept...
-#include <netinet/in.h> // sockaddr_in
-#include <unistd.h> //close...
-#include <poll.h>
 #include "../include/Server.hpp"
-#include "arpa/inet.h"
 
 // #define PORT 8080 //common port for http servers( under 1024 is reserved for system services)
 // #define BUFFER_SIZE 1024
@@ -27,78 +19,88 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 
 */
 
-Server::Server(ConfigServer & config, std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
+Server::Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
 	_len_address = sizeof(_address);
+	_client_count = 0;
 	for (int i = 0; i != _listen.size(); ++i) {
 		initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
 	}
 }
 
 void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
-	if (std::find(mapPortFd.begin(), mapPortFd.end(), ipPort.second) == mapPortFd.end()) {
-			/*create the FD*/
-			mapPortFd[ipPort.second] = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-			if (mapPortFd[ipPort.second] == -1)
-				throw ServerException("Socket creation failed");
-			/*in case of server crach, this setting allow to reuse the port */
-			int opt = 1;
-			if (setsockopt(mapPortFd[ipPort.second], SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
-				throw ServerException("setsockopt failed");
-			}
-			/*init server socket*/
-			_address.sin_family = AF_INET; //IPv4
-			if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
-    			throw ServerException("Erreur : adresse IP invalide ou conversion échouée\n");
-			_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
-			if (bind(mapPortFd[ipPort.second], (struct sockaddr *)&_address, sizeof(_address)) < 0)
-			//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-				throw ServerException("Bind failed");
-			if (listen(mapPortFd[ipPort.second], 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
-			    throw ServerException("Listen failed");
-			std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << mapPortFd[ipPort.second] << std::endl;
-			addFdToServerFds(mapPortFd[ipPort.second]);
-		}
+	std::map<int, t_Fd_data*>::iterator	it;
+	for (it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+		if (it->second->port == ipPort.second)
+			return;
+	}
+	/*create the FD*/
+	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
+	if (new_fd == -1)
+		throw ServerException("Socket creation failed");
+	/*in case of server crach, this setting allow to reuse the port */
+	int opt = 1;
+	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
+		throw ServerException("setsockopt failed");
+	}
+	/*init server socket*/
+	_address.sin_family = AF_INET; //IPv4
+	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
+    	throw ServerException("Erreur : adresse IP invalide ou conversion échouée\n");
+	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
+	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0)
+	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
+		throw ServerException("Bind failed");
+	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
+	    throw ServerException("Listen failed");
+	std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
+	addFdToFds(new_fd);
+	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, false);
 }
 
-void	Server::addFdToServerFds(int fd_to_add) {
+void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request) {
+	t_Fd_data*	new_fd_data = new t_Fd_data;
+	new_fd_data->ip = ip;
+	new_fd_data->port = port;
+	new_fd_data->server = server;
+	new_fd_data->status = status;
+	if (request == true){
+		Request*	request = new Request(fd);
+		new_fd_data->request = request;
+	}
+	else
+		new_fd_data->request = NULL;
+	FD_DATA[fd] = new_fd_data;
+}
+
+void	Server::addFdToFds(int fd_to_add) {
 	struct pollfd new_socket;
     new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;// to check write and read in a same time (subject order)
-    _ServerFds.push_back(new_socket);
+    ALL_FDS.push_back(new_socket);
 }
 
 int	Server::createClientSocket(int fd) {
     //if we want to save data from each client, create a sockaddr_in for each
-	if (_ClientFds.size() >= MAX_CLIENT)//of one server
+	if (_client_count >= MAX_CLIENT) {
         std::cout << "Max clients reached, rejecting connection\n";
+		return -1;
+	}
 	int new_socket = accept(fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
     if (new_socket < 0) {
         perror("Accept failed");
-        return;
+        return -1;
     }
+	_client_count++;
     std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
-	struct pollfd new_poll;
-    new_poll.fd = new_socket;
-    new_poll.events = POLLIN | POLLOUT;  // to check write and read in a same time (subject order)
-    _ClientFds.push_back(new_poll);
-	Request	request(new_socket);
-	_clientFdRequest[new_socket] = request;
+	addFdToFds(new_socket);
+	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, true);
+	return new_socket;
 }
 
+void	Server::decreaseClientCount() {_client_count--;}
+
 Server::~Server() {
-	std::map<int, int>::iterator	it;
-	for (int i = 0; i < _ServerFds.size(); ++i) {
-		for (it = mapPortFd.begin(); it != mapPortFd.end(); ++it) {
-			if (it->second == _ServerFds[i].fd)
-				mapPortFd.erase(it);
-		}
-		close(_ServerFds[i].fd);
-		_ServerFds.erase(_ServerFds.begin() + i);
-	}
-	for (int i = 0; i < _ClientFds.size(); ++i) {
-		close(_ClientFds[i].fd);
-		_ClientFds.erase(_ClientFds.begin() + i);
-	}
+	std::cout<<"the server : "<<_config.getServerNames()[0]<<" is closed"<<std::endl;
 }
 
 /*

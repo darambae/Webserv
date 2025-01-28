@@ -1,22 +1,37 @@
 #pragma once
 
 #include <iostream>
+#include <fstream>
 #include <cstring>
+#include <cerrno>
+#include <ctime>
+#include "webserv.hpp"
 
-enum LogType{
+enum LogType {
     DEBUG,
     INFO,
-    ERROR
+    ERROR,
+    OFF
+};
+
+enum OutputType {
+    CONSOLE_OUTPUT,
+    FILE_OUTPUT
 };
 
 class Logger {
+    private:
+        std::ofstream   _logFile;
+        OutputType _output_type;
+        Logger(OutputType type = CONSOLE_OUTPUT);
+        Logger(const Logger&);
+        Logger& operator=(const Logger&); 
 
     public:
-        // Logger() {};
-        // ~Logger() {};
-
-        const std::string&  getTime();
-        static void    log(LogType type, const std::string& location, const std::string& msg, int errno_set);
+        static Logger &getInstance(OutputType type);
+        void log(LogType type, const char *msg);
+        static std::string  getTime();
+        ~Logger();
 
 };
 
