@@ -36,14 +36,14 @@ class   ConfigParser {
         void    parseDirectives(std::ifstream &file, ConfigServer &server);
         
 
-        static bool    validMethods(const std::string& methods);
-        static bool    validIp(std::string ip);
-        static bool    validPort(const std::string& port);
-        static bool    validAutoindex(const std::string& line);
-        static bool    validErrorPage(const std::string& line);
-        static bool    validReturn(const std::string& line);
-        static bool    validRoot(const std::string& line);
-        static bool    validBodySize(const std::string& line);
+        static void    validMethods(const std::string& methods);
+        static void    validIp(std::string ip);
+        static void    validPort(const std::string& port);
+        static void    validAutoindex(const std::string& line);
+        static void    validErrorPage(const std::string& line);
+        static void    validReturn(const std::string& line);
+        static void    validRoot(const std::string& line);
+        static void    validBodySize(const std::string& line);
 
 };
 
