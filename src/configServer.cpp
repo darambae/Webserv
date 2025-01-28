@@ -8,9 +8,9 @@ ConfigServer::ConfigServer() {
 void    ConfigServer::setListen(const std::string& ip, const std::string& port) {
     int num = std::atoi(port.c_str());
     if (!ConfigParser::validIp(ip))
-        THROW("Invalid ip");
+        throw "Invalid ip address";
     if (!ConfigParser::validPort(port))
-        THROW("Invalid port");
+        throw "Invalid port";
     this->_listen.push_back(std::make_pair(ip, num));
 }
 
@@ -21,7 +21,7 @@ void    ConfigServer::setServerNames(const std::string& server_name) {
 void    ConfigServer::setRoot(const std::string& root) {
     struct stat buffer;
     if (ConfigParser::validRoot(root) == false)
-        THROW("Invalid root"); 
+        throw "Invalid root";
     this->_root = root;
 }
 
@@ -29,7 +29,7 @@ void    ConfigServer::setLimitClientBodySize(const std::string& value) {
     unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;
     if (ConfigParser::validBodySize(value) == false)
-        THROW("Invalid body size or format");
+        throw "Invalid body size or format";
     if (value[value.size() - 1] == 'k' || value[value.size() - 1] == 'K')
         res = num * 1024;
     else if (value[value.size() - 1] == 'm' || value[value.size() - 1] == 'M')
@@ -43,7 +43,7 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     if (ConfigParser::validErrorPage(line) == false)
-        THROW("Invalid error page");
+        throw "Invalid error page";
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
