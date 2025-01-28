@@ -20,3 +20,6 @@ GAUDALY:
 
 - Does a new connection means a request with content ?
 	=> do we make a map<fd, request class> directly ?
+
+What to discuss
+-how to organize the logging system. Printing what info in the terminal(console) or file.
