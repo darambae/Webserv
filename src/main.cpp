@@ -15,6 +15,14 @@
 #include "../include/ConfigParser.hpp"
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
+#include "../include/ServerManager.hpp"
+#include "../include/webserv.hpp"
+
+int MAX_CLIENT = 1024;
+
+std::map<int, t_Fd_data*>	FD_DATA;
+std::vector<struct pollfd> ALL_FDS;
+
 
 
 int main(int ac, char **av)
@@ -31,11 +39,19 @@ int main(int ac, char **av)
         ConfigParser parser(file);
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
-        Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
-        //printContainer(servers);
-    } catch (const Exception& e) {
-        LOG(e.what());
-        return 1;
+        std::cout << servers.size() << " servers found" << std::endl;
+        printContainer(servers);
+		ServerManager	manager(servers);
+		manager.launchServers();
+    } catch (const char *e) {
+        std::cerr << "Error: " << e << std::endl;
+    // } catch (const std::exception& e) {
+    //     Logger::log(ERROR, "main", e.what(), 0);
+    //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
+    //     //printContainer(servers);
+    // } catch (const Exception& e) {
+    //     LOG(e.what());
+    //     return 1;
     }
     return 0;
 }

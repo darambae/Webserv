@@ -3,6 +3,20 @@
 #include <iostream>
 #include <list>
 #include <set>
+#include <map>
+#include <string>
+#include <cstring> //memset...
+#include <cstdlib> //exit ...
+#include <sys/socket.h> // socket, bind, accept...
+#include <netinet/in.h> // sockaddr_in
+#include <unistd.h> //close...
+#include <poll.h>
+#include <vector>
+#include <algorithm>
+#include <arpa/inet.h>
+
+class	Server;
+class	Request;
 #include <cerrno>
 #include "../include/Exception.hpp"
 #include "../include/Logger.hpp"
@@ -15,6 +29,28 @@ struct ErrorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
+
+enum fd_status
+{
+	CLIENT,
+	SERVER,
+};
+
+typedef struct s_FD_data
+{
+	enum fd_status	status;
+	Server*			server;
+	Request*		request;
+	int				port;
+	std::string		ip;
+}			t_Fd_data;
+
+
+extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)
+extern std::map<int, t_Fd_data*>	FD_DATA;
+extern std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
+
+
 
 // enum HttpStatus {
 //     // Informational responses (100–199)
