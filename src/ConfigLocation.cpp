@@ -2,6 +2,11 @@
 #include "../include/ConfigLocation.hpp"
 
 ConfigLocation::ConfigLocation() {
+    ErrorPage error_page;
+    error_page.error_codes.insert(404);
+    error_page.error_path = "/data/www/errors/404.html";
+
+    this->_error_pages.push_back(error_page);
     this->_path = "";
     this->_root = "";
     this->_autoindex = false;
@@ -33,14 +38,14 @@ void    ConfigLocation::setIndex(const std::string& line) {
     this->_index = splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiExtension(std::vector<std::string> cgi_extension) {
-    //To do
-    this->_cgi_extension = cgi_extension;
+void    ConfigLocation::setCgiExtension(const std::string& line) {
+    ConfigParser::validCgiExtension(line);
+    this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiPath(std::string cgi_path) {
-    //To do
-    this->_cgi_path = cgi_path;
+void    ConfigLocation::setCgiPath(const std::string& line) {
+    ConfigParser::validRoot(line);
+    this->_cgi_path = line;
 }
 
 //loop through several status codes for one error page and save them in a set
@@ -64,7 +69,7 @@ void    ConfigLocation::setReturn(const std::string& line) {
     this->_return_value = splitString<std::vector<std::string> >(line, ' ');
 }
 
-std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
+std::ostream& operator<<(std::ostream& os, ConfigLocation location) {
     os << "Location: " << std::endl;
     if (!location.getPath().empty()) {
         os << "\tPath: " << location.getPath() << std::endl;
@@ -95,7 +100,7 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     if (!location.getCgiPath().empty())
         os << "\tCGI Path: " << location.getCgiPath() << std::endl;
 
-    std::vector<ErrorPage> error_pages = location.getErrorPages();
+    std::vector<ErrorPage> &error_pages = location.getErrorPages();
     if (!error_pages.empty()) {
         os << "\tError pages: " << std::endl;
         for (std::vector<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {

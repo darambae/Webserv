@@ -48,6 +48,10 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
+            if (server.getListen().size() == 1 &&
+                server.getListen().front().first == "0.0.0.0" &&
+                server.getListen().front().second == 80)
+                server.getListen().clear(); //remove default listen
             if (line.find(":") != std::string::npos)
                 server.setListen(line.substr(start_pos, line.find(":") - start_pos), 
                     line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
@@ -66,9 +70,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             server.setRoot(line.substr(start_pos, len));
         else if (line.find("client_max_body_size ") != std::string::npos && endingSemicolon(line))
             server.setLimitClientBodySize(line.substr(start_pos, len));
-        else if (line.find("error_page ") != std::string::npos && endingSemicolon(line)) {
+        else if (line.find("error_page ") != std::string::npos && endingSemicolon(line))
             server.setErrorPages(line.substr(start_pos, len));
-        }
         else if (line.find("location ") != std::string::npos && validBracket(line, '{', '}')) {
             ConfigLocation location;
             parseLocation(file, line, location);
@@ -85,7 +88,9 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos;
-        if (validBracket(line, '}', '{')) { break; }
+        std::vector<ErrorPage> &error_pages = location.getErrorPages();
+        if (validBracket(line, '}', '{'))
+            break;
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos && endingSemicolon(line))
             location.setRoot(line.substr(start_pos, len));
@@ -97,7 +102,11 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setAllowMethods(line.substr(start_pos, len));
         else if (line.find("return ") != std::string::npos && endingSemicolon(line))
             location.setReturn(line.substr(start_pos, len));
-        
+        else if (line.find("error_page ") != std::string::npos && endingSemicolon(line)) {
+            if (error_pages.size() == 1 && error_pages.front().error_codes.count(404) && error_pages.front().error_path == "/data/www/errors/404.html")
+                error_pages.clear();
+            location.setErrorPages(line.substr(start_pos, len));
+        }
     }
 }
 
@@ -135,7 +144,7 @@ void    ConfigParser::validIp(std::string ip) {
 void    ConfigParser::validPort(const std::string& port) {
     int num = std::atoi(port.c_str());
     if (num < 0 || num > 65535)
-        THROW("");
+        THROW("Invalid Port");
     //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid port");
 }
 
@@ -197,10 +206,7 @@ void    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
     if (realpath(path.c_str(), resolved_path) == NULL)
-        {
-            std::cout << path << std::endl;
-            THROW ("Realpath failed");
-        }
+        THROW ("Realpath failed");
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
         THROW ("Invalid root");
     //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid root");
@@ -215,6 +221,17 @@ void    ConfigParser::validBodySize(const std::string& line) {
         //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid body size");
         return;
     THROW("Invalid body size format");
+}
+
+void    ConfigParser::validCgiExtension(const std::string& line) {
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    while (!tmp_vector.empty()) {
+        const std::string& token = tmp_vector.front();
+        if (token != ".py" && token != ".php" && token != ".cgi")
+            THROW("Invalid CGI extension");
+        tmp_vector.erase(tmp_vector.begin());
+    }
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid CGI extension");
 }
 
 bool    onlyDigits(const std::string& str) {
