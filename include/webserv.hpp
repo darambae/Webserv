@@ -16,7 +16,7 @@
 #include <arpa/inet.h>
 
 class	Server;
-class	Request;
+// class	Request;
 #include <cerrno>
 #include "../include/Exception.hpp"
 #include "../include/Logger.hpp"
@@ -40,7 +40,7 @@ typedef struct s_FD_data
 {
 	enum fd_status	status;
 	Server*			server;
-	Request*		request;
+	// Request*		request;
 	int				port;
 	std::string		ip;
 }			t_Fd_data;

@@ -39,8 +39,8 @@ class ConfigLocation {
         void setAutoindex(const std::string& line);
         void setAllowMethods(const std::string& line);
         void setIndex(const std::string& line);
-        void setCgiExtension(std::vector<std::string> cgi_extension);
-        void setCgiPath(std::string cgi_path);
+        void setCgiExtension(const std::string& line);
+        void setCgiPath(const std::string& line);
         void setErrorPages(const std::string& line);
         void setReturn(const std::string& line);
 };

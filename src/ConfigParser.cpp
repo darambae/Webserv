@@ -138,7 +138,7 @@ void    ConfigParser::validIp(std::string ip) {
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
         THROW("The given IP is Out of range");
-    Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid ip");
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid ip");
 }
 
 void    ConfigParser::validPort(const std::string& port) {
@@ -221,6 +221,17 @@ void    ConfigParser::validBodySize(const std::string& line) {
         //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid body size");
         return;
     THROW("Invalid body size format");
+}
+
+void    ConfigParser::validCgiExtension(const std::string& line) {
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    while (!tmp_vector.empty()) {
+        const std::string& token = tmp_vector.front();
+        if (token != ".py" && token != ".php" && token != ".cgi")
+            THROW("Invalid CGI extension");
+        tmp_vector.erase(tmp_vector.begin());
+    }
+    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid CGI extension");
 }
 
 bool    onlyDigits(const std::string& str) {

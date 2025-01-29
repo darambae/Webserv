@@ -9,8 +9,7 @@ void	ServerManager::launchServers() {
 	//create one FD by odd of IP/port
 		for (int i = 0; i < _configs.size(); ++i) {
 			//cree une classe server par configServer
-			Server	server(_configs[i], _configs[i].getListen());
-			_servers.push_back(server);
+			_servers.push_back(new Server(_configs[i], _configs[i].getListen()));
 		}
     while (true) {
         int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
@@ -21,11 +20,18 @@ void	ServerManager::launchServers() {
 			if (ALL_FDS[i].revents & POLLIN) {
 				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
-					if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
-						cleanClientFd(new_client);
+					char *buffer;
+					read(ALL_FDS[i].fd, buffer, 1024);
+					// if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
+					// 	cleanClientFd(new_client);
 				}
-				else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
-					cleanClientFd(ALL_FDS[i].fd);
+				else {
+					char *buffer;
+					read(ALL_FDS[i].fd, buffer, 1024);
+					std::cout << "the client with FD " << ALL_FDS[i].fd <<" send a request"<<std::endl;
+				}
+				// else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
+				// 	cleanClientFd(ALL_FDS[i].fd);
 			}
 		}
     }
@@ -36,7 +42,7 @@ void	ServerManager::cleanClientFd(int FD) {
 	close(FD);
 	std::map<int, t_Fd_data*>::iterator	it = FD_DATA.find(FD);
 	it->second->server->decreaseClientCount();
-	delete it->second->request;
+	// delete it->second->request;
 	FD_DATA.erase(it);
 	for (int i = 0; i < ALL_FDS.size(); ++i) {
 		if (ALL_FDS[i].fd == FD) {
@@ -47,6 +53,8 @@ void	ServerManager::cleanClientFd(int FD) {
 }
 
 ServerManager::~ServerManager() {
+	for (size_t i = 0; i < _servers.size(); ++i)
+	    delete _servers[i];
 	if (FD_DATA.size() > 0) {
 		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);

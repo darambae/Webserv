@@ -44,6 +44,7 @@ class   ConfigParser {
         static void    validReturn(const std::string& line);
         static void    validRoot(const std::string& line);
         static void    validBodySize(const std::string& line);
+        static void    validCgiExtension(const std::string& line);
 
 };
 
