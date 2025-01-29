@@ -38,14 +38,14 @@ void    ConfigLocation::setIndex(const std::string& line) {
     this->_index = splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiExtension(std::vector<std::string> cgi_extension) {
-    //To do
-    this->_cgi_extension = cgi_extension;
+void    ConfigLocation::setCgiExtension(const std::string& line) {
+    ConfigParser::validCgiExtension(line);
+    this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiPath(std::string cgi_path) {
-    //To do
-    this->_cgi_path = cgi_path;
+void    ConfigLocation::setCgiPath(const std::string& line) {
+    ConfigParser::validRoot(line);
+    this->_cgi_path = line;
 }
 
 //loop through several status codes for one error page and save them in a set

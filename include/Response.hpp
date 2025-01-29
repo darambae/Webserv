@@ -2,6 +2,8 @@
 
 #include "SetupResponse.hpp"
 
+class SetupResponse;
+
 class Response {
 
 	private: 
