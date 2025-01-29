@@ -11,7 +11,7 @@
 // 	ConfigParser	config(configFile);
 // 	Server	server(config.getServers())
 // }
-#include "../include/webserv.hpp"
+#include "../include/Server.hpp"
 #include "../include/ConfigParser.hpp"
 #include "../include/ConfigServer.hpp"
 #include "../include/ConfigLocation.hpp"
@@ -33,8 +33,8 @@ int main(int ac, char **av)
         return 1;
     }
     std::string file = "config/default.conf";
-    if (ac == 2)
-        file = av[1];
+    // if (ac == 2)
+    //     file = av[1];
     try {
         ConfigParser parser(file);
         parser.parseFile();
@@ -43,8 +43,8 @@ int main(int ac, char **av)
         printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();
-    } catch (const char *e) {
-        std::cerr << "Error: " << e << std::endl;
+    } catch (std::exception & e) {
+        std::cerr << "Error: " << e.what() << std::endl;
     // } catch (const std::exception& e) {
     //     Logger::log(ERROR, "main", e.what(), 0);
     //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");

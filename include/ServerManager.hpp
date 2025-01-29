@@ -1,7 +1,7 @@
 #pragma once
 
 #include "ConfigServer.hpp"
-#include "Request.hpp"
+//#include "Request.hpp"
 #include "webserv.hpp"
 
 class	Server;
@@ -9,7 +9,7 @@ class	Server;
 class	ServerManager {
 	private:
 		const std::vector<ConfigServer> &	_configs;
-		std::vector<Server>	_servers;
+		std::vector<Server*>	_servers;
 	public:
 		ServerManager(const std::vector<ConfigServer> & configs);
 		~ServerManager();
