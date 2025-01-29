@@ -10,17 +10,14 @@ class Response {
 	{
 		std::string	_timeStamp;
 		std::string	_contentType;
-		std::string	_contentSize;
-	}s; 
+		std::string	_contentLength;
+	}; 
 
 	SetupResponse&	_setup;
 	std::string		_builtResponse;
 	s_headers		_headers;
 	std::string		_body;
-	std::string		_contentType;
-	std::string		_contentSize;
-
-	
+	std::map<std::string, std::string>	_mimeTypes;
 
 	public:
 	Response(SetupResponse& setup): _setup(setup) {}
@@ -31,6 +28,7 @@ class Response {
 	std::string const&	getBuiltResponse() const { return _builtResponse; }
 
 	/* methods */
+	void			initMimeTypes();
 	void			buildResponse();
 	std::string		buildFirstLine();
 	std::string		buildHeaders();

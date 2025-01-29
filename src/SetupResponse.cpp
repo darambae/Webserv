@@ -115,7 +115,6 @@ void	SetupResponse::handleGet(ConfigLocation const* location) {
 			handleError();
 		}
 	}
-
 }
 
 void	SetupResponse::sendResponse() {
