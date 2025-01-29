@@ -2,13 +2,21 @@
 
 #include "Request.hpp"
 #include "Response.hpp"
+#include "ConfigServer.hpp"
+#include "ConfigLocation.hpp"
 #include <sys/stat.h>
 #include <map>
 
+class ConfigServer;
+class ConfigLocation;
+class Request;
+class Response;
 
-class SetupResponse {
 
-	private:
+class SetupResponse
+{
+
+private:
 	Response*			_response;
 	ConfigServer const&	_config;
 	Request&			_request;

@@ -10,6 +10,7 @@
 #include <unistd.h>
 #include <map>
 
+class SetupResponse;
 
 class Request {
 
