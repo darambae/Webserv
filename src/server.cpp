@@ -50,9 +50,13 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
     	throw ServerException("Erreur : adresse IP invalide ou conversion échouée\n");
 	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
-	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0)
+	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-		throw ServerException("Bind failed");
+		std::cout<<"the bind of the new socket "<<new_fd<<" for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<" failed"<<std::endl;
+		perror("");
+		return;
+		//throw ServerException("Bind failed");
+	}
 	std::cout<<"the socket is bind"<<std::endl;
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
 	    throw ServerException("Listen failed");
