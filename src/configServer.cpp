@@ -1,8 +1,14 @@
 #include "../include/ConfigServer.hpp"
 
 ConfigServer::ConfigServer() {
+    ErrorPage error_page;
+    error_page.error_codes.insert(404);
+    error_page.error_path = "/data/www/errors/404.html";
+
+    this->_error_pages.push_back(error_page);
     this->_root = "";
     this->_limit_client_body_size = -1;
+    this->_listen.push_back(std::make_pair("0.0.0.0", 80));
 }
 
 void    ConfigServer::setListen(const std::string& ip, const std::string& port) {
@@ -53,7 +59,7 @@ void    ConfigServer::setLocations(const ConfigLocation& location) {
     this->_locations.push_back(location);
 }
 
-std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
+std::ostream& operator<<(std::ostream& os, ConfigServer server) {
     os << "Server : " << std::endl;
     if (!server.getListen().empty()) {
         std::vector<std::pair<std::string, int> > listens = server.getListen();
