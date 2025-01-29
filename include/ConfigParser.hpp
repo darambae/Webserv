@@ -1,17 +1,5 @@
-//By parsing configuration file, we save the data in a struct.
 #pragma once
 
-#include <fstream>
-#include <iostream>
-#include <string>
-#include <sstream>
-#include <vector>
-#include <set>
-#include <cstdlib>
-#include <cstring>
-#include <cerrno>
-#include "ConfigServer.hpp"
-#include "ConfigLocation.hpp"
 #include "webserv.hpp"
 
 class ConfigServer;

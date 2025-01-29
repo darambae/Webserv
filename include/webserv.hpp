@@ -1,9 +1,13 @@
 #pragma once
 
 #include <iostream>
+
+#include <fstream>
+#include <sstream>
 #include <list>
 #include <set>
 #include <map>
+#include <vector>
 #include <string>
 #include <cstring> //memset...
 #include <cstdlib> //exit ...
@@ -11,21 +15,23 @@
 #include <netinet/in.h> // sockaddr_in
 #include <unistd.h> //close...
 #include <poll.h>
-#include <vector>
 #include <algorithm>
 #include <arpa/inet.h>
 #include <cerrno>
-#include "../include/Exception.hpp"
-#include "../include/Logger.hpp"
-#include "../include/Request.hpp"
-#include "../include/Response.hpp"
-#include "../include/Server.hpp"
-#include "../include/ServerManager.hpp"
-#include "../include/ConfigParser.hpp"
-#include "../include/ConfigServer.hpp"
-#include "../include/ConfigLocation.hpp"
-#include "../include/SetupResponse.hpp"
-#include "../include/Utils.hpp"
+#include <sys/stat.h>
+#include <ctime>
+#include <exception>
+#include "Exception.hpp"
+#include "Logger.hpp"
+#include "Request.hpp"
+#include "Response.hpp"
+#include "Server.hpp"
+#include "ServerManager.hpp"
+#include "ConfigParser.hpp"
+#include "ConfigServer.hpp"
+#include "ConfigLocation.hpp"
+#include "SetupResponse.hpp"
+#include "Utils.hpp"
 
 #define LOG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
@@ -46,7 +52,7 @@ enum fd_status
 
 typedef struct s_FD_data
 {
-	enum fd_status	status;
+	fd_status	status;
 	Server*			server;
 	// Request*		request;
 	int				port;

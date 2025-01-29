@@ -1,13 +1,9 @@
 
 #pragma once
 
-#include <iostream>
-#include <string>
-#include <vector>
-#include <set>
-#include "sys/stat.h"
-#include "ConfigParser.hpp"
 #include "webserv.hpp"
+
+struct ErrorPage;
 
 class ConfigLocation {
     private:

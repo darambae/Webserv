@@ -1,10 +1,5 @@
 #pragma once
 
-#include <iostream>
-#include <fstream>
-#include <cstring>
-#include <cerrno>
-#include <ctime>
 #include "webserv.hpp"
 
 enum LogType {

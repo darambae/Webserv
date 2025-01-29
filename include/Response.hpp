@@ -1,8 +1,6 @@
 #pragma once
 
-#include "SetupResponse.hpp"
-#include <iostream>
-#include <map>
+#include "webserv.hpp"
 
 class SetupResponse;
 

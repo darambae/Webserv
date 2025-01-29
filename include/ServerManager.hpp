@@ -1,11 +1,10 @@
+
 #pragma once
 
-#include "ConfigServer.hpp"
-//#include "Request.hpp"
 #include "webserv.hpp"
 
 class	Server;
-
+class	ConfigServer;
 class	ServerManager {
 	private:
 		const std::vector<ConfigServer> &	_configs;

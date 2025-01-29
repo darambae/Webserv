@@ -1,40 +1,38 @@
 #pragma once
 
-#include <iostream>
-#include <vector>
-#include <set>
-#include "ConfigLocation.hpp"
-#include "ConfigParser.hpp"
 #include "webserv.hpp"
 
 class ConfigLocation;
+struct ErrorPage;
 
-class ConfigServer {
-    private:
-        std::vector<std::pair<std::string, int> > _listen;
-        std::vector<std::string> _server_names;
-        std::string _root;
-        unsigned long _limit_client_body_size; //ex)10, 10k, 10m (didn't consider g)
-        std::vector<ErrorPage> _error_pages;
-        std::vector<ConfigLocation> _locations;
+class ConfigServer
+{
+private:
+    std::vector<std::pair<std::string, int> > _listen;
+    std::vector<std::string> _server_names;
+    std::string _root;
+    unsigned long _limit_client_body_size; // ex)10, 10k, 10m (didn't consider g)
+    std::vector<ErrorPage> _error_pages;
+    std::vector<ConfigLocation> _locations;
 
-    public:
-        ConfigServer();
-        ~ConfigServer() {};
+public:
+    ConfigServer();
+    ~ConfigServer() {};
 
-        std::vector<std::pair<std::string, int> > getListen() const { return _listen; };
-        std::vector<std::string> getServerNames() const { return _server_names; };
-        std::string getRoot() const { return _root; };
-        int getLimitClientBodySize() const { return _limit_client_body_size; };
-        std::vector<ErrorPage> &getErrorPages() { return _error_pages; };
-        std::vector<ConfigLocation> getLocations() const { return _locations; };
+    std::vector<std::pair<std::string, int> > getListen() const { return _listen; };
+    std::vector<std::string> getServerNames() const { return _server_names; };
+    std::string getRoot() const { return _root; };
+    int getLimitClientBodySize() const { return _limit_client_body_size; };
+    std::vector<ErrorPage> &getErrorPages() { return _error_pages; };
+    std::vector<ConfigLocation> getLocations() const { return _locations; };
 
-        void setListen(const std::string& ip, const std::string& port);
-        void setServerNames(const std::string& server_name);
-        void setRoot(const std::string& root);
-        void setLimitClientBodySize(const std::string& limit_client_body_size);
-        void setErrorPages(const std::string& error_page);
-        void setLocations(const ConfigLocation& location);
-};;
+    void setListen(const std::string &ip, const std::string &port);
+    void setServerNames(const std::string &server_name);
+    void setRoot(const std::string &root);
+    void setLimitClientBodySize(const std::string &limit_client_body_size);
+    void setErrorPages(const std::string &error_page);
+    void setLocations(const ConfigLocation &location);
+};
+;
 
 std::ostream& operator<<(std::ostream& os, ConfigServer c);

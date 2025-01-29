@@ -1,20 +1,13 @@
 #pragma once
 
-#include "Request.hpp"
-#include "Response.hpp"
-#include "ConfigServer.hpp"
-#include "ConfigLocation.hpp"
-#include <sys/stat.h>
-#include <map>
+#include "webserv.hpp"
 
 class ConfigServer;
 class ConfigLocation;
 class Request;
 class Response;
 
-
-class SetupResponse
-{
+class SetupResponse {
 
 private:
 	Response*			_response;

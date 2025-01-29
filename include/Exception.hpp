@@ -1,9 +1,6 @@
 #pragma once
 
-#include <iostream>
-#include <cstring>
-#include <exception>
-#include <sstream>
+#include "webserv.hpp"
 
 class Exception : public std::exception {
     private:
