@@ -1,6 +1,8 @@
 #pragma once
 
 #include "SetupResponse.hpp"
+#include <iostream>
+#include <map>
 
 class SetupResponse;
 

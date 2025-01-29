@@ -14,16 +14,24 @@
 #include <vector>
 #include <algorithm>
 #include <arpa/inet.h>
-
-class	Server;
-class	Request;
 #include <cerrno>
 #include "../include/Exception.hpp"
 #include "../include/Logger.hpp"
+#include "../include/Request.hpp"
+#include "../include/Response.hpp"
+#include "../include/Server.hpp"
+#include "../include/ServerManager.hpp"
+#include "../include/ConfigParser.hpp"
+#include "../include/ConfigServer.hpp"
+#include "../include/ConfigLocation.hpp"
+#include "../include/SetupResponse.hpp"
+#include "../include/Utils.hpp"
 
 #define LOG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 
+class	Server;
+class	Request;
 
 struct ErrorPage {
     std::set<int> error_codes;
