@@ -1,7 +1,12 @@
 #pragma once
 
-#include <iostream>
+enum fd_status
+{
+	CLIENT,
+	SERVER,
+};
 
+#include <iostream>
 #include <fstream>
 #include <sstream>
 #include <list>
@@ -21,6 +26,8 @@
 #include <sys/stat.h>
 #include <ctime>
 #include <exception>
+#include "ConfigServer.hpp"
+#include "SetupResponse.hpp"
 #include "Exception.hpp"
 #include "Logger.hpp"
 #include "Request.hpp"
@@ -28,9 +35,8 @@
 #include "Server.hpp"
 #include "ServerManager.hpp"
 #include "ConfigParser.hpp"
-#include "ConfigServer.hpp"
 #include "ConfigLocation.hpp"
-#include "SetupResponse.hpp"
+
 #include "Utils.hpp"
 
 #define LOG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
@@ -44,11 +50,7 @@ struct ErrorPage {
     std::string error_path;
 };
 
-enum fd_status
-{
-	CLIENT,
-	SERVER,
-};
+
 
 typedef struct s_FD_data
 {

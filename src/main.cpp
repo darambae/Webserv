@@ -11,11 +11,11 @@
 // 	ConfigParser	config(configFile);
 // 	Server	server(config.getServers())
 // }
-#include "../include/Server.hpp"
-#include "../include/ConfigParser.hpp"
-#include "../include/ConfigServer.hpp"
-#include "../include/ConfigLocation.hpp"
-#include "../include/ServerManager.hpp"
+// #include "../include/Server.hpp"
+// #include "../include/ConfigParser.hpp"
+// #include "../include/ConfigServer.hpp"
+// #include "../include/ConfigLocation.hpp"
+// #include "../include/ServerManager.hpp"
 #include "../include/webserv.hpp"
 
 int MAX_CLIENT = 1024;

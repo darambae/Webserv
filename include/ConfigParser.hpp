@@ -35,27 +35,3 @@ class   ConfigParser {
         static void    validCgiExtension(const std::string& line);
 
 };
-
-template <typename Container> //Return a container of strings split by delimiter
-Container splitString(const std::string& line, char delimiter) {
-    Container result;
-    std::string token;
-    std::istringstream tokenStream(line);
-
-    while (std::getline(tokenStream, token, delimiter))
-        result.insert(result.end(), token);
-    return result;
-}
-
-template <typename Container> //Print a container
-void printContainer(const Container& container) {
-    typename Container::const_iterator it = container.begin();
-    for (it = container.begin(); it != container.end(); ++it)
-        std::cout << *it << " ";
-    std::cout << std::endl;
-}
-
-void    removeWhitespaces(std::string& str); //Remove whitespaces from a string in the beginning and the end
-bool    endingSemicolon(const std::string& line);
-bool    onlyDigits(const std::string& str); //Check if a string contains only digits
-bool    validBracket(const std::string& line, char a, char b); //Check if a string contains a valid bracket(a), not b

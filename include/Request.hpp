@@ -1,6 +1,14 @@
+
 #pragma once
 
-#include "webserv.hpp"
+#include "SetupResponse.hpp"
+#include "ConfigServer.hpp"
+#include "Utils.hpp"
+#include <iostream>
+#include <string>
+#include <sstream>
+#include <unistd.h>
+#include <map>
 
 class SetupResponse;
 
