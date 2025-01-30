@@ -20,18 +20,18 @@ void	ServerManager::launchServers() {
 			if (ALL_FDS[i].revents & POLLIN) {
 				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
-					// char *buffer;
-					// read(ALL_FDS[i].fd, buffer, 1024);
-					if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
-						cleanClientFd(new_client);
+					char *buffer;
+					read(ALL_FDS[i].fd, buffer, 1024);
+					//if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
+					//	cleanClientFd(new_client);
 				}
-				// else {
-				// 	char *buffer;
-				// 	read(ALL_FDS[i].fd, buffer, 1024);
-				// 	std::cout << "the client with FD " << ALL_FDS[i].fd <<" send a request"<<std::endl;
-				// }
-				else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
-					cleanClientFd(ALL_FDS[i].fd);
+				else {
+					char *buffer;
+					read(ALL_FDS[i].fd, buffer, 1024);
+					std::cout << "the client with FD " << ALL_FDS[i].fd <<" send a request"<<std::endl;
+				}
+				// else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
+				// 	cleanClientFd(ALL_FDS[i].fd);
 			}
 		}
     }
