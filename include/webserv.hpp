@@ -56,7 +56,7 @@ typedef struct s_FD_data
 {
 	fd_status	status;
 	Server*			server;
-	// Request*		request;
+	Request*		request;
 	int				port;
 	std::string		ip;
 }			t_Fd_data;
