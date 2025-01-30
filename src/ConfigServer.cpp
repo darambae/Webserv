@@ -8,7 +8,7 @@ ConfigServer::ConfigServer() {
     this->_error_pages.push_back(error_page);
     this->_root = "";
     this->_limit_client_body_size = -1;
-    this->_listen.push_back(std::make_pair("0.0.0.0", 80));
+    this->_listen.push_back(std::make_pair("0.0.0.0", 8080));
 }
 
 void    ConfigServer::setListen(const std::string& ip, const std::string& port) {

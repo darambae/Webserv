@@ -22,8 +22,8 @@ void	ServerManager::launchServers() {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
 					char *buffer;
 					read(ALL_FDS[i].fd, buffer, 1024);
-					// if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
-					// 	cleanClientFd(new_client);
+					//if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
+					//	cleanClientFd(new_client);
 				}
 				else {
 					char *buffer;
