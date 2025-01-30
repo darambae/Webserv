@@ -37,13 +37,17 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	}
 	/*create the FD*/
 	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-	if (new_fd == -1)
-		throw ServerException("Socket creation failed");
+	if (new_fd == -1) {
+		std::cout<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;
+		perror("error message : ");
+		return;
+	}
 	std::cout<<"a new server socket was created : "<<new_fd<<std::endl;
 	/*in case of server crach, this setting allow to reuse the port */
 	int opt = 1;
-	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) { //Checking if the socket is already in use
-		throw ServerException("setsockopt failed");
+	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
+		perror("setsockopt failed");
+		return;
 	}
 	/*init server socket*/
 	_address.sin_family = AF_INET; //IPv4
