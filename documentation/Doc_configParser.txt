@@ -3,7 +3,9 @@ To do list:
 2. Validity check for each directive (done for principal directives)
 3. Add additional directives (for future)
 
-compile command line for config classes : c++ -std=c++98 -Iinclude -o config.out src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp	
+>>Compile command lines 
+1> config classes : c++ -std=c++98 -Iinclude -o config.out src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp	
+2> Kelly's + Daram's : c++ -std=c++98 -Iinclude -o config.out src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp src/Logger.cpp src/ServerManager.cpp src/server.cpp
 
 >>How to use Logger and Exception classes
     1> For informational logs = Logger::getInstance().log(INFO, "Message to print");
@@ -11,3 +13,4 @@ compile command line for config classes : c++ -std=c++98 -Iinclude -o config.out
     
     2> For debugging logs = THROW("Message to print");
     (The program will stop with the information about the error(where it happened and msg you specify))
+
