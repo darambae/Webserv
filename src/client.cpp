@@ -1,3 +1,4 @@
+#include "../include/webserv.hpp"
 #include <iostream>
 #include <cstring>
 #include <cstdlib>
@@ -13,7 +14,6 @@ int main(){
     int sock;
     struct sockaddr_in server_address;
     char buffer[BUFFER_SIZE];
-    time_t now;
     sock = socket(AF_INET, SOCK_STREAM, 0);
     if (sock == -1){
         std::cerr << "Socket creation on client side failed" << std::endl;
@@ -31,7 +31,7 @@ int main(){
     }
 
     for (int i = 0; i < 5; ++i) { // Send 5 messages for testing
-        std::string message = std::to_string(i + 1) + " : Hello, Server!\n";
+        std::string message = to_string(i + 1) + " : Hello, Server!\n";
         send(sock, message.c_str(), message.length(), 0);
         std::cout << "Client's message to server: " << message << std::endl;
 

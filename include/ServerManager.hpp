@@ -7,10 +7,10 @@ class	Server;
 class	ConfigServer;
 class	ServerManager {
 	private:
-		const std::vector<ConfigServer> &	_configs;
+		std::vector<ConfigServer>	_configs;
 		std::vector<Server*>	_servers;
 	public:
-		ServerManager(const std::vector<ConfigServer> & configs);
+		ServerManager(std::vector<ConfigServer> configs);
 		~ServerManager();
 		class ServerManagerException : public std::exception {
 		private:

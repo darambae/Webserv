@@ -19,7 +19,7 @@ public:
     ConfigServer();
     ~ConfigServer() {};
 
-    std::vector<std::pair<std::string, int> > getListen() const { return _listen; };
+    std::vector<std::pair<std::string, int> > &getListen() { return _listen; };
     std::vector<std::string> getServerNames() const { return _server_names; };
     std::string getRoot() const { return _root; };
     int getLimitClientBodySize() const { return _limit_client_body_size; };

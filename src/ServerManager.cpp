@@ -3,7 +3,7 @@
 
 //faire une fonction qui rajoute le fd et ses infos dans la map
 
-ServerManager::ServerManager(const std::vector<ConfigServer> & configs) : _configs(configs) {}
+ServerManager::ServerManager(std::vector<ConfigServer> configs) : _configs(configs) {}
 
 void	ServerManager::launchServers() {
 	//create one FD by odd of IP/port

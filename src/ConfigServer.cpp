@@ -15,7 +15,8 @@ void    ConfigServer::setListen(const std::string& ip, const std::string& port) 
     int num = std::atoi(port.c_str());
     ConfigParser::validIp(ip);
     ConfigParser::validPort(port);
-    this->_listen.push_back(std::make_pair(ip, num));
+    std::string ip_string = ip == "localhost" ? "127.0.0.1" : ip;
+    this->_listen.push_back(std::make_pair(ip_string, num));
 }
 
 void    ConfigServer::setServerNames(const std::string& server_name) {
@@ -45,6 +46,8 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     ConfigParser::validErrorPage(line);
+    if (getErrorPages().size() == 1 && getErrorPages().front().error_codes.count(404) && getErrorPages().front().error_path == "/data/www/errors/404.html")
+        getErrorPages().clear();
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
