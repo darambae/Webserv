@@ -45,7 +45,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
-        if (validBracket(line, '}', '{')) { break; }
+        //std::cout << "line: " << line << std::endl;
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
             if (line.find(":") != std::string::npos)
@@ -73,8 +73,17 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             parseLocation(file, line, location);
             server.setLocations(location);
         }
-
+        if (validBracket(line, '}', '{')) {
+            break;
+        }
     }
+    // if (getline(file, line)) {
+    //     std::cout << "line: " << line << std::endl;
+    //     removeWhitespaces(line);
+    //     if (!line.empty())
+    //         THROW("Server block bracket isn't closed properly");
+    // }
+
     if (server.getErrorPages().empty())
         server.setDefaultErrorPages();
     if (server.getListen().empty())
@@ -90,8 +99,6 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos;
         std::vector<ErrorPage> error_pages = location.getErrorPages();
-        if (validBracket(line, '}', '{'))
-            break;
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos && endingSemicolon(line))
             location.setRoot(line.substr(start_pos, len));
@@ -108,6 +115,7 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
                 error_pages.clear();
             location.setErrorPages(line.substr(start_pos, len));
         }
+        if (validBracket(line, '}', '{'))   { break; }
     }
     if (location.getErrorPages().empty())
         location.setDefaultErrorPages();
