@@ -141,7 +141,7 @@ void    ConfigParser::validIp(std::string ip) {
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
         THROW("The given IP is Out of range");
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid ip");
+    //LOG_INFO("Valid ip");
 }
 
 void    ConfigParser::validPort(const std::string& port) {

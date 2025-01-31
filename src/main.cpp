@@ -42,10 +42,10 @@ int main(int ac, char **av)
         const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
         printContainer(servers);
-		ServerManager	manager(servers);
-		manager.launchServers();
+		// ServerManager	manager(servers);
+		// manager.launchServers();
     } catch (std::exception & e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        LOG_DEBUG(e.what());
     // } catch (const std::exception& e) {
     //     Logger::log(ERROR, "main", e.what(), 0);
     //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
