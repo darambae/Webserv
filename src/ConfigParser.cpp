@@ -89,7 +89,7 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos;
-        std::vector<ErrorPage> &error_pages = location.getErrorPages();
+        std::vector<ErrorPage> error_pages = location.getErrorPages();
         if (validBracket(line, '}', '{'))
             break;
         if (line.empty() || line[0] == '#') { continue; }

@@ -100,7 +100,7 @@ std::ostream& operator<<(std::ostream& os, ConfigLocation location) {
     if (!location.getCgiPath().empty())
         os << "\tCGI Path: " << location.getCgiPath() << std::endl;
 
-    std::vector<ErrorPage> &error_pages = location.getErrorPages();
+    std::vector<ErrorPage> error_pages = location.getErrorPages();
     if (!error_pages.empty()) {
         os << "\tError pages: " << std::endl;
         for (std::vector<ErrorPage>::const_iterator it = error_pages.begin(); it != error_pages.end(); ++it) {
