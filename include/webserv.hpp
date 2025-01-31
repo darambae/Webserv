@@ -39,7 +39,9 @@ enum fd_status
 
 #include "Utils.hpp"
 
-#define LOG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
+#define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
+#define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
+#define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 
 class	Server;

@@ -29,7 +29,8 @@ int main(int ac, char **av)
 {
     if (ac > 2)
     {
-        std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
+        // std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
+        LOG_ERROR("Usage: ./config_parser [config_file]", 0);
         return 1;
     }
     std::string file = "config/default.conf";
