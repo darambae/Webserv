@@ -1,21 +1,21 @@
 #include "../include/ConfigServer.hpp"
 
 ConfigServer::ConfigServer() {
-    ErrorPage error_page;
-    error_page.error_codes.insert(404);
-    error_page.error_path = "/data/www/errors/404.html";
-
-    this->_error_pages.push_back(error_page);
     this->_root = "";
     this->_limit_client_body_size = -1;
-    this->_listen.push_back(std::make_pair("0.0.0.0", 8080));
 }
 
 void    ConfigServer::setListen(const std::string& ip, const std::string& port) {
     int num = std::atoi(port.c_str());
     ConfigParser::validIp(ip);
     ConfigParser::validPort(port);
-    std::string ip_string = ip == "localhost" ? "127.0.0.1" : ip;
+    std::string ip_string;
+    if (ip == "localhost")
+        ip_string = "127.0.0.1";
+    else if (ip == "*")
+        ip_string = "0.0.0.0";
+    else
+        ip_string = ip;
     this->_listen.push_back(std::make_pair(ip_string, num));
 }
 
@@ -46,8 +46,6 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     ConfigParser::validErrorPage(line);
-    if (getErrorPages().size() == 1 && getErrorPages().front().error_codes.count(404) && getErrorPages().front().error_path == "/data/www/errors/404.html")
-        getErrorPages().clear();
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
@@ -60,6 +58,17 @@ void    ConfigServer::setErrorPages(const std::string& line) {
 
 void    ConfigServer::setLocations(const ConfigLocation& location) {
     this->_locations.push_back(location);
+}
+
+void    ConfigServer::setDefaultErrorPages() {
+    ErrorPage error_page;
+    error_page.error_codes.insert(404);
+    error_page.error_path = "/data/www/errors/404.html";
+    this->_error_pages.push_back(error_page);
+}
+
+void    ConfigServer::setDefaultListen() {
+    this->_listen.push_back(std::make_pair("0.0.0.0", 8080));
 }
 
 std::ostream& operator<<(std::ostream& os, ConfigServer server) {
@@ -93,3 +102,4 @@ std::ostream& operator<<(std::ostream& os, ConfigServer server) {
     printContainer(server.getLocations());
     return os;
 }
+

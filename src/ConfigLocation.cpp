@@ -1,12 +1,7 @@
 
 #include "../include/ConfigLocation.hpp"
 
-ConfigLocation::ConfigLocation() {
-    ErrorPage error_page;
-    error_page.error_codes.insert(404);
-    error_page.error_path = "/data/www/errors/404.html";
-
-    this->_error_pages.push_back(error_page);
+ConfigLocation::ConfigLocation() { 
     this->_path = "";
     this->_root = "";
     this->_autoindex = false;
@@ -62,6 +57,13 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
         tmp_vector.erase(tmp_vector.begin());
     }
     _error_pages.push_back(error_page);
+}
+
+void    ConfigLocation::setDefaultErrorPages() {
+    ErrorPage error_page;
+    error_page.error_codes.insert(404);
+    error_page.error_path = "/data/www/errors/404.html";
+    this->_error_pages.push_back(error_page);
 }
 
 void    ConfigLocation::setReturn(const std::string& line) {

@@ -27,10 +27,12 @@ public:
     std::vector<ConfigLocation> getLocations() const { return _locations; };
 
     void setListen(const std::string &ip, const std::string &port);
+    void setDefaultListen();
     void setServerNames(const std::string &server_name);
     void setRoot(const std::string &root);
     void setLimitClientBodySize(const std::string &limit_client_body_size);
     void setErrorPages(const std::string &error_page);
+    void setDefaultErrorPages();
     void setLocations(const ConfigLocation &location);
 };
 ;

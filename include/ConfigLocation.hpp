@@ -38,6 +38,7 @@ class ConfigLocation {
         void setCgiExtension(const std::string& line);
         void setCgiPath(const std::string& line);
         void setErrorPages(const std::string& line);
+        void setDefaultErrorPages();
         void setReturn(const std::string& line);
 };
 

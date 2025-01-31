@@ -47,11 +47,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t len = end_pos - start_pos; //string length from space to semicolon
         if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
-            if (server.getListen().size() == 1 &&
-                server.getListen().front().first == "0.0.0.0" &&
-                server.getListen().front().second == 8080)
-                server.getListen().clear(); //remove default listen
+        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
             if (line.find(":") != std::string::npos)
                 server.setListen(line.substr(start_pos, line.find(":") - start_pos), 
                     line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
@@ -77,7 +73,12 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             parseLocation(file, line, location);
             server.setLocations(location);
         }
+
     }
+    if (server.getErrorPages().empty())
+        server.setDefaultErrorPages();
+    if (server.getListen().empty())
+        server.setDefaultListen();
 }
 
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
@@ -108,6 +109,8 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setErrorPages(line.substr(start_pos, len));
         }
     }
+    if (location.getErrorPages().empty())
+        location.setDefaultErrorPages();
 }
 
 void    ConfigParser::validMethods(const std::string& methods) {
@@ -126,8 +129,8 @@ void    ConfigParser::validIp(std::string ip) {
     size_t  pos;
     int     num;
     
-    if (ip == "localhost")
-        Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "");
+    if (ip == "localhost" || ip == "*")
+        return;
     while ((pos = ip.find(".")) != std::string::npos) {
         segment = ip.substr(0, pos);
         num = std::atoi(segment.c_str());

@@ -38,15 +38,17 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	/*create the FD*/
 	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
 	if (new_fd == -1) {
-		std::cout<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;
-		perror("error message : ");
+		//std::cout<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;
+		LOG_ERROR("socket function failed to create a new fd for the IP "+ipPort.first+" and the port "+std::to_string(ipPort.second), 1);
+		//perror("error message : ");
 		return;
 	}
 	std::cout<<"a new server socket was created : "<<new_fd<<std::endl;
 	/*in case of server crach, this setting allow to reuse the port */
 	int opt = 1;
 	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-		perror("setsockopt failed");
+		LOG_ERROR("setsockopt failed", 1);
+		//perror("setsockopt failed");
 		return;
 	}
 	/*init server socket*/
@@ -56,15 +58,17 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
 	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-		std::cout<<"the bind of the new socket "<<new_fd<<" for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<" failed"<<std::endl;
-		perror("");
+		// std::cout<<"the bind of the new socket "<<new_fd<<" for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<" failed"<<std::endl;
+		// perror("");
+		LOG_ERROR("The bind of the new socket "+std::to_string(new_fd)+" for the IP "+ipPort.first+" and the port "+std::to_string(ipPort.second)+" failed", 1);
 		return;
 		//throw ServerException("Bind failed");
 	}
-	std::cout<<"the socket is bind"<<std::endl;
+	std::cout<<"The socket is bind"<<std::endl;
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
 	    throw ServerException("Listen failed");
-	std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
+	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
+	LOG_INFO("A new socket was created for " + _config.getServerNames()[0] + " and port " + std::to_string(ipPort.second) + " on FD " + std::to_string(new_fd));
 	addFdToFds(new_fd);
 	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER/*, false*/);
 }
@@ -103,7 +107,8 @@ int	Server::createClientSocket(int fd) {
         return -1;
     }
 	_client_count++;
-    std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
+    //std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
+	LOG_INFO("New client connected : " + std::to_string(new_socket));
 	addFdToFds(new_socket);
 	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT/*, true*/);
 	return new_socket;

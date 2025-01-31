@@ -1,4 +1,5 @@
 #include "../include/Logger.hpp"
+#include <cerrno>
 
 Logger::Logger(OutputType type) {
     if (type == FILE_OUTPUT) {
@@ -29,7 +30,7 @@ std::string Logger::getTime() {
     return buf;
 }
 
-void    Logger::log(LogType type, const char* msg) {
+void    Logger::log(LogType type, const std::string& msg, bool errno_set) {
     std::string log_type;
     if (type == 0)
         log_type = "DEBUG";
@@ -37,11 +38,14 @@ void    Logger::log(LogType type, const char* msg) {
         log_type = "INFO";
     else if (type == 2)
         log_type = "ERROR";
-    
-    if (type == 3) //LogType::OFF
+    else // if (type == 3) LOG OFF
         return;
 
-    std::string log_msg = "[" + log_type + "] [" + getTime() + "] " + msg + "\n";
+    int save_errno = errno;
+    std::string log_msg = "[" + getTime() + "] " + "[" + log_type + "]: " + msg;
+    if (log_type == "ERROR" && errno_set)
+        log_msg += " : " + std::string(strerror(save_errno));
+    log_msg += "\n";
     if (_output_type == CONSOLE_OUTPUT)
         std::cout << log_msg;
     else if (_output_type == FILE_OUTPUT) {
