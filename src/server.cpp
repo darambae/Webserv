@@ -41,40 +41,24 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	// 	}
 	// }
 	/*create the FD*/
-	std::ostringstream oss;
-    oss << msg << " | Valeur: " << value << " | Extra: " << extra;
-    return oss.str();
+	std::cout<<"initiation socket of IP "<<ipPort.first<<" and port "<<ipPort.second<<" begin..."<<std::endl;
 	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
-	if (new_fd == -1) {
-		return LOG((oss<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;).str());
-		perror("error message : ");
-		return LOG("socket failed");
-	}
-	std::cout<<"a new server socket was created : "<<new_fd<<std::endl;
+	if (new_fd == -1)
+		return LOG("socket function failed");
 	/*in case of server crach, this setting allow to reuse the port */
 	int opt = 1;
-	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-		perror("setsockopt failed");
-		return;
-	}
+	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0)
+		return LOG("setsockopt failed");
 	/*init server socket*/
 	_address.sin_family = AF_INET; //IPv4
-	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0) {
-    	std::cout<<"Erreur : adresse IP invalide ou conversion échouée\n"<<std::endl;
-		perror("error message : ");
-		return;
-	}
+	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
+    	return LOG("Erreur : adresse IP invalide ou conversion échouée\n");
 	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
-	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
-	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
-		std::cout<<"the bind of the new socket "<<new_fd<<" for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<" failed"<<std::endl;
-		perror("");
-		return;
-	}
-	std::cout<<"the socket is bind"<<std::endl;
+	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0)
+		return LOG("bind failed");
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
-	    "Listen failed");
-	std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
+	    return LOG("Listen failed");
+	std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" on FD " << new_fd << std::endl;
 	addFdToFds(new_fd);
 	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER/*, false*/);
 }
