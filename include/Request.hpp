@@ -41,6 +41,7 @@ class Request {
 	std::string	getMethod() const { return _path; }
 	std::string	getPath() const { return _method; }
 	std::string	getVersion() const { return _version; }
+	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
 	/* methods */
