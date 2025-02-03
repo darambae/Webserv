@@ -28,7 +28,7 @@ enum fd_status
 #include <ctime>
 #include <exception>
 #include "ConfigServer.hpp"
-#include "SetupResponse.hpp"
+#include "Response.hpp"
 #include "Exception.hpp"
 #include "Logger.hpp"
 #include "Request.hpp"

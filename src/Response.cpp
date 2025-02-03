@@ -1,106 +1,126 @@
 #include "../include/Response.hpp"
 
-void	Response::buildResponse() {
-
-	std::stringstream buffer;
-	buffer << _setup.getRequestedFile().rdbuf();
-	_body = buffer.str();
-
-	initMimeTypes();
-
-	_builtResponse = buildFirstLine();
-	_builtResponse += buildHeaders();
-	_builtResponse += _body;
-}
-
-std::string	Response::buildFirstLine() {
-
-	std::string	firstLine = _setup.getRequest().getVersion() + " " + to_string(_setup.getCodeStatus()) + " " + _setup.getReasonPhrase() + "\r\n";
-	return firstLine;
-}
-
-std::string	Response::buildHeaders() {
+ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
 	
-	std::string	header;
+	const	ConfigLocation*	bestMatch = NULL;
+	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
-	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
-	_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
-	_headers._contentLength = "Content-length: " + to_string(_headers._contentType.size()) + "\r\n\r\n";
-
-	return (header = _headers._timeStamp + _headers._contentType + _headers._timeStamp);
+	for (; it != config.getLocations().end(); ++it) {
+		if (requestPath.find(it->getPath()) == 0) {
+			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size())
+				bestMatch = &(*it);
+		}
+	}
+	return bestMatch;
 }
 
-std::string	Response::buildTime(void) {
 
-	time_t _timestamp;
+bool	Response::findIndex(ConfigLocation const* location) {
+	
+	std::string indexPath = _request.getPath();
 
-	std::stringstream result;
-	std::string weekDay, month, day, hours, year;
-	std::string	timeZone = "GMT";
+	if (!_request.getIsRequestPathDirectory())
+		indexPath += "/";
+		
+	std::vector<std::string>::const_iterator it = location->getIndex().begin();
+	for (; it != location->getIndex().end(); ++it) {
+		std::string	tryIndex = *it;
+		std::string	tryCompletePath = indexPath + tryIndex;
 
-	// Get the current time.
-	time(&_timestamp);
-	std::stringstream buffTime;
-	buffTime << ctime(&_timestamp);
-
-	// Dispatch the ctime format accross the corresponding strings
-	// ? ctime format = Sat Oct 19 10:31:54 2024
-	buffTime >> weekDay >> month >> day >> hours >> year;
-
-	// Rearrange time to match HTTP standarts.
-	// ? ex : Wed, 11 Oct 2024 10:24:12 GMT
-	result	<< weekDay << ", " << day << " " << month << " " << year << " " << hours << " " << timeZone;
-
-	return result.str();
+		if (access(tryCompletePath.c_str(), F_OK) == -1) {
+			setRequestedFile(tryCompletePath);
+			return true;
+		}
+	}
+	return false;
 }
 
-std::string	Response::buildContentType() {
-	std::string	requestedFilePath = _setup.getRequestedFilePath();
-	std::string	contentType;
 
-	size_t	pos = requestedFilePath.find_last_of('.');
-	if (pos != std::string::npos) {
-		std::string fileExtension = requestedFilePath.substr(pos + 1);
-		std::map<std::string, std::string>::const_iterator	it = _mimeTypes.begin();
-		for (; it != _mimeTypes.end(); ++it) {
-			if (it->first == fileExtension) {
-				contentType = it->second;
-				break ;
+//IF request path is a directory 
+//	=> IF index page exist, serve it
+//	=> ELSE => IF auto index is ON, file list is generated
+//			=> ELSE (auto-index off), error 404 Not found.
+//ELSE IF request path is a file
+//	=> IF file exist, serve it
+//	=> ELSE, error 404 not found
+void	Response::handleGet(ConfigLocation const* location) {
+
+	struct stat	pathStat;
+	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+		if (findIndex(location)) {
+			setCodeStatus(200);
+			setReasonPhrase("OK");
+			sendResponse();
+		}
+		else {
+			if (location->getAutoindex()) {
+				//generate html page with all the files and repos present in the repo asked in the request
+				//page is supposed to be dynamic so we can navigate through website's repos and files via hypertext links
+			}
+			else {
+				setCodeStatus(404);
+				setReasonPhrase("Not found");
+				handleError();
 			}
 		}
 	}
-	return contentType;
+
+	else {
+	// request path is a file
+
+		setRequestedFile(_request.getPath().c_str());
+		if (_requestedFile) {
+			setCodeStatus(200);
+			setReasonPhrase("OK");
+			sendResponse();
+		}
+		else {
+			setCodeStatus(404);
+			setReasonPhrase("Not found");
+			handleError();
+		}
+	}
 }
 
 
-void	Response::initMimeTypes() {
+void	Response::handleResponse() {
 
-	// Text Based Types
-	_mimeTypes.insert(std::make_pair("html", "text/html"));
-	_mimeTypes.insert(std::make_pair("htm", "text/htm"));
-	_mimeTypes.insert(std::make_pair("txt", "text/plain"));
-	_mimeTypes.insert(std::make_pair("css", "text/css"));
-	_mimeTypes.insert(std::make_pair("xml", "text/xml"));
-	// Application Content Types
-	_mimeTypes.insert(std::make_pair("js", "application/javascript"));
-	_mimeTypes.insert(std::make_pair("json", "application/json"));
-	_mimeTypes.insert(std::make_pair("pdf", "application/pdf"));
-	_mimeTypes.insert(std::make_pair("zip", "application/zip"));
-	// Image Content Types
-	_mimeTypes.insert(std::make_pair("jpeg", "image/jpeg"));
-	_mimeTypes.insert(std::make_pair("jpg", "image/jpg"));
-	_mimeTypes.insert(std::make_pair("png", "image/png"));
-	_mimeTypes.insert(std::make_pair("gif", "image/gif"));
-	_mimeTypes.insert(std::make_pair("webp", "image/webp"));
-	_mimeTypes.insert(std::make_pair("bmp", "image/bmp"));
-	_mimeTypes.insert(std::make_pair("ico", "image/x-icon"));
-	// Audio Content Types
-	_mimeTypes.insert(std::make_pair("mp3", "audio/mp3"));
-	_mimeTypes.insert(std::make_pair("mpeg", "audio/mpeg"));
-	_mimeTypes.insert(std::make_pair("ogg", "audio/ogg"));
-	_mimeTypes.insert(std::make_pair("wav", "audio/wav"));
-	// Video Content Types
-	_mimeTypes.insert(std::make_pair("mp4", "video/mp4"));
-	_mimeTypes.insert(std::make_pair("webm", "video/webm"));
-	_mimeTypes.insert(std::make_pair("ogv", "video/ogv"));
+	std::string requestPath = _request.getPath();
+	std::string requestMethod = _request.getMethod();
+
+	//find the proper location block to read depending on the path given in the request
+	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
+	if (!location) {
+		setCodeStatus(404);
+		setReasonPhrase("Not found");
+		return ;
+	}
+
+	//check if the request's method is allowed in location block of server configuration
+	std::set<std::string> allowedMethods = location->getAllowMethods();
+	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
+		setCodeStatus(405);
+		setReasonPhrase("Method not allowed");
+		handleError();
+		return ;
+	}
+
+	if (requestMethod == "GET")
+		handleGet(location);
+	else if (requestMethod == "POST")
+		handlePost();
+	else if (requestMethod == "DELETE")
+		handleDelete();
+	else {
+		setCodeStatus(501);
+		setReasonPhrase("method not implemented");
+		handleError();
+		return ;
+	}
+}
+
+void	Response::sendResponse() {
+	
+	_responseBuilder = new ResponseBuilder(*this);
+	_builtResponse = _responseBuilder->buildResponse();
 }
