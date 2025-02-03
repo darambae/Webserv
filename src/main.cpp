@@ -23,10 +23,25 @@ int MAX_CLIENT = 1024;
 std::map<int, t_Fd_data*>	FD_DATA;
 std::vector<struct pollfd> ALL_FDS;
 
+void    signalHandler(int signal) {
+    LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
+    // cleaning up and closing the program
+    exit(signal);
+}
 
+// void    handlerSIGCHLD(int signal) {
+//     (void)signal;
+//     while (waitpid(-1, NULL, WNOHANG) > 0);
+// }
 
 int main(int ac, char **av)
 {
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = signalHandler;
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    // sigaction(SIGCHLD, &sa, NULL);
     if (ac > 2)
     {
         // std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -41,9 +56,9 @@ int main(int ac, char **av)
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
-        printContainer(servers);
-		// ServerManager	manager(servers);
-		// manager.launchServers();
+        //printContainer(servers);
+		ServerManager	manager(servers);
+		manager.launchServers();
     } catch (std::exception & e) {
         LOG_DEBUG(e.what());
     // } catch (const std::exception& e) {

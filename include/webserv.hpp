@@ -7,6 +7,7 @@ enum fd_status
 };
 
 #include <iostream>
+#include <csignal>
 #include <fstream>
 #include <sstream>
 #include <list>
@@ -36,7 +37,6 @@ enum fd_status
 #include "ServerManager.hpp"
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
-
 #include "Utils.hpp"
 
 #define LOG_DEBUG(msg) Logger::getInstance(CONSOLE_OUTPUT).log(DEBUG, msg)
@@ -51,8 +51,6 @@ struct ErrorPage {
     std::set<int> error_codes;
     std::string error_path;
 };
-
-
 
 typedef struct s_FD_data
 {
