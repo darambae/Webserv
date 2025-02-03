@@ -123,4 +123,17 @@ void	Response::sendResponse() {
 	
 	_responseBuilder = new ResponseBuilder(*this);
 	_builtResponse = _responseBuilder->buildResponse();
+
+	size_t	totalSent = 0;
+	size_t	responseSize = _builtResponse->size();
+
+	while (totalSent < responseSize) {
+		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + totalSent, responseSize - totalSent, 0);
+
+		if (totalSent = -1)
+			//disconnected. Behavior to define
+			break;
+
+		totalSent += bytesSent;
+	}
 }
