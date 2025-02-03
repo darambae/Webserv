@@ -75,8 +75,8 @@ int	Request::handleRequest(ConfigServer const& config) {
 		return 1;
 
 	if (isRequestComplete) {
-		_setupResponse = new SetupResponse(*this, config);
-		_setupResponse->handleResponse();
+		_Response = new Response(*this, config);
+		_Response->handleResponse();
 	}
 	return 0;
 }

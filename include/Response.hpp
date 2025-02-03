@@ -1,42 +1,56 @@
 #pragma once
 
 #include "webserv.hpp"
+#include "ResponseBuilder.hpp"
 
-class SetupResponse;
+class ConfigServer;
+class ConfigLocation;
+class Request;
+class ResponseBuilder;
 
 class Response {
 
-	private: 
-	
-	struct s_headers
-	{
-		std::string	_timeStamp;
-		std::string	_contentType;
-		std::string	_contentLength;
-	}; 
+private:
+	ResponseBuilder*	_responseBuilder;
+	std::string*		_builtResponse;
+	ConfigServer const&	_config;
+	Request&			_request;
+	int					_codeStatus;
+	std::string			_reasonPhrase;
+	std::string			_requestedFilePath;
+	std::ifstream		_requestedFile;
+	std::map<std::string, std::string>	_header;
 
-	SetupResponse&	_setup;
-	std::string		_builtResponse;
-	s_headers		_headers;
-	std::string		_body;
-	std::map<std::string, std::string>	_mimeTypes;
+	Response();
 
 	public:
-	Response(SetupResponse& setup): _setup(setup) {}
+	Response(Request& request, ConfigServer const&	config): _request(request), _config(config) {}
 	~Response() {}
 
-	/* setters/getters */
-	std::string const&	getBody() const { return _body; }
-	std::string const&	getBuiltResponse() const { return _builtResponse; }
+	/* setters / getters */
+	void		setRequestedFile(std::string const& filePath) { 
+		_requestedFilePath = filePath; 
+		_requestedFile.open(filePath.c_str(), std::ios::binary);
+	}
+	void		setCodeStatus(int code) { _codeStatus = code; }
+	void		setReasonPhrase(std::string reason) { _reasonPhrase = reason; }
+	void		setHeader(std::string key, std::string value) { _header[key] = value; }
 
-	/* methods */
-	void			initMimeTypes();
-	void			buildResponse();
-	std::string		buildFirstLine();
-	std::string		buildHeaders();
-	std::string		buildTime();
-	std::string		buildContentType();
+	int					getCodeStatus() const { return _codeStatus; }
+	Request&			getRequest() const { return _request; }
+	std::string const&	getReasonPhrase() const { return _reasonPhrase; }
+	std::string			getRequestedFilePath() const { return _requestedFilePath; }
+	std::ifstream&		getRequestedFile() { return _requestedFile; }
+	std::map<std::string, std::string>	getHeader() const { return _header; }
 
-	/* Header building */
 
+	/* method */
+	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
+	void	handleResponse();
+	bool	findIndex(ConfigLocation const* location);
+	void	sendResponse();
+	void	handleGet(ConfigLocation const* location);
+	void	handlePost();
+	void	handleDelete();
+	void	handleError();
 };
