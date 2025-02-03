@@ -40,12 +40,11 @@ void    ConfigParser::parseFile() {
 
 void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server) {
     std::string line;
-    while (getline(file, line)) {
+    while (getline(file, line) && line.find("}") == std::string::npos) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
-        //std::cout << "line: " << line << std::endl;
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
             if (line.find(":") != std::string::npos)
@@ -73,17 +72,9 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             parseLocation(file, line, location);
             server.setLocations(location);
         }
-        if (validBracket(line, '}', '{')) {
-            break;
-        }
     }
-    // if (getline(file, line)) {
-    //     std::cout << "line: " << line << std::endl;
-    //     removeWhitespaces(line);
-    //     if (!line.empty())
-    //         THROW("Server block bracket isn't closed properly");
-    // }
-
+    if (!validBracket(line, '}', '{'))
+        THROW("Server block bracket isn't closed properly");
     if (server.getErrorPages().empty())
         server.setDefaultErrorPages();
     if (server.getListen().empty())
@@ -93,7 +84,7 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
     std::string path = line.substr(line.find(" ") + 1, line.find(" {") - line.find(" ") - 1);
     location.setPath(path);
-    while (getline(file, line)) {
+    while (getline(file, line) && line.find("}") == std::string::npos) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
@@ -115,8 +106,9 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
                 error_pages.clear();
             location.setErrorPages(line.substr(start_pos, len));
         }
-        if (validBracket(line, '}', '{'))   { break; }
     }
+    if (!validBracket(line, '}', '{'))
+        THROW("Location block bracket isn't closed properly");
     if (location.getErrorPages().empty())
         location.setDefaultErrorPages();
 }
