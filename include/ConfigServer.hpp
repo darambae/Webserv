@@ -24,7 +24,7 @@ public:
     std::string getRoot() const { return _root; };
     int getLimitClientBodySize() const { return _limit_client_body_size; };
     std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
-    std::vector<ConfigLocation> getLocations() const { return _locations; };
+    std::vector<ConfigLocation> const& getLocations() const { return _locations; };
 
     void setListen(const std::string &ip, const std::string &port);
     void setDefaultListen();

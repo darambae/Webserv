@@ -34,7 +34,7 @@ class Request {
 
 	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
 					_clientFd(fd), _contentLength(0) {}
-	~Request() { delete _Response; }
+	~Request() {}
 
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }
