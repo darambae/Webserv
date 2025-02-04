@@ -27,14 +27,16 @@ enum fd_status
 #include <sys/stat.h>
 #include <ctime>
 #include <exception>
+#include <csignal>
+
+#include "ServerManager.hpp"
 #include "ConfigServer.hpp"
 #include "Response.hpp"
 #include "Exception.hpp"
 #include "Logger.hpp"
 #include "Request.hpp"
-#include "Response.hpp"
 #include "Server.hpp"
-#include "ServerManager.hpp"
+
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"
@@ -65,7 +67,7 @@ typedef struct s_FD_data
 extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)
 extern std::map<int, t_Fd_data*>	FD_DATA;
 extern std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
-
+extern volatile sig_atomic_t    stopProgram;
 
 
 // enum HttpStatus {

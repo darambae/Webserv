@@ -1,5 +1,6 @@
+
 #include "../include/ServerManager.hpp"
-#include "../include/Request.hpp"
+//#include "../include/Request.hpp"
 
 //faire une fonction qui rajoute le fd et ses infos dans la map
 
@@ -11,7 +12,7 @@ void	ServerManager::launchServers() {
 			//cree une classe server par configServer
 			_servers.push_back(new Server(_configs[i], _configs[i].getListen()));
 		}
-    while (true) {
+    while (stopProgram != 1) {
         int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
             THROW("Poll failed");
