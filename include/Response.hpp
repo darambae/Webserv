@@ -24,7 +24,7 @@ private:
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _request(request), _config(config) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _request(request) {}
 	~Response() {}
 
 	/* setters / getters */

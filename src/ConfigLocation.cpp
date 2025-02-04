@@ -75,8 +75,8 @@ std::ostream& operator<<(std::ostream& os, ConfigLocation location) {
     os << "Location: " << std::endl;
     if (!location.getPath().empty())
         os << "\tPath: " << location.getPath() << std::endl;
-        if (!location.getRoot().empty())
-            os << "\tRoot: " << location.getRoot() << std::endl;
+    if (!location.getRoot().empty())
+        os << "\tRoot: " << location.getRoot() << std::endl;
     os << "\tAutoindex: " << (location.getAutoindex() ? "on" : "off") << std::endl;
 
     std::set<std::string> allowed_methods = location.getAllowMethods();

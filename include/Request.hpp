@@ -32,8 +32,8 @@ class Request {
 
 	public:
 
-	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false),
-					_contentLength(0), isRequestPathDirectory(false) {}
+	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
+					_clientFd(fd), _contentLength(0) {}
 	~Request() { delete _Response; }
 
 	/* getters */

@@ -136,4 +136,5 @@ void	Response::sendResponse() {
 
 		totalSent += bytesSent;
 	}
+	delete _responseBuilder;
 }
