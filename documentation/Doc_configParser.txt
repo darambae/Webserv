@@ -5,9 +5,9 @@ To do list:
 
 >>Compile command lines 
 1> Daram's : 
-    c++ -std=c++98 -Iinclude -o webserv src/Logger.cpp src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp
+    c++ -std=c++98 -Wall -Wextra -Werror -Iinclude -o webserv src/Logger.cpp src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp
 2> Kelly's + Daram's : 
-    c++ -std=c++98 -Iinclude -o webserv src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp src/Logger.cpp src/ServerManager.cpp src/server.cpp
+    c++ -std=c++98 -Wall -Wextra -Werror -Iinclude -o webserv src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp src/Logger.cpp src/ServerManager.cpp src/server.cpp
 
 >>How to use Logger and Exception classes
  Logger usage cases

@@ -25,6 +25,7 @@ std::vector<struct pollfd> ALL_FDS;
 
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
+    exit(1);
 }
 
 // void    handlerSIGCHLD(int signal) {
@@ -58,6 +59,7 @@ int main(int ac, char **av)
         //printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();
+
     } catch (std::exception & e) {
         LOG_ERROR(e.what(), 0);
     // } catch (const std::exception& e) {
