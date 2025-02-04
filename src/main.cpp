@@ -25,8 +25,6 @@ std::vector<struct pollfd> ALL_FDS;
 
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
-    // cleaning up and closing the program
-    exit(signal);
 }
 
 // void    handlerSIGCHLD(int signal) {
@@ -60,7 +58,7 @@ int main(int ac, char **av)
 		ServerManager	manager(servers);
 		manager.launchServers();
     } catch (std::exception & e) {
-        LOG_DEBUG(e.what());
+        LOG_ERROR(e.what(), 0);
     // } catch (const std::exception& e) {
     //     Logger::log(ERROR, "main", e.what(), 0);
     //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
