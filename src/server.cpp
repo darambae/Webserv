@@ -22,7 +22,7 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 Server::Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
 	_len_address = sizeof(_address);
 	_client_count = 0;
-	for (int i = 0; i < _listen.size(); ++i) {
+	for (size_t i = 0; i < _listen.size(); ++i) {
 		initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
 	}
 }
@@ -70,21 +70,21 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
 	LOG_INFO("A new socket was created for " + _config.getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
 	addFdToFds(new_fd);
-	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER/*, false*/);
+	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, false);
 }
 
-void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status/*, bool request*/) {
+void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request) {
 	t_Fd_data*	new_fd_data = new t_Fd_data;
 	new_fd_data->ip = ip;
 	new_fd_data->port = port;
 	new_fd_data->server = server;
 	new_fd_data->status = status;
-	// if (request == true){
-	// 	Request*	request = new Request(fd);
-	// 	new_fd_data->request = request;
-	// }
-	// else
-	// 	new_fd_data->request = NULL;
+	if (request == true){
+		Request*	request = new Request(fd);
+		new_fd_data->request = request;
+	}
+	else
+		new_fd_data->request = NULL;
 	FD_DATA[fd] = new_fd_data;
 }
 
@@ -110,7 +110,7 @@ int	Server::createClientSocket(int fd) {
     //std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
 	LOG_INFO("New client connected : " + to_string(new_socket));
 	addFdToFds(new_socket);
-	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT/*, true*/);
+	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, true);
 	return new_socket;
 }
 

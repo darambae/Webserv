@@ -24,7 +24,7 @@ class ConfigLocation {
         std::string getRoot() const { return _root; };
         bool getAutoindex() const { return _autoindex; };
         std::set<std::string> getAllowMethods() const { return _allowed_methods; };
-        std::vector<std::string> getIndex() const { return _index; };
+        std::vector<std::string> const& getIndex() const { return _index; };
         std::vector<std::string> getCgiExtension() const { return _cgi_extension; };
         std::string getCgiPath() const { return _cgi_path; };
         std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
