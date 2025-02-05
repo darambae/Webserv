@@ -24,7 +24,7 @@ public:
 		virtual const char *what() const throw() { return _message.c_str(); }
 	};
 	void initServerSocket(std::pair<std::string, int> ipPort);
-	void addFdData(int fd, std::string ip, int port, Server *server, fd_status status /*, bool request*/);
+	void addFdData(int fd, std::string ip, int port, Server *server, fd_status status , bool request);
 	void addFdToFds(int fd_to_add);
 	int createClientSocket(int fd);
 	void decreaseClientCount();

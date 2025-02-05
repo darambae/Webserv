@@ -32,9 +32,9 @@ class Request {
 
 	public:
 
-	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false),
-					_contentLength(0), isRequestPathDirectory(false) {}
-	~Request() { delete _Response; }
+	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
+					_clientFd(fd), _contentLength(0) {}
+	~Request() {}
 
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }

@@ -23,8 +23,11 @@ int MAX_CLIENT = 1024;
 std::map<int, t_Fd_data*>	FD_DATA;
 std::vector<struct pollfd> ALL_FDS;
 
+volatile sig_atomic_t stopProgram = 0;
+
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
+    stopProgram = 1;
 }
 
 // void    handlerSIGCHLD(int signal) {
@@ -34,6 +37,7 @@ void    signalHandler(int signal) {
 
 int main(int ac, char **av)
 {
+    (void)av;
     struct sigaction sa;
     memset(&sa, 0, sizeof(sa));
     sa.sa_handler = signalHandler;
@@ -57,6 +61,7 @@ int main(int ac, char **av)
         //printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();
+
     } catch (std::exception & e) {
         LOG_ERROR(e.what(), 0);
     // } catch (const std::exception& e) {

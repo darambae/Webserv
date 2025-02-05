@@ -24,7 +24,7 @@ void    ConfigServer::setServerNames(const std::string& server_name) {
 }
 
 void    ConfigServer::setRoot(const std::string& root) {
-    struct stat buffer;
+
     ConfigParser::validRoot(root);
     this->_root = root;
 }

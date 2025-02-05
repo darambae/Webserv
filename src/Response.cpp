@@ -27,7 +27,7 @@ bool	Response::findIndex(ConfigLocation const* location) {
 		std::string	tryIndex = *it;
 		std::string	tryCompletePath = indexPath + tryIndex;
 
-		if (access(tryCompletePath.c_str(), F_OK) == -1) {
+		if (access(tryCompletePath.c_str(), F_OK) != -1) {
 			setRequestedFile(tryCompletePath);
 			return true;
 		}
@@ -60,7 +60,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 			else {
 				setCodeStatus(404);
 				setReasonPhrase("Not found");
-				handleError();
+				//handleError();
 			}
 		}
 	}
@@ -77,7 +77,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 		else {
 			setCodeStatus(404);
 			setReasonPhrase("Not found");
-			handleError();
+			//handleError();
 		}
 	}
 }
@@ -101,20 +101,20 @@ void	Response::handleResponse() {
 	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
 		setCodeStatus(405);
 		setReasonPhrase("Method not allowed");
-		handleError();
+		//handleError();
 		return ;
 	}
 
 	if (requestMethod == "GET")
 		handleGet(location);
-	else if (requestMethod == "POST")
-		handlePost();
-	else if (requestMethod == "DELETE")
-		handleDelete();
+	else if (requestMethod == "POST") {}
+		//handlePost();
+	else if (requestMethod == "DELETE") {}
+		//handleDelete();
 	else {
 		setCodeStatus(501);
 		setReasonPhrase("method not implemented");
-		handleError();
+		//handleError();
 		return ;
 	}
 }
@@ -130,10 +130,11 @@ void	Response::sendResponse() {
 	while (totalSent < responseSize) {
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + totalSent, responseSize - totalSent, 0);
 
-		if (totalSent = -1)
+		if (totalSent == static_cast<size_t>(-1))
 			//disconnected. Behavior to define
 			break;
 
 		totalSent += bytesSent;
 	}
+	delete _responseBuilder;
 }
