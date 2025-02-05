@@ -19,21 +19,18 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents & POLLIN) {
-				std::cout << FD_DATA[ALL_FDS[i].fd] << std::endl;
+				//std::cout << FD_DATA[ALL_FDS[i].fd] << std::endl;
 				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
-					//char buffer[1024];
-					//read(ALL_FDS[i].fd, buffer, sizeof(buffer));
-					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
+					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1) {
+						LOG_ERROR("the client with FD : "+to_string(new_client)+" is disconnected", 0);
 						cleanClientFd(new_client);
+					}
 				}
-				else if (FD_DATA[ALL_FDS[i].fd]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
+				else if (FD_DATA[ALL_FDS[i].fd]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1) {
+					LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
 					cleanClientFd(ALL_FDS[i].fd);
-				// else {
-				// 	char buffer[1024];
-				// 	read(ALL_FDS[i].fd, buffer, sizeof(buffer));
-				// 	std::cout << "the client with FD " << ALL_FDS[i].fd <<" send a request"<<std::endl;
-				// }
+				}
 			}
 		}
     }

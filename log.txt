@@ -1,0 +1,34 @@
+[2025-02-05 14:48:16] [DEBUG] Valid error page
+[2025-02-05 14:48:16] [DEBUG] Valid error page
+[2025-02-05 14:48:16] [DEBUG] Valid error page
+[2025-02-05 14:48:16] [DEBUG] Valid body size
+[2025-02-05 14:48:16] [DEBUG] Valid path
+[2025-02-05 14:48:16] [DEBUG] Valid root
+[2025-02-05 14:48:16] [DEBUG] Valid autoindex
+[2025-02-05 14:48:16] [DEBUG] Valid methods
+[2025-02-05 14:48:16] [DEBUG] Valid path
+[2025-02-05 14:48:16] [DEBUG] Valid root
+[2025-02-05 14:48:16] [DEBUG] Valid methods
+[2025-02-05 14:48:16] [DEBUG] Valid autoindex
+[2025-02-05 14:48:16] [DEBUG] Valid path
+[2025-02-05 14:48:16] [DEBUG] Valid root
+[2025-02-05 14:48:16] [DEBUG] Valid methods
+[2025-02-05 14:48:16] [DEBUG] Valid path
+[2025-02-05 15:15:25] [DEBUG] Interrupt signal 2 received
+[2025-02-05 15:29:30] [DEBUG] Valid error page
+[2025-02-05 15:29:30] [DEBUG] Valid error page
+[2025-02-05 15:29:30] [DEBUG] Valid error page
+[2025-02-05 15:29:30] [DEBUG] Valid body size
+[2025-02-05 15:29:30] [DEBUG] Valid path
+[2025-02-05 15:29:30] [DEBUG] Valid root
+[2025-02-05 15:29:30] [DEBUG] Valid autoindex
+[2025-02-05 15:29:30] [DEBUG] Valid methods
+[2025-02-05 15:29:30] [DEBUG] Valid path
+[2025-02-05 15:29:30] [DEBUG] Valid root
+[2025-02-05 15:29:30] [DEBUG] Valid methods
+[2025-02-05 15:29:30] [DEBUG] Valid autoindex
+[2025-02-05 15:29:30] [DEBUG] Valid path
+[2025-02-05 15:29:30] [DEBUG] Valid root
+[2025-02-05 15:29:30] [DEBUG] Valid methods
+[2025-02-05 15:29:30] [DEBUG] Valid path
+[2025-02-05 15:30:34] [DEBUG] Interrupt signal 2 received
