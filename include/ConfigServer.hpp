@@ -37,4 +37,4 @@ public:
 };
 ;
 
-std::ostream& operator<<(std::ostream& os, ConfigServer c);
+std::ostream& operator<<(std::ostream& os, const ConfigServer& c);
