@@ -10,6 +10,7 @@ int	Request::parseRequest() {
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 
 	if (bytes <= 0) {
+		LOG_ERROR("Error reading from client", 1);
 		return -1; //client disconnected
 	}
 
@@ -21,6 +22,7 @@ int	Request::parseRequest() {
 		_firstLine = _tempBuffer.substr(0, pos);
 		_tempBuffer.erase(0, pos + 2);
 		parseFirstLine();
+		LOG_INFO("Request received : " + _firstLine);
 	}
 
 	//read request's header
@@ -30,6 +32,7 @@ int	Request::parseRequest() {
 		_tempBuffer.erase(0, pos + 4);
 		parseHeader(headerPart);
 		isHeaderRead = true;
+		LOG_INFO("Header received");
 	}
 
 	//read body if present
@@ -39,11 +42,13 @@ int	Request::parseRequest() {
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
 			//do we reanitialize contentLength to 0 ? maybe further in the code.
+			LOG_INFO("Body received");
 		}
 	}
-	else if (isHeaderRead && _contentLength == 0)
+	else if (isHeaderRead && _contentLength == 0) {
 		isRequestComplete = true;
-
+		LOG_INFO("Request complete");
+	}
 	return 0;
 }
 
@@ -72,12 +77,15 @@ void	Request::parseHeader(std::string headerPart) {
 
 int	Request::handleRequest(ConfigServer const& config) {
 
-	if (parseRequest() == -1)
+	if (parseRequest() == -1) {
+		LOG_INFO("Request parsing failed");
 		return -1;
+	}
 
 	if (isRequestComplete) {
 		_Response = new Response(*this, config);
 		_Response->handleResponse();
+		LOG_INFO("Response handled");
 		delete _Response;
 	}
 

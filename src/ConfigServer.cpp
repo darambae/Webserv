@@ -9,6 +9,7 @@ void    ConfigServer::setListen(const std::string& ip, const std::string& port) 
     int num = std::atoi(port.c_str());
     ConfigParser::validIp(ip);
     ConfigParser::validPort(port);
+    LOG_DEBUG("Valid IP and Port");
     std::string ip_string;
     if (ip == "localhost")
         ip_string = "127.0.0.1";
@@ -24,8 +25,8 @@ void    ConfigServer::setServerNames(const std::string& server_name) {
 }
 
 void    ConfigServer::setRoot(const std::string& root) {
-
     ConfigParser::validRoot(root);
+    LOG_DEBUG("Valid root");
     this->_root = root;
 }
 
@@ -33,6 +34,7 @@ void    ConfigServer::setLimitClientBodySize(const std::string& value) {
     unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;
     ConfigParser::validBodySize(value);
+    LOG_DEBUG("Valid body size");
     if (value[value.size() - 1] == 'k' || value[value.size() - 1] == 'K')
         res = num * 1024;
     else if (value[value.size() - 1] == 'm' || value[value.size() - 1] == 'M')
@@ -46,6 +48,7 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     ConfigParser::validErrorPage(line);
+    LOG_DEBUG("Valid error page");
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));

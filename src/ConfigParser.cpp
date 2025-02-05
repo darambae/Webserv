@@ -121,7 +121,6 @@ void    ConfigParser::validMethods(const std::string& methods) {
             THROW("Invalid methods");
         tmp_vector.erase(tmp_vector.begin());
     }
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid methods");
 }
 
 void    ConfigParser::validIp(std::string ip) {
@@ -141,19 +140,16 @@ void    ConfigParser::validIp(std::string ip) {
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
         THROW("The given IP is Out of range");
-    //LOG_INFO("Valid ip");
 }
 
 void    ConfigParser::validPort(const std::string& port) {
     int num = std::atoi(port.c_str());
     if (num < 0 || num > 65535)
         THROW("Invalid Port");
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid port");
 }
 
 void    ConfigParser::validAutoindex(const std::string& line) {
     if (line.find("on") != std::string::npos || line.find("off") != std::string::npos)
-        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid autoindex");
         return;
     THROW("Invalid autoindex");
 }
@@ -167,7 +163,6 @@ void    ConfigParser::validErrorPage(const std::string& line) {
             continue;
         }
         if (token[0] == '/' && tmp_vector.size() == 1)
-            //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid error page");
             return;
         tmp_vector.erase(tmp_vector.begin());
     }
@@ -181,10 +176,7 @@ void    ConfigParser::validReturn(const std::string& line) {
     if (tmp_vector.size() == 1) {
         const std::string& value = tmp_vector.front();
         if (onlyDigits(value) && std::atoi(value.c_str()) >= 300 && atoi(value.c_str()) <= 599)
-        {
-            //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid return");
             return;
-        }
         THROW("Invalid return");
     }
     if (tmp_vector.size() == 2) {
@@ -195,7 +187,6 @@ void    ConfigParser::validReturn(const std::string& line) {
         validRoot(path);
         // if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos)
         //     THROW("Invalid return path");
-        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid return");
         return;
     }   
     THROW("Invalid return");
@@ -221,7 +212,6 @@ void    ConfigParser::validBodySize(const std::string& line) {
         THROW("Invalid body size");
     if (onlyDigits(line) || line[line.size() - 1] == 'k' || line[line.size() - 1] == 'K' ||
             line[line.size() - 1] == 'm' || line[line.size() - 1] == 'M')
-        //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid body size");
         return;
     THROW("Invalid body size format");
 }
@@ -234,5 +224,4 @@ void    ConfigParser::validCgiExtension(const std::string& line) {
             THROW("Invalid CGI extension");
         tmp_vector.erase(tmp_vector.begin());
     }
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid CGI extension");
 }
