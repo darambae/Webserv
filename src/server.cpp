@@ -54,6 +54,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	int opt = 1;
 	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 		LOG_ERROR("setsockopt failed", 1);
+		
 		//perror("setsockopt failed");
 		return;
 	}
