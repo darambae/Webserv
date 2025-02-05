@@ -28,12 +28,20 @@ volatile sig_atomic_t stopProgram = 0;
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
     stopProgram = 1;
+    // kill(0, SIGTERM);
+    // while (waitpid(-1, NULL, WNOHANG) > 0);
+	if (FD_DATA.size() > 0) {
+		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+			close(it->first);
+			if (it->second->status == CLIENT)
+				delete it->second->request;
+			delete it->second;
+		}
+		FD_DATA.clear();
+	}
+	if (ALL_FDS.size() > 0)
+		ALL_FDS.clear();
 }
-
-// void    handlerSIGCHLD(int signal) {
-//     (void)signal;
-//     while (waitpid(-1, NULL, WNOHANG) > 0);
-// }
 
 int main(int ac, char **av)
 {
@@ -43,16 +51,12 @@ int main(int ac, char **av)
     sa.sa_handler = signalHandler;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
-    // sigaction(SIGCHLD, &sa, NULL);
     if (ac > 2)
     {
-        // std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
         LOG_ERROR("Usage: ./config_parser [config_file]", 0);
         return 1;
     }
-    std::string file = "config/default.conf";
-    // if (ac == 2)
-    //     file = av[1];
+    std::string file = ac == 2 ? std::string("config/") + av[1] : "config/default.conf";
     try {
         ConfigParser parser(file);
         parser.parseFile();

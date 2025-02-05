@@ -19,7 +19,7 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 
 */
 
-Server::Server(const ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(config), _listen(listen) {
+Server::Server(ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(&config), _listen(listen) {
 	_len_address = sizeof(_address);
 	_client_count = 0;
 	for (size_t i = 0; i < _listen.size(); ++i) {
@@ -54,6 +54,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	int opt = 1;
 	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 		LOG_ERROR("setsockopt failed", 1);
+		
 		//perror("setsockopt failed");
 		return;
 	}
@@ -74,7 +75,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
 	    throw ServerException("Listen failed");
 	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
-	LOG_INFO("A new socket was created for " + _config.getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
+	LOG_INFO("A new socket was created for " + _config->getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
 	addFdToFds(new_fd);
 	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, false);
 }
@@ -85,6 +86,7 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 	new_fd_data->port = port;
 	new_fd_data->server = server;
 	new_fd_data->status = status;
+	new_fd_data->config = _config;
 	if (request == true){
 		Request*	request = new Request(fd);
 		new_fd_data->request = request;
@@ -123,7 +125,7 @@ int	Server::createClientSocket(int fd) {
 void	Server::decreaseClientCount() {_client_count--;}
 
 Server::~Server() {
-	std::cout<<"the server : "<<_config.getServerNames()[0]<<" is closed"<<std::endl;
+	std::cout<<"the server : "<<_config->getServerNames()[0]<<" is closed"<<std::endl;
 }
 
 /*
