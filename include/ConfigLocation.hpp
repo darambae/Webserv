@@ -42,4 +42,4 @@ class ConfigLocation {
         void setReturn(const std::string& line);
 };
 
-std::ostream& operator<<(std::ostream& os, ConfigLocation c);
+std::ostream& operator<<(std::ostream& os, const ConfigLocation& c);

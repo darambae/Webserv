@@ -16,9 +16,6 @@ $(NAME): $(OBJ)
 
 clean:
 	rm -rf $(OBJ_DIR)
-
-clean_logs:
-	# Remove log files
 	rm -f log.txt
 
 fclean: clean

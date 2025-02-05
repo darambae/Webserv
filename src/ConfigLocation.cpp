@@ -71,7 +71,7 @@ void    ConfigLocation::setReturn(const std::string& line) {
     this->_return_value = splitString<std::vector<std::string> >(line, ' ');
 }
 
-std::ostream& operator<<(std::ostream& os, ConfigLocation location) {
+std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     os << "Location: " << std::endl;
     if (!location.getPath().empty())
         os << "\tPath: " << location.getPath() << std::endl;
