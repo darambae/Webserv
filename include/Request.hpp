@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "SetupResponse.hpp"
+#include "Response.hpp"
 #include "ConfigServer.hpp"
 #include "Utils.hpp"
 #include <iostream>
@@ -10,13 +10,13 @@
 #include <unistd.h>
 #include <map>
 
-class SetupResponse;
+class Response;
 
 class Request {
 
 	private:
 
-	SetupResponse*	_setupResponse;
+	Response*		_Response;
 	bool			isRequestComplete;
 	bool			isHeaderRead;
 	bool			isRequestPathDirectory;
@@ -32,15 +32,16 @@ class Request {
 
 	public:
 
-	Request(int fd): _clientFd(fd), isRequestComplete(false), isHeaderRead(false),
-					_contentLength(0), isRequestPathDirectory(false) {}
-	~Request() { delete _setupResponse; }
+	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
+					_clientFd(fd), _contentLength(0) {}
+	~Request() {}
 
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 	std::string	getMethod() const { return _path; }
 	std::string	getPath() const { return _method; }
 	std::string	getVersion() const { return _version; }
+	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
 	/* methods */

@@ -24,10 +24,10 @@ class ConfigLocation {
         std::string getRoot() const { return _root; };
         bool getAutoindex() const { return _autoindex; };
         std::set<std::string> getAllowMethods() const { return _allowed_methods; };
-        std::vector<std::string> getIndex() const { return _index; };
+        std::vector<std::string> const& getIndex() const { return _index; };
         std::vector<std::string> getCgiExtension() const { return _cgi_extension; };
         std::string getCgiPath() const { return _cgi_path; };
-        std::vector<ErrorPage> &getErrorPages() { return _error_pages; };
+        std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
         std::vector<std::string> getReturn() const { return _return_value; };
 
         void setPath(const std::string& path);
@@ -42,4 +42,4 @@ class ConfigLocation {
         void setReturn(const std::string& line);
 };
 
-std::ostream& operator<<(std::ostream& os, ConfigLocation c);
+std::ostream& operator<<(std::ostream& os, const ConfigLocation& c);

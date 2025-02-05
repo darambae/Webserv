@@ -42,7 +42,7 @@ void    Logger::log(LogType type, const std::string& msg, bool errno_set) {
         return;
 
     int save_errno = errno;
-    std::string log_msg = "[" + getTime() + "] " + "[" + log_type + "]: " + msg;
+    std::string log_msg = "[" + getTime() + "] [" + log_type + "] " + msg;
     if (log_type == "ERROR" && errno_set)
         log_msg += " : " + std::string(strerror(save_errno));
     log_msg += "\n";

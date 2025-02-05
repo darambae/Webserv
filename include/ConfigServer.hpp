@@ -19,12 +19,12 @@ public:
     ConfigServer();
     ~ConfigServer() {};
 
-    std::vector<std::pair<std::string, int> > &getListen() { return _listen; };
+    std::vector<std::pair<std::string, int> > getListen() const { return _listen; };
     std::vector<std::string> getServerNames() const { return _server_names; };
     std::string getRoot() const { return _root; };
     int getLimitClientBodySize() const { return _limit_client_body_size; };
-    std::vector<ErrorPage> &getErrorPages() { return _error_pages; };
-    std::vector<ConfigLocation> getLocations() const { return _locations; };
+    std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
+    std::vector<ConfigLocation> const& getLocations() const { return _locations; };
 
     void setListen(const std::string &ip, const std::string &port);
     void setDefaultListen();
@@ -37,4 +37,4 @@ public:
 };
 ;
 
-std::ostream& operator<<(std::ostream& os, ConfigServer c);
+std::ostream& operator<<(std::ostream& os, const ConfigServer& c);

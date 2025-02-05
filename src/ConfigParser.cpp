@@ -40,12 +40,11 @@ void    ConfigParser::parseFile() {
 
 void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server) {
     std::string line;
-    while (getline(file, line)) {
+    while (getline(file, line) && line.find("}") == std::string::npos) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
-        if (validBracket(line, '}', '{')) { break; }
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
             if (line.find(":") != std::string::npos)
@@ -73,8 +72,9 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             parseLocation(file, line, location);
             server.setLocations(location);
         }
-
     }
+    if (!validBracket(line, '}', '{'))
+        THROW("Server block bracket isn't closed properly");
     if (server.getErrorPages().empty())
         server.setDefaultErrorPages();
     if (server.getListen().empty())
@@ -84,14 +84,12 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
     std::string path = line.substr(line.find(" ") + 1, line.find(" {") - line.find(" ") - 1);
     location.setPath(path);
-    while (getline(file, line)) {
+    while (getline(file, line) && line.find("}") == std::string::npos) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos;
-        std::vector<ErrorPage> &error_pages = location.getErrorPages();
-        if (validBracket(line, '}', '{'))
-            break;
+        std::vector<ErrorPage> error_pages = location.getErrorPages();
         if (line.empty() || line[0] == '#') { continue; }
         if (line.find("root ") != std::string::npos && endingSemicolon(line))
             location.setRoot(line.substr(start_pos, len));
@@ -109,6 +107,8 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setErrorPages(line.substr(start_pos, len));
         }
     }
+    if (!validBracket(line, '}', '{'))
+        THROW("Location block bracket isn't closed properly");
     if (location.getErrorPages().empty())
         location.setDefaultErrorPages();
 }
@@ -141,7 +141,7 @@ void    ConfigParser::validIp(std::string ip) {
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
         THROW("The given IP is Out of range");
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid ip");
+    //LOG_INFO("Valid ip");
 }
 
 void    ConfigParser::validPort(const std::string& port) {

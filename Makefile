@@ -1,21 +1,26 @@
 NAME= webserv
 SRC= $(wildcard src/*.cpp)
-OBJ= $(SRC:.cpp=.o)
+OBJ_DIR= obj/
+OBJ= $(SRC:%.cpp=$(OBJ_DIR)%.o)
 CC= c++
-CPPFLAGS= -Wall -Wextra -Werror -std=c++98 -Iinclude
+CPPFLAGS= -g -Wall -Wextra -Werror -std=c++98 -Iinclude
 
 all: $(NAME)
+
+$(OBJ_DIR)%.o: %.cpp
+	@mkdir -p $(dir $@)
+	$(CC) $(CPPFLAGS) -c $< -o $@
 
 $(NAME): $(OBJ)
 	$(CC) $(CPPFLAGS) $(OBJ) -o $(NAME)
 
 clean:
-	rm -f $(OBJ)
-
-clean_logs:
-	# Remove log files
+	rm -rf $(OBJ_DIR)
 	rm -f log.txt
 
 fclean: clean
 	rm -f $(NAME)
+
+re: fclean all
+
 .PHONY: all clean fclean re

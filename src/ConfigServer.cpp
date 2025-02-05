@@ -24,7 +24,7 @@ void    ConfigServer::setServerNames(const std::string& server_name) {
 }
 
 void    ConfigServer::setRoot(const std::string& root) {
-    struct stat buffer;
+
     ConfigParser::validRoot(root);
     this->_root = root;
 }
@@ -71,7 +71,7 @@ void    ConfigServer::setDefaultListen() {
     this->_listen.push_back(std::make_pair("0.0.0.0", 8080));
 }
 
-std::ostream& operator<<(std::ostream& os, ConfigServer server) {
+std::ostream& operator<<(std::ostream& os, const ConfigServer& server) {
     os << "Server : " << std::endl;
     if (!server.getListen().empty()) {
         std::vector<std::pair<std::string, int> > listens = server.getListen();

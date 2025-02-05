@@ -23,10 +23,27 @@ int MAX_CLIENT = 1024;
 std::map<int, t_Fd_data*>	FD_DATA;
 std::vector<struct pollfd> ALL_FDS;
 
+volatile sig_atomic_t stopProgram = 0;
 
+void    signalHandler(int signal) {
+    LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
+    stopProgram = 1;
+}
+
+// void    handlerSIGCHLD(int signal) {
+//     (void)signal;
+//     while (waitpid(-1, NULL, WNOHANG) > 0);
+// }
 
 int main(int ac, char **av)
 {
+    (void)av;
+    struct sigaction sa;
+    memset(&sa, 0, sizeof(sa));
+    sa.sa_handler = signalHandler;
+    sigaction(SIGINT, &sa, NULL);
+    sigaction(SIGTERM, &sa, NULL);
+    // sigaction(SIGCHLD, &sa, NULL);
     if (ac > 2)
     {
         // std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
@@ -41,11 +58,12 @@ int main(int ac, char **av)
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
         std::cout << servers.size() << " servers found" << std::endl;
-        printContainer(servers);
+        //printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();
+
     } catch (std::exception & e) {
-        std::cerr << "Error: " << e.what() << std::endl;
+        LOG_ERROR(e.what(), 0);
     // } catch (const std::exception& e) {
     //     Logger::log(ERROR, "main", e.what(), 0);
     //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
