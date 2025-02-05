@@ -28,6 +28,7 @@ enum fd_status
 #include <ctime>
 #include <exception>
 #include <csignal>
+#include <sys/wait.h>
 
 #include "ServerManager.hpp"
 #include "ConfigServer.hpp"
@@ -36,7 +37,6 @@ enum fd_status
 #include "Logger.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
-
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"

@@ -28,12 +28,9 @@ volatile sig_atomic_t stopProgram = 0;
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
     stopProgram = 1;
+    // kill(0, SIGTERM);
+    // while (waitpid(-1, NULL, WNOHANG) > 0);
 }
-
-// void    handlerSIGCHLD(int signal) {
-//     (void)signal;
-//     while (waitpid(-1, NULL, WNOHANG) > 0);
-// }
 
 int main(int ac, char **av)
 {
@@ -43,7 +40,6 @@ int main(int ac, char **av)
     sa.sa_handler = signalHandler;
     sigaction(SIGINT, &sa, NULL);
     sigaction(SIGTERM, &sa, NULL);
-    // sigaction(SIGCHLD, &sa, NULL);
     if (ac > 2)
     {
         // std::cerr << "Usage: ./config_parser [config_file]" << std::endl;
