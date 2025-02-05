@@ -10,22 +10,26 @@ ConfigLocation::ConfigLocation() {
 void    ConfigLocation::setPath(const std::string& path) {
     if (path.empty() || path[0] != '/')
         THROW("Invalid path");
+    LOG_DEBUG("Valid path");
     this->_path = path;
 }
 
 void    ConfigLocation::setRoot(const std::string& root) {
     ConfigParser::validRoot(root);
+    LOG_DEBUG("Valid root");
     this->_root = root;
 }
 
 void    ConfigLocation::setAutoindex(const std::string& line) {
     ConfigParser::validAutoindex(line);
+    LOG_DEBUG("Valid autoindex");
     if (line.find("on") != std::string::npos)
         this->_autoindex = true;
 }
 
 void    ConfigLocation::setAllowMethods(const std::string& line) {
     ConfigParser::validMethods(line);
+    LOG_DEBUG("Valid methods");
     this->_allowed_methods = splitString<std::set<std::string> >(line, ' ');
 }
 
@@ -35,11 +39,13 @@ void    ConfigLocation::setIndex(const std::string& line) {
 
 void    ConfigLocation::setCgiExtension(const std::string& line) {
     ConfigParser::validCgiExtension(line);
+    LOG_DEBUG("Valid CGI extension");
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
 void    ConfigLocation::setCgiPath(const std::string& line) {
     ConfigParser::validRoot(line);
+    LOG_DEBUG("Valid CGI path");
     this->_cgi_path = line;
 }
 
@@ -48,6 +54,7 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     ErrorPage error_page;
     ConfigParser::validErrorPage(line);
+    LOG_DEBUG("Valid error page");
     while (!tmp_vector.empty()) {
         const std::string& token = tmp_vector.front();
         if (token[0] == '/')

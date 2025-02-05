@@ -58,7 +58,7 @@ std::string	ResponseBuilder::buildTime(void) {
 
 std::string	ResponseBuilder::buildContentType() {
 	std::string	requestedFilePath = _setup.getRequestedFilePath();
-	std::string	contentType;
+	std::string	contentType; // Should we initialize it?
 
 	size_t	pos = requestedFilePath.find_last_of('.');
 	if (pos != std::string::npos) {
@@ -67,6 +67,7 @@ std::string	ResponseBuilder::buildContentType() {
 		for (; it != _mimeTypes.end(); ++it) {
 			if (it->first == fileExtension) {
 				contentType = it->second;
+				LOG_INFO("Content-Type: " + contentType);
 				break ;
 			}
 		}

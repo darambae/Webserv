@@ -91,6 +91,7 @@ void	Response::handleResponse() {
 	//find the proper location block to read depending on the path given in the request
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
 	if (!location) {
+		LOG_INFO("No location found for request path: " + requestPath);
 		setCodeStatus(404);
 		setReasonPhrase("Not found");
 		return ;
@@ -99,6 +100,7 @@ void	Response::handleResponse() {
 	//check if the request's method is allowed in location block of server configuration
 	std::set<std::string> allowedMethods = location->getAllowMethods();
 	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
+		LOG_INFO("Method not allowed");
 		setCodeStatus(405);
 		setReasonPhrase("Method not allowed");
 		//handleError();
@@ -112,6 +114,7 @@ void	Response::handleResponse() {
 	else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
+		LOG_INFO("Method not implemented");
 		setCodeStatus(501);
 		setReasonPhrase("method not implemented");
 		//handleError();
@@ -132,6 +135,7 @@ void	Response::sendResponse() {
 
 		if (totalSent == static_cast<size_t>(-1))
 			//disconnected. Behavior to define
+			LOG_INFO("Client disconnected");
 			break;
 
 		totalSent += bytesSent;

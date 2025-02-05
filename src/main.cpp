@@ -57,7 +57,7 @@ int main(int ac, char **av)
         ConfigParser parser(file);
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
-        std::cout << servers.size() << " servers found" << std::endl;
+        LOG_INFO("Configuration file parsed successfully");
         //printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();

@@ -18,7 +18,7 @@ class Logger {
     private:
         std::ofstream   _logFile;
         OutputType _output_type;
-        Logger(OutputType type = CONSOLE_OUTPUT);
+        Logger(OutputType type);
         Logger(const Logger&);
         Logger& operator=(const Logger&); 
 
