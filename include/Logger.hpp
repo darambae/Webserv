@@ -27,7 +27,4 @@ class Logger {
         void log(LogType type, const std::string& msg, bool errno_set = 0);
         static std::string  getTime();
         ~Logger();
-
 };
-
-
