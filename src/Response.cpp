@@ -19,15 +19,12 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 bool	Response::findIndex(ConfigLocation const* location) {
 	
 	std::string indexPath = _request.getPath();
-
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-		
 	std::vector<std::string>::const_iterator it = location->getIndex().begin();
 	for (; it != location->getIndex().end(); ++it) {
 		std::string	tryIndex = *it;
 		std::string	tryCompletePath = indexPath + tryIndex;
-
 		if (access(tryCompletePath.c_str(), F_OK) != -1) {
 			setRequestedFile(tryCompletePath);
 			return true;
