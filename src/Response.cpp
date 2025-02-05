@@ -6,9 +6,10 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
 	for (; it != config.getLocations().end(); ++it) {
-		if (requestPath.find(it->getPath()) == 0) {
-			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size())
+		if (requestPath.find(it->getPath()) != std::string::npos) {
+			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size()) {
 				bestMatch = &(*it);
+			}
 		}
 	}
 	return bestMatch;
