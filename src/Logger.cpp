@@ -17,8 +17,10 @@ Logger::~Logger() {
 }
 
 Logger  &Logger::getInstance(OutputType type) {
-    static Logger instance(type);
-    return instance;
+    static Logger consoleLogger(CONSOLE_OUTPUT);
+    static Logger fileLogger(FILE_OUTPUT);
+
+    return (type == FILE_OUTPUT) ? fileLogger : consoleLogger;
 }
 
 std::string Logger::getTime() {
@@ -33,14 +35,12 @@ std::string Logger::getTime() {
 
 void    Logger::log(LogType type, const std::string& msg, bool errno_set) {
     std::string log_type;
-    if (type == 0)
-        log_type = "DEBUG";
-    else if (type == 1)
-        log_type = "INFO";
-    else if (type == 2)
-        log_type = "ERROR";
-    else // if (type == 3) LOG OFF
-        return;
+    switch (type) {
+        case DEBUG: log_type = "DEBUG"; break;
+        case INFO: log_type = "INFO"; break;
+        case ERROR: log_type = "ERROR"; break;
+        default: return; //if it's LOG OFF, don't print msg anywhere.
+    }
 
     int save_errno = errno;
     std::string log_msg = "[" + getTime() + "] [" + log_type + "] " + msg;

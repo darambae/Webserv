@@ -27,15 +27,21 @@ Server::Server(const ConfigServer & config, const std::vector<std::pair<std::str
 	}
 }
 
+/*one socket == one IP specific and one port.
+one port can be associate with many socket if each have a different IP
+but if one of them is 0.0.0.0 an error will appear for the creation of the second socket
+wich try to use a IP allready used on a port*/
 void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
-	std::map<int, t_Fd_data*>::iterator	it;
-	if (FD_DATA.size() > 0) {
-		for (it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
-			if (it->second->port == ipPort.second)
-				return;
-		}
-	}
+/*i comment this step because in case of double use of one IP with one port, socket will launch an error*/
+	// std::map<int, t_Fd_data*>::iterator	it;
+	// if (FD_DATA.size() > 0) {
+	// 	for (it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+	// 		if (it->second->port == ipPort.second && it->second->ip == ipPort.first)
+	// 			return;
+	// 	}
+	// }
 	/*create the FD*/
+	std::cout<<"initiation socket of IP "<<ipPort.first<<" and port "<<ipPort.second<<" begin..."<<std::endl;
 	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
 	if (new_fd == -1) {
 		//std::cout<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;
@@ -54,7 +60,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	/*init server socket*/
 	_address.sin_family = AF_INET; //IPv4
 	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
-    	throw ServerException("Erreur : adresse IP invalide ou conversion échouée\n");
+    	return LOG_ERROR("Erreur : adresse IP invalide ou conversion échouée\n", 1);
 	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
 	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
