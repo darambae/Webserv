@@ -1,4 +1,4 @@
-
+#pragma once
 #include "webserv.hpp"
 
 enum LogType {
