@@ -45,6 +45,7 @@ void	ServerManager::cleanClientFd(int FD) {
 	std::map<int, t_Fd_data*>::iterator	it = FD_DATA.find(FD);
 	it->second->server->decreaseClientCount();
 	delete it->second->request;
+	delete it->second;
 	FD_DATA.erase(it);
 	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 		if (ALL_FDS[i].fd == FD) {
@@ -60,6 +61,8 @@ ServerManager::~ServerManager() {
 	if (FD_DATA.size() > 0) {
 		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);
+			if (it->second->status == CLIENT)
+				delete it->second->request;
 			delete it->second;
 		}
 		FD_DATA.clear();

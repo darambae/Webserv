@@ -60,7 +60,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	/*init server socket*/
 	_address.sin_family = AF_INET; //IPv4
 	if (inet_pton(AF_INET, ipPort.first.c_str(), &_address.sin_addr) <= 0)
-    	return LOG("Erreur : adresse IP invalide ou conversion échouée\n");
+    	return LOG_ERROR("Erreur : adresse IP invalide ou conversion échouée\n", 1);
 	_address.sin_port = htons(ipPort.second); //Converts the port number to "network byte order"
 	if (bind(new_fd, (struct sockaddr *)&_address, sizeof(_address)) < 0) {
 	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
