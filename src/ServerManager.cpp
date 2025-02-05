@@ -24,10 +24,10 @@ void	ServerManager::launchServers() {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
 					//char buffer[1024];
 					//read(ALL_FDS[i].fd, buffer, sizeof(buffer));
-					if (new_client != -1 && FD_DATA[new_client]->request->parseRequest() == -1)
+					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
 						cleanClientFd(new_client);
 				}
-				else if (FD_DATA[ALL_FDS[i].fd]->request->parseRequest() == -1)
+				else if (FD_DATA[ALL_FDS[i].fd]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
 					cleanClientFd(ALL_FDS[i].fd);
 				// else {
 				// 	char buffer[1024];

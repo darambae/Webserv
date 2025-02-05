@@ -4,14 +4,14 @@
 
 class Server {
 private:
-	const ConfigServer &_config;
+	ConfigServer* _config;
 	const std::vector<std::pair<std::string, int> > &_listen;
 	struct sockaddr_in _address;
 	int _len_address;
 	int _client_count;
 
 public:
-	Server(const ConfigServer &config, const std::vector<std::pair<std::string, int> > &listen);
+	Server(ConfigServer &config, const std::vector<std::pair<std::string, int> > &listen);
 	~Server();
 	class ServerException : public std::exception
 	{
