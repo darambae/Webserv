@@ -9,7 +9,7 @@ int	Request::parseRequest() {
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 
-	if (bytes <= 0) {
+	if (bytes < 0) {
 		LOG_ERROR("Error reading from client", 1);
 		return -1; //client disconnected
 	}
@@ -43,7 +43,9 @@ int	Request::parseRequest() {
 			isRequestComplete = true;
 			//do we reanitialize contentLength to 0 ? maybe further in the code.
 			LOG_INFO("Body received");
-		}
+		} 
+		// else
+		// 	LOG_INFO("Body not fully received");
 	}
 	else if (isHeaderRead && _contentLength == 0) {
 		isRequestComplete = true;
@@ -85,7 +87,7 @@ int	Request::handleRequest(ConfigServer const& config) {
 	if (isRequestComplete) {
 		_Response = new Response(*this, config);
 		_Response->handleResponse();
-		LOG_INFO("Response handled");
+		LOG_INFO("Response :" + _Response->getReasonPhrase());
 		delete _Response;
 	}
 

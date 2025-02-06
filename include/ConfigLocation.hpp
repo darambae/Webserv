@@ -17,7 +17,7 @@ class ConfigLocation {
         std::vector<ErrorPage> _error_pages;
         std::vector<std::string> _return_value;
     public:
-        ConfigLocation();
+        ConfigLocation() : _autoindex(false) {};
         ~ConfigLocation() {};
 
         std::string getPath() const { return _path; };

@@ -1,5 +1,15 @@
 #include "../include/Utils.hpp"
 
+std::string   fullPath(const std::string& directoryName) {
+    struct stat buffer;
+    char resolved_path[1000]; //possible memory leak
+    std::string path = directoryName[0] == '/' ? directoryName.substr(1) : directoryName;
+    if (realpath(path.c_str(), resolved_path) == NULL)
+        THROW("Realpath failed");
+    if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
+        THROW("Invalid path");
+    return resolved_path;
+}
 bool    onlyDigits(const std::string& str) {
     for (size_t i = 0; i < str.size(); i++) {
         if (!std::isdigit(str[i]))

@@ -1,10 +1,5 @@
 #include "../include/ConfigServer.hpp"
 
-ConfigServer::ConfigServer() {
-    this->_root = "";
-    this->_limit_client_body_size = -1;
-}
-
 void    ConfigServer::setListen(const std::string& ip, const std::string& port) {
     int num = std::atoi(port.c_str());
     ConfigParser::validIp(ip);

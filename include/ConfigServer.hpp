@@ -16,7 +16,7 @@ private:
     std::vector<ConfigLocation> _locations;
 
 public:
-    ConfigServer();
+    ConfigServer() : _limit_client_body_size(-1) {};
     ~ConfigServer() {};
 
     std::vector<std::pair<std::string, int> > getListen() const { return _listen; };

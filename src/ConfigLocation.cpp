@@ -1,12 +1,6 @@
 
 #include "../include/ConfigLocation.hpp"
 
-ConfigLocation::ConfigLocation() { 
-    this->_path = "";
-    this->_root = "";
-    this->_autoindex = false;
-}
-
 void    ConfigLocation::setPath(const std::string& path) {
     if (path.empty() || path[0] != '/')
         THROW("Invalid path");

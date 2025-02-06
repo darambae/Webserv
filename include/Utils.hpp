@@ -29,7 +29,8 @@ void printContainer(const Container& container) {
     std::cout << std::endl;
 }
 
-void    removeWhitespaces(std::string& str); //Remove whitespaces from a string in the beginning and the end
+std::string   fullPath(const std::string &directoryName);
+void    removeWhitespaces(std::string &str); // Remove whitespaces from a string in the beginning and the end
 bool    endingSemicolon(const std::string& line);
 bool    onlyDigits(const std::string& str); //Check if a string contains only digits
 bool    validBracket(const std::string& line, char a, char b); //Check if a string contains a valid bracket(a), not b

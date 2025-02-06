@@ -25,6 +25,12 @@
 #include <csignal>
 #include <sys/wait.h>
 
+enum fd_status
+{
+	CLIENT,
+	SERVER,
+};
+
 #include "ServerManager.hpp"
 #include "ConfigServer.hpp"
 #include "Response.hpp"
@@ -49,11 +55,7 @@ struct ErrorPage {
     std::string error_path;
 };
 
-enum fd_status
-{
-	CLIENT,
-	SERVER,
-};
+
 
 struct Fd_data
 {
