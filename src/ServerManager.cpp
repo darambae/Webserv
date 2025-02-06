@@ -8,10 +8,10 @@ ServerManager::ServerManager(const std::vector<ConfigServer>& configs) : _config
 
 void	ServerManager::launchServers() {
 	//create one FD by odd of IP/port
-		for (size_t i = 0; i < _configs.size(); ++i) {
-			//cree une classe server par configServer
-			_servers.push_back(new Server(_configs[i], _configs[i].getListen()));
-		}
+	for (size_t i = 0; i < _configs.size(); ++i) {
+		//cree une classe server par configServer
+		_servers.push_back(new Server(_configs[i], _configs[i].getListen()));
+	}
     while (stopProgram != 1) {
         int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
@@ -42,7 +42,7 @@ void	ServerManager::launchServers() {
 void	ServerManager::cleanClientFd(int FD) {
 	//clean fd in _all_fds; _mapFd_data;
 	close(FD);
-	std::map<int, t_Fd_data*>::iterator	it = FD_DATA.find(FD);
+	std::map<int, Fd_data*>::iterator	it = FD_DATA.find(FD);
 	it->second->server->decreaseClientCount();
 	delete it->second->request;
 	delete it->second;
@@ -59,7 +59,7 @@ ServerManager::~ServerManager() {
 	for (size_t i = 0; i < _servers.size(); ++i)
 	    delete _servers[i];
 	if (FD_DATA.size() > 0) {
-		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+		for (std::map<int, Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);
 			if (it->second->status == CLIENT)
 				delete it->second->request;

@@ -203,7 +203,6 @@ void    ConfigParser::validRoot(const std::string& line) {
         THROW ("Realpath failed");
     if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
         THROW ("Invalid root");
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid root");
 }
 
 void    ConfigParser::validBodySize(const std::string& line) {

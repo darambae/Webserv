@@ -1,10 +1,5 @@
 #pragma once
 
-enum fd_status
-{
-	CLIENT,
-	SERVER,
-};
 
 #include <iostream>
 #include <csignal>
@@ -54,7 +49,13 @@ struct ErrorPage {
     std::string error_path;
 };
 
-typedef struct s_FD_data
+enum fd_status
+{
+	CLIENT,
+	SERVER,
+};
+
+struct Fd_data
 {
 	fd_status	status;
 	Server*			server;
@@ -62,12 +63,11 @@ typedef struct s_FD_data
 	Request*		request;
 	int				port;
 	std::string		ip;
-}			t_Fd_data;
-
+};
 
 extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)
-extern std::map<int, t_Fd_data*>	FD_DATA;
-extern std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers
+extern std::map<int, Fd_data*>	FD_DATA;
+extern std::vector<struct pollfd> ALL_FDS;//stock all fds of all servers & clients & further
 extern volatile sig_atomic_t    stopProgram;
 
 
