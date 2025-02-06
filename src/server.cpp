@@ -54,7 +54,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	int opt = 1;
 	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
 		LOG_ERROR("setsockopt failed", 1);
-		
+
 		//perror("setsockopt failed");
 		return;
 	}
@@ -100,7 +100,8 @@ void	Server::addFdToFds(int fd_to_add) {
 	struct pollfd new_socket;
     new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;// to check write and read in a same time (subject order)
-    ALL_FDS.push_back(new_socket);
+	new_socket.revents = 0;
+	ALL_FDS.push_back(new_socket);
 }
 
 int	Server::createClientSocket(int fd) {
