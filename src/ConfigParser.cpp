@@ -193,17 +193,10 @@ void    ConfigParser::validReturn(const std::string& line) {
 }
 
 void    ConfigParser::validRoot(const std::string& line) {
-    struct stat buffer;
-    char resolved_path[100]; //possible memory leak
-    std::string path = line.length() > 1 ? line.substr(1) : line;
-
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
-    if (realpath(path.c_str(), resolved_path) == NULL)
-        THROW ("Realpath failed");
-    if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
-        THROW ("Invalid root");
-    //Logger::getInstance(CONSOLE_OUTPUT).log(INFO, "Valid root");
+    fullPath(line);
+    //LOG_INFO("Root path is valid : " + std::string(root));
 }
 
 void    ConfigParser::validBodySize(const std::string& line) {

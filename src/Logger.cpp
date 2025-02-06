@@ -4,7 +4,6 @@
 Logger::Logger(OutputType type) {
     if (type == FILE_OUTPUT) {
         this->_logFile.open("log.txt", std::ios::app | std::ios::out);
-        std::cout << "Log file created" << std::endl;
         if (!this->_logFile.is_open())
             THROW("Error opening log file");
     }

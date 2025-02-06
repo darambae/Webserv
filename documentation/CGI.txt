@@ -1,0 +1,141 @@
+Since your Webserv project must use **only one `poll()` (or equivalent)** for all I/O operations, including CGI, you need to carefully handle the following aspects when implementing CGI:
+
+---
+
+### 1. **CGI Execution with Non-Blocking I/O**
+- A CGI script typically reads from `stdin` (for `POST` requests) and writes to `stdout` (the response). Since your server is non-blocking, you **cannot directly use blocking `fork()` + `execve()` + `waitpid()`** without integrating it into your `poll()`-based event loop.
+- Instead, after `fork()`, you should:
+  - Use **non-blocking pipes** for communication between the CGI process and your server.
+  - Register the CGI process's `stdout` (for reading response) and `stdin` (for sending request body) in your `poll()` loop.
+
+---
+
+### 2. **Managing Child Processes Efficiently**
+- When you `fork()` a CGI process:
+  - Store the **PID** and associated **pipes** in a structure.
+  - Use `poll()` to monitor when the child process sends data back.
+  - Avoid `waitpid()` in a blocking way—**use `waitpid(-1, &status, WNOHANG)`** inside the event loop to check for finished processes.
+
+---
+
+### 3. **Handling CGI Input (POST Requests)**
+- If the request body needs to be passed to CGI via `stdin`, you must:
+  1. **Read the request body** in chunks using `poll()`.
+  2. **Write it to the CGI process's `stdin`** asynchronously.
+  3. **Close the write end of the pipe** when done, so the CGI script knows the input is finished.
+
+---
+
+### 4. **Handling CGI Output**
+- The CGI script sends the response via `stdout`, which is piped back to your server:
+  1. **Use `poll()` to detect when the CGI process writes data**.
+  2. **Read the output in chunks**, then store it in a buffer.
+  3. **Once complete, send it to the client** (using `poll()` for socket write).
+
+---
+
+### 5. **Timeout Handling**
+- A CGI script **must not block the server indefinitely**.
+- Track the **start time** of the CGI process and implement a timeout (e.g., 30s).
+- If the CGI process **exceeds the limit**, kill it (`kill(pid, SIGKILL)`) and clean up.
+
+---
+
+### 6. **Handling Multiple CGI Scripts Simultaneously**
+- Since `poll()` is managing **all I/O** (sockets and CGI processes), ensure that:
+  - Each CGI request gets assigned a **unique pipe pair**.
+  - Multiple CGI processes don’t block each other.
+  - The server can handle client connections while CGI runs.
+
+---
+
+### 7. **Edge Cases**
+- The CGI script might:
+  - Write partial data (handle this in a buffer).
+  - Crash mid-execution (detect with `waitpid(WNOHANG)`).
+  - Produce large output (ensure non-blocking reads).
+
+---
+
+### **Conclusion**
+✅ Use **non-blocking pipes** for CGI communication.  
+✅ Track CGI processes in **poll()**, no blocking `waitpid()`.  
+✅ Implement **timeouts** to avoid hanging processes.  
+✅ Read & write **in chunks**, avoiding buffer overflow or starvation.  
+
+With these in mind, your CGI integration should fit well into your single `poll()` event loop. 🚀
+
+Yes! Since each CGI execution is an independent process, you **must create a separate pipe for each CGI request**.  
+
+---
+
+### **How It Works for Multiple Concurrent CGI POST Requests**
+1. **For each incoming CGI request**:
+   - Create a **new pair of pipes**:
+     - One pipe for sending the request body to `stdin` of the CGI script.
+     - Another pipe for reading the response from `stdout` of the CGI script.
+   - Fork a child process for executing the CGI script.
+   - Register the pipes in `poll()` for **non-blocking read/write**.
+
+2. **For multiple CGI processes**:
+   - Each CGI script runs separately.
+   - Each one has its **own pipes** and is tracked independently in `poll()`.
+   - You must **write the request body in chunks** (if it’s large) before closing the write end of the `stdin` pipe.
+   - Read the output from the CGI **incrementally** using `poll()`, storing it in a buffer before sending it to the client.
+
+3. **Cleanup after the CGI process finishes**:
+   - Use `waitpid(-1, &status, WNOHANG)` to check when a process exits.
+   - Close the pipes and remove the process from your tracking structure.
+
+---
+
+### **Example of Handling Multiple CGI POST Requests**
+#### **1. Creating pipes per CGI request**
+```cpp
+int cgi_stdin[2];  // Pipe for request body (write to CGI)
+int cgi_stdout[2]; // Pipe for CGI response (read from CGI)
+
+pipe(cgi_stdin);   // Create pipe for CGI stdin
+pipe(cgi_stdout);  // Create pipe for CGI stdout
+```
+
+#### **2. Forking and executing CGI**
+```cpp
+pid_t pid = fork();
+if (pid == 0) // Child process (CGI script)
+{
+    dup2(cgi_stdin[0], STDIN_FILENO);  // Read request body from stdin
+    dup2(cgi_stdout[1], STDOUT_FILENO); // Write response to stdout
+
+    close(cgi_stdin[1]);  // Close unused write end
+    close(cgi_stdout[0]); // Close unused read end
+
+    execve("/path/to/cgi_script", argv, envp); // Execute CGI script
+    exit(1); // If execve fails
+}
+else if (pid > 0) // Parent process (Server)
+{
+    close(cgi_stdin[0]);  // Close unused read end (we write to CGI)
+    close(cgi_stdout[1]); // Close unused write end (we read from CGI)
+
+    // Add cgi_stdout[0] to poll() to read response
+    register_poll_fd(cgi_stdout[0]);
+
+    // Write request body to CGI process in chunks via poll()
+}
+```
+
+#### **3. Handling multiple CGI scripts in poll()**
+- **Monitor `cgi_stdout[0]` in `poll()`** to read CGI output as it becomes available.
+- **Write to `cgi_stdin[1]` in chunks** using `poll()` if the request body is large.
+- **Store process PID and pipes in a tracking structure** so each CGI process is handled separately.
+
+---
+
+### **Key Takeaways**
+✅ **Each CGI request needs its own pipes**.  
+✅ **poll() manages multiple CGI processes concurrently**.  
+✅ **Never block on write/read—use poll()**.  
+✅ **Close pipes properly when the process is done**.  
+
+With this setup, you can handle multiple concurrent POST requests using CGI **without blocking your server**! 🚀

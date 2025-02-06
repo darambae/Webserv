@@ -14,6 +14,10 @@ $(OBJ_DIR)%.o: %.cpp
 $(NAME): $(OBJ)
 	$(CC) $(CPPFLAGS) $(OBJ) -o $(NAME)
 
+# cgi-prep:
+# 	sudo apt install python3
+# 	chmod +x cgi-bin/*.py
+
 clean:
 	rm -rf $(OBJ_DIR)
 	rm -f log.txt

@@ -6,9 +6,10 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
 	for (; it != config.getLocations().end(); ++it) {
-		if (requestPath.find(it->getPath()) == 0) {
-			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size())
+		if (requestPath.find(it->getPath()) != std::string::npos) {
+			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size()) {
 				bestMatch = &(*it);
+			}
 		}
 	}
 	return bestMatch;
@@ -18,17 +19,16 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 bool	Response::findIndex(ConfigLocation const* location) {
 	
 	std::string indexPath = _request.getPath();
-
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-		
 	std::vector<std::string>::const_iterator it = location->getIndex().begin();
 	for (; it != location->getIndex().end(); ++it) {
 		std::string	tryIndex = *it;
 		std::string	tryCompletePath = indexPath + tryIndex;
-
-		if (access(tryCompletePath.c_str(), F_OK) != -1) {
-			setRequestedFile(tryCompletePath);
+		std::string path = fullPath(location->getRoot()) + tryCompletePath;
+		if (access(path.c_str(), F_OK) != -1) {
+			LOG_INFO("access to " + path + " success");
+			setRequestedFile(path);
 			return true;
 		}
 	}
@@ -45,11 +45,13 @@ bool	Response::findIndex(ConfigLocation const* location) {
 //	=> ELSE, error 404 not found
 void	Response::handleGet(ConfigLocation const* location) {
 
+	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex(location)) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
+			LOG_INFO("Index found");
 			sendResponse();
 		}
 		else {
@@ -127,6 +129,7 @@ void	Response::sendResponse() {
 	_responseBuilder = new ResponseBuilder(*this);
 	_builtResponse = _responseBuilder->buildResponse();
 
+	LOG_INFO("Response built" + *_builtResponse);
 	size_t	totalSent = 0;
 	size_t	responseSize = _builtResponse->size();
 

@@ -38,8 +38,8 @@ class Request {
 
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }
-	std::string	getMethod() const { return _path; }
-	std::string	getPath() const { return _method; }
+	std::string	getMethod() const { return _method; }
+	std::string	getPath() const { return _path; }
 	std::string	getVersion() const { return _version; }
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
