@@ -43,7 +43,7 @@ int	Request::parseRequest() {
 			isRequestComplete = true;
 			//do we reanitialize contentLength to 0 ? maybe further in the code.
 			LOG_INFO("Body received");
-		} 
+		}
 		// else
 		// 	LOG_INFO("Body not fully received");
 	}
@@ -77,15 +77,16 @@ void	Request::parseHeader(std::string headerPart) {
 	}
 }
 
-int	Request::handleRequest(ConfigServer const& config) {
+int	Request::handleRequest() {
 
+	ConfigServer* config = FD_DATA[_clientFd]->config;
 	if (parseRequest() == -1) {
 		LOG_INFO("Request parsing failed");
 		return -1;
 	}
 
 	if (isRequestComplete) {
-		_Response = new Response(*this, config);
+		_Response = new Response(*this, *config);
 		_Response->handleResponse();
 		LOG_INFO("Response :" + _Response->getReasonPhrase());
 		delete _Response;
