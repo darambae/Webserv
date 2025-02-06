@@ -33,7 +33,7 @@ but if one of them is 0.0.0.0 an error will appear for the creation of the secon
 wich try to use a IP allready used on a port*/
 void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 /*i comment this step because in case of double use of one IP with one port, socket will launch an error*/
-	// std::map<int, t_Fd_data*>::iterator	it;
+	// std::map<int, Fd_data*>::iterator	it;
 	// if (FD_DATA.size() > 0) {
 	// 	for (it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 	// 		if (it->second->port == ipPort.second && it->second->ip == ipPort.first)
@@ -81,7 +81,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 }
 
 void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request) {
-	t_Fd_data*	new_fd_data = new t_Fd_data;
+	Fd_data*	new_fd_data = new Fd_data;
 	new_fd_data->ip = ip;
 	new_fd_data->port = port;
 	new_fd_data->server = server;

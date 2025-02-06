@@ -20,7 +20,7 @@
 
 int MAX_CLIENT = 1024;
 
-std::map<int, t_Fd_data*>	FD_DATA;
+std::map<int, Fd_data*>	FD_DATA;
 std::vector<struct pollfd> ALL_FDS;
 
 volatile sig_atomic_t stopProgram = 0;
@@ -31,7 +31,7 @@ void    signalHandler(int signal) {
     // kill(0, SIGTERM);
     // while (waitpid(-1, NULL, WNOHANG) > 0);
 	if (FD_DATA.size() > 0) {
-		for (std::map<int, t_Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+		for (std::map<int, Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);
 			if (it->second->status == CLIENT)
 				delete it->second->request;
