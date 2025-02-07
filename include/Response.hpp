@@ -21,11 +21,12 @@ private:
 	std::ifstream		_requestedFile;
 	std::map<std::string, std::string>	_header;
 	bool				_responseReadyToSend;
+	size_t				_totalBytesSent;
 
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _request(request), _responseReadyToSend(false) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
 	/* setters / getters */
