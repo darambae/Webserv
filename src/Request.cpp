@@ -81,7 +81,6 @@ void	Request::parseHeader(std::string headerPart) {
 int	Request::handleRequest() {
 
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
-	
 	if (parseRequest() == -1) {
 		LOG_INFO("Request parsing failed");
 		return -1;

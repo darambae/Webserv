@@ -90,6 +90,7 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 	new_fd_data->status = status;
 	new_fd_data->response = NULL;
 	//new_fd_data->config = _config;
+
 	if (request == true){
 		Request*	request = new Request(fd);
 		new_fd_data->request = request;
