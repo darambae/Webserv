@@ -13,16 +13,9 @@ private:
 public:
 	Server(ConfigServer &config, const std::vector<std::pair<std::string, int> > &listen);
 	~Server();
-	class ServerException : public std::exception
-	{
-	private:
-		std::string _message;
-
-	public:
-		ServerException(std::string const &message) : _message(message) {}
-		virtual ~ServerException() throw() {}
-		virtual const char *what() const throw() { return _message.c_str(); }
-	};
+	//getter
+	ConfigServer*	getConfigServer() {return _config;}
+	//setter
 	void initServerSocket(std::pair<std::string, int> ipPort);
 	void addFdData(int fd, std::string ip, int port, Server *server, fd_status status , bool request);
 	void addFdToFds(int fd_to_add);

@@ -45,7 +45,7 @@ class Request {
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
 	/* methods */
-	int		handleRequest(ConfigServer const& config);
+	int		handleRequest();
 	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);

@@ -19,21 +19,33 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents & POLLIN) {
-				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
-					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
-					//char buffer[1024];
-					//read(ALL_FDS[i].fd, buffer, sizeof(buffer));
-					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
+				int	readable_FD = ALL_FDS[i].fd;
+				if (FD_DATA[readable_FD]->status == SERVER) {
+					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
+					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
+						LOG_ERROR("the client with FD : "+to_string(new_client)+" is disconnected", 0);
 						cleanClientFd(new_client);
+					}
 				}
-				else if (FD_DATA[ALL_FDS[i].fd]->request->handleRequest(*FD_DATA[ALL_FDS[i].fd]->config) == -1)
+				else if (FD_DATA[readable_FD]->status == CLIENT && FD_DATA[readable_FD]->request->handleRequest() == -1) {
+					LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
 					cleanClientFd(ALL_FDS[i].fd);
-				// else {
-				// 	char buffer[1024];
-				// 	read(ALL_FDS[i].fd, buffer, sizeof(buffer));
-				// 	std::cout << "the client with FD " << ALL_FDS[i].fd <<" send a request"<<std::endl;
-				// }
+				}
+				//else if (FD_DATA[readable_FD] == CGI) CGI can read and treat the message
+				//else//it means it's the stopFD wich recv a signal
+				//	stopServer();
 			}
+			/*traiter les POLLOUT
+			else if (ALL_FDS[i].revents & POLL_OUT) {
+				int sendable_fd = ALL_FDS[i].fd;
+				if (FD_DATA[sendable_fd]->status == CLIENT) {
+					if (FD_DATA[sendable_fd]->a_response_is_sendable == true)
+						sendtheresponse();
+				}
+				else if (FD_DATA[sendable_fd]->status == CGI) {
+				response can be send to the client (by response class or CGI?)
+			}
+			}*/
 		}
     }
 }
