@@ -1,7 +1,7 @@
 #include "../include/Response.hpp"
 
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
-	
+
 	const	ConfigLocation*	bestMatch = NULL;
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
@@ -17,7 +17,7 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 
 
 bool	Response::findIndex(ConfigLocation const* location) {
-	
+
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
@@ -36,7 +36,7 @@ bool	Response::findIndex(ConfigLocation const* location) {
 }
 
 
-//IF request path is a directory 
+//IF request path is a directory
 //	=> IF index page exist, serve it
 //	=> ELSE => IF auto index is ON, file list is generated
 //			=> ELSE (auto-index off), error 404 Not found.
@@ -52,7 +52,8 @@ void	Response::handleGet(ConfigLocation const* location) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
 			LOG_INFO("Index found");
-			sendResponse();
+			_responseReadyToSend = true;
+			//sendResponse();
 		}
 		else {
 			if (location->getAutoindex()) {
@@ -75,7 +76,8 @@ void	Response::handleGet(ConfigLocation const* location) {
 		if (_requestedFile) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
-			sendResponse();
+			_responseReadyToSend = true;
+			//sendResponse();
 		}
 		else {
 			setCodeStatus(404);
@@ -126,7 +128,7 @@ void	Response::handleResponse() {
 }
 
 void	Response::sendResponse() {
-	
+
 	_responseBuilder = new ResponseBuilder(*this);
 	_builtResponse = _responseBuilder->buildResponse();
 
@@ -144,5 +146,8 @@ void	Response::sendResponse() {
 
 		totalSent += bytesSent;
 	}
+	//rajoute par Kelly :D
+	if (totalSent == responseSize)
+		_responseReadyToSend = false;
 	delete _responseBuilder;
 }

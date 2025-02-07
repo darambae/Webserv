@@ -62,8 +62,8 @@ struct Fd_data
 {
 	fd_status	status;
 	Server*			server;
-	ConfigServer*	config;
 	Request*		request;
+	Response*		response;
 	int				port;
 	std::string		ip;
 };
