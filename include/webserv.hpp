@@ -41,6 +41,7 @@ enum fd_status
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"
+#include <fcntl.h>
 
 #define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
@@ -49,6 +50,7 @@ enum fd_status
 
 class	Server;
 class	Request;
+class	Response;
 
 struct ErrorPage {
     std::set<int> error_codes;
@@ -61,8 +63,8 @@ struct Fd_data
 {
 	fd_status	status;
 	Server*			server;
-	ConfigServer*	config;
 	Request*		request;
+	Response*		response;
 	int				port;
 	std::string		ip;
 };

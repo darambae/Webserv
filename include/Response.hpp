@@ -20,16 +20,18 @@ private:
 	std::string			_requestedFilePath;
 	std::ifstream		_requestedFile;
 	std::map<std::string, std::string>	_header;
+	bool				_responseReadyToSend;
+	size_t				_totalBytesSent;
 
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _request(request) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
 	/* setters / getters */
-	void		setRequestedFile(std::string const& filePath) { 
-		_requestedFilePath = filePath; 
+	void		setRequestedFile(std::string const& filePath) {
+		_requestedFilePath = filePath;
 		_requestedFile.open(filePath.c_str(), std::ios::binary);
 	}
 	void		setCodeStatus(int code) { _codeStatus = code; }
@@ -42,6 +44,7 @@ private:
 	std::string			getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&		getRequestedFile() { return _requestedFile; }
 	std::map<std::string, std::string>	getHeader() const { return _header; }
+	bool				getResponseReadyToSend() {return _responseReadyToSend;}
 
 
 	/* method */

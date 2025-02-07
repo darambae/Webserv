@@ -1,7 +1,7 @@
 #include "../include/Response.hpp"
 
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
-	
+
 	const	ConfigLocation*	bestMatch = NULL;
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
@@ -17,7 +17,7 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 
 
 bool	Response::findIndex(ConfigLocation const* location) {
-	
+
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
@@ -36,7 +36,7 @@ bool	Response::findIndex(ConfigLocation const* location) {
 }
 
 
-//IF request path is a directory 
+//IF request path is a directory
 //	=> IF index page exist, serve it
 //	=> ELSE => IF auto index is ON, file list is generated
 //			=> ELSE (auto-index off), error 404 Not found.
@@ -52,7 +52,10 @@ void	Response::handleGet(ConfigLocation const* location) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
 			LOG_INFO("Index found");
-			sendResponse();
+			_responseReadyToSend = true;
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
+			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			if (location->getAutoindex()) {
@@ -70,11 +73,15 @@ void	Response::handleGet(ConfigLocation const* location) {
 	else {
 	// request path is a file
 
-		setRequestedFile(_request.getPath().c_str());
+		std::string	path = fullPath(location->getRoot()) + _request.getPath();
+		setRequestedFile(path.c_str());
 		if (_requestedFile) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
-			sendResponse();
+			_responseReadyToSend = true;
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
+			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			setCodeStatus(404);
@@ -118,30 +125,41 @@ void	Response::handleResponse() {
 	else {
 		LOG_INFO("Method not implemented");
 		setCodeStatus(501);
-		setReasonPhrase("method not implemented");
+		setReasonPhrase("Method not implemented");
 		//handleError();
 		return ;
 	}
 }
 
 void	Response::sendResponse() {
-	
-	_responseBuilder = new ResponseBuilder(*this);
-	_builtResponse = _responseBuilder->buildResponse();
 
-	LOG_INFO("Response built" + *_builtResponse);
-	size_t	totalSent = 0;
 	size_t	responseSize = _builtResponse->size();
+	const size_t	BUFFER_SIZE = 4096;
 
-	while (totalSent < responseSize) {
-		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + totalSent, responseSize - totalSent, 0);
+	LOG_INFO("sending response");
+	if (_totalBytesSent < responseSize) {
+		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
+		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
-		if (totalSent == static_cast<size_t>(-1))
-			//disconnected. Behavior to define
-			LOG_INFO("Client disconnected");
-			break;
+		if (bytesSent == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return; 
+            }
+            LOG_INFO("Client disconnected");
+            _responseReadyToSend = false;
+            return;
+        }
 
-		totalSent += bytesSent;
+		_totalBytesSent += bytesSent;
 	}
-	delete _responseBuilder;
+	//rajoute par Kelly :D
+	if (_totalBytesSent == responseSize) {
+		LOG_INFO("Response fully sent");
+		_responseReadyToSend = false;
+	}
+
+	if (_responseBuilder) {
+		delete _responseBuilder;
+		_responseBuilder = NULL;
+	}
 }

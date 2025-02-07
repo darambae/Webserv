@@ -1,0 +1,17 @@
+[2025-02-07 15:16:17] [DEBUG] Valid error page
+[2025-02-07 15:16:17] [DEBUG] Valid error page
+[2025-02-07 15:16:17] [DEBUG] Valid error page
+[2025-02-07 15:16:17] [DEBUG] Valid body size
+[2025-02-07 15:16:17] [DEBUG] Valid path
+[2025-02-07 15:16:17] [DEBUG] Valid root
+[2025-02-07 15:16:17] [DEBUG] Valid autoindex
+[2025-02-07 15:16:17] [DEBUG] Valid methods
+[2025-02-07 15:16:17] [DEBUG] Valid path
+[2025-02-07 15:16:17] [DEBUG] Valid root
+[2025-02-07 15:16:17] [DEBUG] Valid methods
+[2025-02-07 15:16:17] [DEBUG] Valid autoindex
+[2025-02-07 15:16:17] [DEBUG] Valid path
+[2025-02-07 15:16:17] [DEBUG] Valid root
+[2025-02-07 15:16:17] [DEBUG] Valid methods
+[2025-02-07 15:16:17] [DEBUG] Valid path
+[2025-02-07 15:17:25] [DEBUG] Interrupt signal 2 received
