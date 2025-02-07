@@ -1,0 +1,92 @@
+{
+    "games": [
+        {
+            "game_id": 1,
+            "players": [
+                { "player_id": 1, "sq_1": 15, "sq_2": 20, "sq_3": 18, "sq_4": 17, "sq_5": 15, "sq_6": 15, "total_score": 100 },
+                { "player_id": 2, "sq_1": 14, "sq_2": 18, "sq_3": 16, "sq_4": 12, "sq_5": 14, "sq_6": 12, "total_score": 86 },
+                { "player_id": 3, "sq_1": 17, "sq_2": 15, "sq_3": 18, "sq_4": 20, "sq_5": 10, "sq_6": 10, "total_score": 90 },
+                { "player_id": 4, "sq_1": 20, "sq_2": 17, "sq_3": 15, "sq_4": 18, "sq_5": 10, "sq_6": 15, "total_score": 95 },
+                { "player_id": 5, "sq_1": 15, "sq_2": 12, "sq_3": 14, "sq_4": 18, "sq_5": 11, "sq_6": 10, "total_score": 80 }
+            ]
+        },
+        {
+            "game_id": 2,
+            "players": [
+                { "player_id": 2, "sq_1": 18, "sq_2": 20, "sq_3": 15, "sq_4": 22, "sq_5": 10, "sq_6": 10, "total_score": 95 },
+                { "player_id": 3, "sq_1": 12, "sq_2": 10, "sq_3": 18, "sq_4": 14, "sq_5": 15, "sq_6": 13, "total_score": 82 },
+                { "player_id": 6, "sq_1": 14, "sq_2": 16, "sq_3": 20, "sq_4": 18, "sq_5": 10, "sq_6": 15, "total_score": 93 }
+            ]
+        },
+        {
+            "game_id": 3,
+            "players": [
+                { "player_id": 1, "sq_1": 14, "sq_2": 18, "sq_3": 15, "sq_4": 20, "sq_5": 13, "sq_6": 10, "total_score": 90 },
+                { "player_id": 5, "sq_1": 10, "sq_2": 14, "sq_3": 16, "sq_4": 15, "sq_5": 12, "sq_6": 13, "total_score": 80 },
+                { "player_id": 7, "sq_1": 12, "sq_2": 18, "sq_3": 20, "sq_4": 15, "sq_5": 12, "sq_6": 13, "total_score": 90 }
+            ]
+        },
+        {
+            "game_id": 4,
+            "players": [
+                { "player_id": 1, "sq_1": 15, "sq_2": 20, "sq_3": 18, "sq_4": 17, "sq_5": 15, "sq_6": 15, "total_score": 80 },
+                { "player_id": 2, "sq_1": 14, "sq_2": 18, "sq_3": 16, "sq_4": 12, "sq_5": 14, "sq_6": 12, "total_score": 83 },
+                { "player_id": 5, "sq_1": 15, "sq_2": 12, "sq_3": 14, "sq_4": 18, "sq_5": 11, "sq_6": 10, "total_score": 80 }
+            ]
+        }
+    ],
+    "players": {
+        "1": {
+            "player_name": "Kelly",
+            "game_history": [
+                { "game_id": 1, "total_score": 100 },
+                { "game_id": 3, "total_score": 90 },
+                { "game_id": 4, "total_score": 80 }
+            ]
+        },
+        "2": {
+            "player_name": "Gauthier",
+            "game_history": [
+                { "game_id": 1, "total_score": 86 },
+                { "game_id": 2, "total_score": 95 },
+                { "game_id": 4, "total_score": 83 }
+            ]
+        },
+        "3": {
+            "player_name": "Daram",
+            "game_history": [
+                { "game_id": 1, "total_score": 90 },
+                { "game_id": 2, "total_score": 82 }
+            ]
+        },
+        "4": {
+            "player_name": "Thomas",
+            "game_history": [
+                { "game_id": 1, "total_score": 95 }
+            ]
+        },
+        "5": {
+            "player_name": "Louna",
+            "game_history": [
+                { "game_id": 1, "total_score": 80 },
+                { "game_id": 3, "total_score": 80 },
+                { "game_id": 4, "total_score": 80 }
+            ]
+        },
+        "6": {
+            "player_name": "Agnes",
+            "game_history": [
+                { "game_id": 2, "total_score": 93 }
+            ]
+        },
+        "7": {
+            "player_name": "Oceane",
+            "game_history": [
+                { "game_id": 3, "total_score": 90 }
+            ]
+        }
+    }
+}
+
+
+
