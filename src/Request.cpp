@@ -80,19 +80,21 @@ void	Request::parseHeader(std::string headerPart) {
 
 int	Request::handleRequest() {
 
-	ConfigServer* config = FD_DATA[_clientFd]->config;
+	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
+	
 	if (parseRequest() == -1) {
 		LOG_INFO("Request parsing failed");
 		return -1;
 	}
 
 	if (isRequestComplete) {
-		_Response = new Response(*this, *config);
+		FD_DATA[_clientFd]->response = new Response(*this, *config);
+		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
 		LOG_INFO("Response :" + _Response->getReasonPhrase());
 		delete _Response;
+		FD_DATA[_clientFd]->response = NULL;
 	}
-
 	return 0;
 }
 

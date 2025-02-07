@@ -50,6 +50,7 @@ enum fd_status
 
 class	Server;
 class	Request;
+class	Response;
 
 struct ErrorPage {
     std::set<int> error_codes;
