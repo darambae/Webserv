@@ -91,8 +91,8 @@ int	Request::handleRequest() {
 		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
 		LOG_INFO("Response :" + _Response->getReasonPhrase());
-		delete _Response;
-		FD_DATA[_clientFd]->response = NULL;
+		//delete _Response;
+		//FD_DATA[_clientFd]->response = NULL;
 	}
 	return 0;
 }

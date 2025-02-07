@@ -19,6 +19,7 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents & POLLIN) {
+				//LOG_INFO("POLLIN signal");
 				int	readable_FD = ALL_FDS[i].fd;
 				if (FD_DATA[readable_FD]->status == SERVER) {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
@@ -35,11 +36,14 @@ void	ServerManager::launchServers() {
 				//else//it means it's the stopFD wich recv a signal
 				//	stopServer();
 			}
-			else if (ALL_FDS[i].revents & POLL_OUT) {
+			else if (ALL_FDS[i].revents & POLLOUT) {
+				//LOG_INFO("POLLOUT signal");
 				int sendable_fd = ALL_FDS[i].fd;
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
-					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true)
+					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true) {
+						LOG_INFO("response ready to be sent");
 						FD_DATA[sendable_fd]->response->sendResponse();
+					}
 				}
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
 			// 	response can be send to the client (by response class or CGI?)

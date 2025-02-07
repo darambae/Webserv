@@ -53,7 +53,9 @@ void	Response::handleGet(ConfigLocation const* location) {
 			setReasonPhrase("OK");
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
-			//sendResponse();
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
+			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			if (location->getAutoindex()) {
@@ -77,7 +79,9 @@ void	Response::handleGet(ConfigLocation const* location) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
 			_responseReadyToSend = true;
-			//sendResponse();
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
+			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			setCodeStatus(404);
@@ -121,7 +125,7 @@ void	Response::handleResponse() {
 	else {
 		LOG_INFO("Method not implemented");
 		setCodeStatus(501);
-		setReasonPhrase("method not implemented");
+		setReasonPhrase("Method not implemented");
 		//handleError();
 		return ;
 	}
@@ -129,25 +133,33 @@ void	Response::handleResponse() {
 
 void	Response::sendResponse() {
 
-	_responseBuilder = new ResponseBuilder(*this);
-	_builtResponse = _responseBuilder->buildResponse();
-
-	LOG_INFO("Response built" + *_builtResponse);
-	size_t	totalSent = 0;
 	size_t	responseSize = _builtResponse->size();
+	const size_t	BUFFER_SIZE = 4096;
 
-	while (totalSent < responseSize) {
-		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + totalSent, responseSize - totalSent, 0);
+	LOG_INFO("sending response");
+	if (_totalBytesSent < responseSize) {
+		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
+		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
-		if (totalSent == static_cast<size_t>(-1))
-			//disconnected. Behavior to define
-			LOG_INFO("Client disconnected");
-			break;
+		if (bytesSent == -1) {
+            if (errno == EAGAIN || errno == EWOULDBLOCK) {
+                return; 
+            }
+            LOG_INFO("Client disconnected");
+            _responseReadyToSend = false;
+            return;
+        }
 
-		totalSent += bytesSent;
+		_totalBytesSent += bytesSent;
 	}
 	//rajoute par Kelly :D
-	if (totalSent == responseSize)
+	if (_totalBytesSent == responseSize) {
+		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
-	delete _responseBuilder;
+	}
+
+	if (_responseBuilder) {
+		delete _responseBuilder;
+		_responseBuilder = NULL;
+	}
 }
