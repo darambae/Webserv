@@ -80,5 +80,5 @@ ServerManager::~ServerManager() {
 	}
 	if (ALL_FDS.size() > 0)
 		ALL_FDS.clear();
-	std::cout<<"the ServerManager is closed"<<std::endl;
+	LOG_INFO("the ServerManager is closed");
 }

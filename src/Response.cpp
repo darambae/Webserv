@@ -70,7 +70,8 @@ void	Response::handleGet(ConfigLocation const* location) {
 	else {
 	// request path is a file
 
-		setRequestedFile(_request.getPath().c_str());
+		std::string	path = fullPath(location->getRoot()) + _request.getPath();
+		setRequestedFile(path.c_str());
 		if (_requestedFile) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");

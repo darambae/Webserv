@@ -1,5 +1,6 @@
 #include "../include/Request.hpp"
 
+
 //a request is always made of :
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (to a file or a directory) ; protocol_version (HTTP/1.1)
 // - Header containing extra data
