@@ -76,6 +76,8 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	    LOG_ERROR("Listen failed", true);
 	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
 	LOG_INFO("A new socket was created for " + _config->getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
+	if (unblockFD(new_fd) == -1)
+		return;
 	addFdToFds(new_fd);
 	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, false);
 }
@@ -124,6 +126,23 @@ int	Server::createClientSocket(int fd) {
 }
 
 void	Server::decreaseClientCount() {_client_count--;}
+
+/*this function enables to make fd non blocking, it means that accept/read/write
+functions will send -1 instead to wait if there is no connection or if there is
+nothing to read or if there is no place to write*/
+int	Server::unblockFD(int fd) {
+	int flag = fcntl(fd, F_GETFL,0);//get fd's flags
+	if (flag == -1) {
+		LOG_ERROR("fcntl failed for the FD "+to_string(fd), true);
+		return -1;
+	}
+		//the fd have to be delete ??
+	if (fcntl(fd, F_SETFL, flag | O_NONBLOCK) == -1) {//add nonblocked flag
+		LOG_ERROR("fcntl failed for the FD "+to_string(fd), true);
+		return -1;
+	}
+	return 0;
+}
 
 Server::~Server() {
 	std::cout<<"the server : "<<_config->getServerNames()[0]<<" is closed"<<std::endl;

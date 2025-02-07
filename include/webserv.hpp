@@ -41,6 +41,7 @@ enum fd_status
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"
+#include <fcntl.h>
 
 #define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)

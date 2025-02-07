@@ -16,9 +16,12 @@ public:
 	//getter
 	ConfigServer*	getConfigServer() {return _config;}
 	//setter
+
+	//member function
 	void initServerSocket(std::pair<std::string, int> ipPort);
 	void addFdData(int fd, std::string ip, int port, Server *server, fd_status status , bool request);
 	void addFdToFds(int fd_to_add);
 	int createClientSocket(int fd);
 	void decreaseClientCount();
+	int	unblockFD(int fd);
 };
