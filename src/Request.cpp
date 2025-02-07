@@ -87,12 +87,13 @@ int	Request::handleRequest() {
 	}
 
 	if (isRequestComplete) {
-		_Response = new Response(*this, *config);
+		FD_DATA[_clientFd]->response = new Response(*this, *config);
+		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
 		LOG_INFO("Response :" + _Response->getReasonPhrase());
 		delete _Response;
+		FD_DATA[_clientFd]->response = NULL;
 	}
-
 	return 0;
 }
 
