@@ -45,7 +45,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	int	new_fd = socket(AF_INET, SOCK_STREAM, 0); // SOCK_STREAM : TCP socket
 	if (new_fd == -1) {
 		//std::cout<<"socket function failed to create a new fd for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<std::endl;
-		LOG_ERROR("socket function failed to create a new fd for the IP "+ipPort.first+" and the port "+to_string(ipPort.second), 1);
+		LOG_ERROR("socket function failed to create a new fd for the IP "+ipPort.first+" and the port "+to_string(ipPort.second), true);
 		//perror("error message : ");
 		return;
 	}
@@ -53,7 +53,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	/*in case of server crach, this setting allow to reuse the port */
 	int opt = 1;
 	if (setsockopt(new_fd, SOL_SOCKET, SO_REUSEADDR, &opt, sizeof(opt)) < 0) {
-		LOG_ERROR("setsockopt failed", 1);
+		LOG_ERROR("setsockopt failed", true);
 
 		//perror("setsockopt failed");
 		return;
@@ -67,13 +67,13 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	//std::cerr << "Bind failed" << std::endl; // When bind fails, on terminal "sudo lsof -i :8080" & "sudo kill 8080" can be used to free the port.
 		// std::cout<<"the bind of the new socket "<<new_fd<<" for the IP "<<ipPort.first<<" and the port "<<ipPort.second<<" failed"<<std::endl;
 		// perror("");
-		LOG_ERROR("The bind of the new socket "+to_string(new_fd)+" for the IP "+ipPort.first+" and the port "+to_string(ipPort.second)+" failed", 1);
+		LOG_ERROR("The bind of the new socket "+to_string(new_fd)+" for the IP "+ipPort.first+" and the port "+to_string(ipPort.second)+" failed", true);
 		return;
 		//throw ServerException("Bind failed");
 	}
 	std::cout<<"The socket is bind"<<std::endl;
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
-	    throw ServerException("Listen failed");
+	    LOG_ERROR("Listen failed", true);
 	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
 	LOG_INFO("A new socket was created for " + _config->getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
 	addFdToFds(new_fd);
