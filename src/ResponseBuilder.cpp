@@ -27,9 +27,9 @@ std::string	ResponseBuilder::buildHeaders() {
 
 	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
 	_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
-	_headers._contentLength = "Content-length: " + to_string(_headers._contentType.size()) + "\r\n\r\n";
+	_headers._contentLength = "Content-length: " + to_string(_body.size()) + "\r\n\r\n";
 
-	return (header = _headers._timeStamp + _headers._contentType + _headers._timeStamp);
+	return (header = _headers._timeStamp + _headers._contentType + _headers._contentLength);
 }
 
 std::string	ResponseBuilder::buildTime(void) {

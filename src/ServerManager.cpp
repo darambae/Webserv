@@ -19,7 +19,6 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents & POLLIN) {
-				std::cout << FD_DATA[ALL_FDS[i].fd] << std::endl;
 				if (FD_DATA[ALL_FDS[i].fd]->status == SERVER) {
 					int new_client = FD_DATA[ALL_FDS[i].fd]->server->createClientSocket(ALL_FDS[i].fd);
 					//char buffer[1024];
@@ -69,5 +68,5 @@ ServerManager::~ServerManager() {
 	}
 	if (ALL_FDS.size() > 0)
 		ALL_FDS.clear();
-	std::cout<<"the ServerManager is closed"<<std::endl;
+	LOG_INFO("the ServerManager is closed");
 }
