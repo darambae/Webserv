@@ -9,10 +9,13 @@ int	Request::parseRequest() {
 
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-
+	//ssize_t	bytes = recv(_clientFd, buffer, sizeof(buffer), 0);
 	if (bytes < 0) {
-		LOG_ERROR("Error reading from client", 1);
+		LOG_ERROR("Error reading from client_fd(" + to_string(_clientFd) +")", 1);
 		return -1; //client disconnected
+	} else if (bytes == 0) {
+		LOG_INFO("Client disconnected");
+		return -1;
 	}
 
 	_tempBuffer.append(buffer, bytes);

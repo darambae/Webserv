@@ -47,7 +47,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
-	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+		if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex(location)) {
 			setCodeStatus(200);
 			setReasonPhrase("OK");
@@ -69,11 +69,11 @@ void	Response::handleGet(ConfigLocation const* location) {
 			}
 		}
 	}
-
 	else {
 	// request path is a file
 
 		std::string	path = fullPath(location->getRoot()) + _request.getPath();
+		LOG_INFO("Request file path: " + path);
 		setRequestedFile(path.c_str());
 		if (_requestedFile) {
 			setCodeStatus(200);
@@ -147,8 +147,14 @@ void	Response::sendResponse() {
             }
             LOG_INFO("Client disconnected");
             _responseReadyToSend = false;
+			close(_request.getClientFD());
             return;
-        }
+        } else if (bytesSent == 0) {
+			LOG_INFO("Client disconnected");
+			_responseReadyToSend = false;
+			close(_request.getClientFD());
+			return;
+		}
 
 		_totalBytesSent += bytesSent;
 	}
@@ -156,6 +162,8 @@ void	Response::sendResponse() {
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
+		//shutdown(_request.getClientFD(), SHUT_RDWR);
+		close(_request.getClientFD());
 	}
 
 	if (_responseBuilder) {

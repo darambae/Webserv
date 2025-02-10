@@ -18,25 +18,35 @@ void	ServerManager::launchServers() {
             THROW("Poll failed");
 		//if new connection on one port of one server
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
+			if (ALL_FDS[i].revents == 0)
+				continue;
 			if (ALL_FDS[i].revents & POLLIN) {
 				//LOG_INFO("POLLIN signal");
 				int	readable_FD = ALL_FDS[i].fd;
 				if (FD_DATA[readable_FD]->status == SERVER) {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
 					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
-						LOG_ERROR("the client with FD : "+to_string(new_client)+" is disconnected", 0);
+						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
+						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
 						cleanClientFd(new_client);
 					}
-				}
-				else if (FD_DATA[readable_FD]->status == CLIENT && FD_DATA[readable_FD]->request->handleRequest() == -1) {
-					LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-					cleanClientFd(ALL_FDS[i].fd);
+				} else if (FD_DATA[readable_FD]->status == CLIENT) {
+					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
+						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
+						//LOG_ERROR(": "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+						cleanClientFd(readable_FD);
+					}
+					// LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
+					// //LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+					// //cleanClientFd(ALL_FDS[i].fd);
+					// cleanClientFd(readable_FD);
 				}
 				//else if (FD_DATA[readable_FD] == CGI) CGI can read and treat the message
 				//else//it means it's the stopFD wich recv a signal
 				//	stopServer();
+				continue;
 			}
-			else if (ALL_FDS[i].revents & POLLOUT) {
+			if (ALL_FDS[i].revents & POLLOUT) {
 				//LOG_INFO("POLLOUT signal");
 				int sendable_fd = ALL_FDS[i].fd;
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
@@ -48,6 +58,19 @@ void	ServerManager::launchServers() {
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
 			// 	response can be send to the client (by response class or CGI?)
 			// }
+				continue;
+			}
+			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
+            //     int error_fd = ALL_FDS[i].fd;
+            //     LOG_INFO("Error or hangup on FD: " + to_string(error_fd));
+                
+            // }
+			if (ALL_FDS[i].revents & POLLHUP) {
+				LOG_INFO("POLLHUP signal");
+				int hangup_fd = ALL_FDS[i].fd;
+				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+				cleanClientFd(hangup_fd);
+				continue;
 			}
 		}
     }
