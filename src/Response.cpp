@@ -147,12 +147,12 @@ void	Response::sendResponse() {
             }
             LOG_INFO("Client disconnected");
             _responseReadyToSend = false;
-			close(_request.getClientFD());
+			//close(_request.getClientFD());
             return;
         } else if (bytesSent == 0) {
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
-			close(_request.getClientFD());
+			//close(_request.getClientFD());
 			return;
 		}
 
@@ -163,7 +163,7 @@ void	Response::sendResponse() {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
 		//shutdown(_request.getClientFD(), SHUT_RDWR);
-		close(_request.getClientFD());
+		//close(_request.getClientFD());
 	}
 
 	if (_responseBuilder) {

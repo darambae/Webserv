@@ -28,13 +28,11 @@ void	ServerManager::launchServers() {
 					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
 						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
-						cleanClientFd(new_client);
 					}
 				} else if (FD_DATA[readable_FD]->status == CLIENT) {
 					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
 						//LOG_ERROR(": "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-						cleanClientFd(readable_FD);
 					}
 					// LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
 					// //LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
@@ -53,6 +51,7 @@ void	ServerManager::launchServers() {
 					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true) {
 						LOG_INFO("response ready to be sent");
 						FD_DATA[sendable_fd]->response->sendResponse();
+						cleanClientFd(sendable_fd);
 					}
 				}
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
