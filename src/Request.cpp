@@ -19,6 +19,7 @@ int	Request::parseRequest() {
 	}
 
 	_tempBuffer.append(buffer, bytes);
+	std::cout<<buffer<<std::endl;
 
 	//read request's first line if not read yet
 	if (_firstLine.empty() && _tempBuffer.find("\r\n") != std::string::npos) {

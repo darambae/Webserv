@@ -17,7 +17,7 @@ void	ServerManager::launchServers() {
         if (poll_count == -1)
             THROW("Poll failed");
 		//if new connection on one port of one server
-		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
+		for (int i = ALL_FDS.size() - 1; i >= 0; --i) {
 			if (ALL_FDS[i].revents == 0)
 				continue;
 
@@ -28,7 +28,7 @@ void	ServerManager::launchServers() {
 				cleanClientFd(hangup_fd);
 				continue;
 			}
-			
+
 			if (ALL_FDS[i].revents & POLLIN) {
 				//LOG_INFO("POLLIN signal");
 				int	readable_FD = ALL_FDS[i].fd;
@@ -71,9 +71,9 @@ void	ServerManager::launchServers() {
 			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
             //     int error_fd = ALL_FDS[i].fd;
             //     LOG_INFO("Error or hangup on FD: " + to_string(error_fd));
-                
+
             // }
-			
+
 		}
     }
 }
