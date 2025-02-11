@@ -57,7 +57,7 @@ void	ServerManager::launchServers() {
 				//LOG_INFO("POLLOUT signal");
 				int sendable_fd = ALL_FDS[i].fd;
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
-					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true) {
+					if (FD_DATA[sendable_fd]->response && FD_DATA[sendable_fd]->response->getResponseReadyToSend()) {
 						LOG_INFO("response ready to be sent");
 						FD_DATA[sendable_fd]->response->sendResponse();
 						cleanClientFd(sendable_fd);
