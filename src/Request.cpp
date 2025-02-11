@@ -9,7 +9,7 @@ int	Request::parseRequest() {
 
 	char	buffer[1024];
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-	//ssize_t	bytes = recv(_clientFd, buffer, sizeof(buffer), 0);
+
 	if (bytes < 0) {
 		LOG_ERROR("Error reading from client_fd(" + to_string(_clientFd) +")", 1);
 		return -1; //client disconnected
@@ -46,16 +46,15 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			//do we reanitialize contentLength to 0 ? maybe further in the code.
 			LOG_INFO("Body received");
 		}
-		// else
-		// 	LOG_INFO("Body not fully received");
 	}
+
 	else if (isHeaderRead && _contentLength == 0) {
 		isRequestComplete = true;
 		LOG_INFO("Request complete");
 	}
+
 	return 0;
 }
 
@@ -95,8 +94,6 @@ int	Request::handleRequest() {
 		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
 		LOG_INFO("Response :" + _Response->getReasonPhrase());
-		//delete _Response;
-		//FD_DATA[_clientFd]->response = NULL;
 	}
 	return 0;
 }
