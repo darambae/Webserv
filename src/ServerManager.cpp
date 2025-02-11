@@ -20,6 +20,15 @@ void	ServerManager::launchServers() {
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents == 0)
 				continue;
+
+			if (ALL_FDS[i].revents & POLLHUP) {
+				LOG_INFO("POLLHUP signal");
+				int hangup_fd = ALL_FDS[i].fd;
+				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+				cleanClientFd(hangup_fd);
+				continue;
+			}
+			
 			if (ALL_FDS[i].revents & POLLIN) {
 				//LOG_INFO("POLLIN signal");
 				int	readable_FD = ALL_FDS[i].fd;
@@ -64,13 +73,7 @@ void	ServerManager::launchServers() {
             //     LOG_INFO("Error or hangup on FD: " + to_string(error_fd));
                 
             // }
-			if (ALL_FDS[i].revents & POLLHUP) {
-				LOG_INFO("POLLHUP signal");
-				int hangup_fd = ALL_FDS[i].fd;
-				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-				cleanClientFd(hangup_fd);
-				continue;
-			}
+			
 		}
     }
 }

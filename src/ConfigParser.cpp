@@ -202,7 +202,7 @@ void    ConfigParser::validRoot(const std::string& line) {
 void    ConfigParser::validBodySize(const std::string& line) {
     unsigned long num = std::strtoul(line.c_str(), NULL, 10);
     if (std::isalpha(line[line.size() - 2]))
-        THROW("Invalid body size" + num);
+        THROW("Invalid body size" + to_string(num));
     if (onlyDigits(line) || line[line.size() - 1] == 'k' || line[line.size() - 1] == 'K' ||
             line[line.size() - 1] == 'm' || line[line.size() - 1] == 'M')
         return;
