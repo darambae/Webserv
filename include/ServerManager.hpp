@@ -22,4 +22,5 @@ class	ServerManager {
 		};
 		void	launchServers();
 		void	cleanClientFd(int	FD);
+		void	print_all_FD_DATA();
 };

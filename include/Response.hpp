@@ -32,7 +32,9 @@ private:
 	/* setters / getters */
 	void		setRequestedFile(std::string const& filePath) {
 		_requestedFilePath = filePath;
+		std::cout<<"\e[31mFILE PATH\e[0m = "<<filePath<<std::endl;
 		_requestedFile.open(filePath.c_str(), std::ios::binary);
+
 	}
 	void		setCodeStatus(int code) { _codeStatus = code; }
 	void		setReasonPhrase(std::string reason) { _reasonPhrase = reason; }

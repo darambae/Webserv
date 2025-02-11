@@ -9,8 +9,8 @@ int	Request::parseRequest() {
 
 	char	buffer[1024];
 	std::cout<<"trying to read fd "<<_clientFd<<std::endl;
-	//ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-	ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
+	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
+	//ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
 	std::cout<<"succeed to read fd "<<_clientFd<<std::endl;
 	if (bytes < 0) {
