@@ -59,8 +59,8 @@ void	ServerManager::launchServers() {
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
 					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true) {
 						LOG_INFO("response ready to be sent");
-						FD_DATA[sendable_fd]->response->sendResponse();
-						cleanClientFd(sendable_fd);
+						if (FD_DATA[sendable_fd]->response->sendResponse() == -1);
+							cleanClientFd(sendable_fd);
 					}
 				}
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
