@@ -29,7 +29,7 @@ std::string	ResponseBuilder::buildHeaders() {
 	_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
 	_headers._contentLength = "Content-Length: " + to_string(_body.size()) + "\r\n\r\n";
 
-	return (header = _headers._timeStamp + _headers._contentType + /*"Transfer-Encoding: chunked\r\n\r\n"*/_headers._contentLength);
+	return (header = _headers._timeStamp + _headers._contentType + _headers._contentLength);
 }
 
 std::string	ResponseBuilder::buildTime(void) {

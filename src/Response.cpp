@@ -142,32 +142,26 @@ int	Response::sendResponse() {
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
 		if (bytesSent <= 0) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                return -1;
-            }
-            LOG_INFO("Client disconnected");
-            _responseReadyToSend = false;
-			//close(_request.getClientFD());
-            return -1;
-        } else if (bytesSent == 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				return -1;
+			}
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
-			//close(_request.getClientFD());
-			return;
+			return -1;
 		}
 
 		_totalBytesSent += bytesSent;
 	}
-	//rajoute par Kelly :D
+
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
-		//shutdown(_request.getClientFD(), SHUT_RDWR);
-		//close(_request.getClientFD());
 	}
 
 	if (_responseBuilder) {
 		delete _responseBuilder;
 		_responseBuilder = NULL;
 	}
+
+	return 0;
 }
