@@ -51,7 +51,7 @@ private:
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
 	void	handleResponse();
 	bool	findIndex(ConfigLocation const* location);
-	void	sendResponse();
+	int		sendResponse();
 	void	handleGet(ConfigLocation const* location);
 	void	handlePost();
 	void	handleDelete();

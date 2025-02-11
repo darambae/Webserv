@@ -131,7 +131,7 @@ void	Response::handleResponse() {
 	}
 }
 
-void	Response::sendResponse() {
+int	Response::sendResponse() {
 
 	size_t	responseSize = _builtResponse->size();
 	const size_t	BUFFER_SIZE = 4096;
@@ -141,33 +141,27 @@ void	Response::sendResponse() {
 		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
-		if (bytesSent == -1) {
-            if (errno == EAGAIN || errno == EWOULDBLOCK) {
-                return; 
-            }
-            LOG_INFO("Client disconnected");
-            _responseReadyToSend = false;
-			//close(_request.getClientFD());
-            return;
-        } else if (bytesSent == 0) {
+		if (bytesSent <= 0) {
+			if (errno == EAGAIN || errno == EWOULDBLOCK) {
+				return -1; 
+			}
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
-			//close(_request.getClientFD());
-			return;
+			return -1;
 		}
 
 		_totalBytesSent += bytesSent;
 	}
-	//rajoute par Kelly :D
+
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
-		//shutdown(_request.getClientFD(), SHUT_RDWR);
-		//close(_request.getClientFD());
 	}
 
 	if (_responseBuilder) {
 		delete _responseBuilder;
 		_responseBuilder = NULL;
 	}
+	
+	return 0;
 }
