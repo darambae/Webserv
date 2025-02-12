@@ -1,5 +1,9 @@
 #include "../include/Response.hpp"
 
+void	Response::setResponseStatus(int code, std::string reasonPhrase) {
+	_codeStatus = to_string(code); _reasonPhrase = reasonPhrase;
+}
+
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
 
 	const	ConfigLocation*	bestMatch = NULL;
@@ -35,7 +39,6 @@ bool	Response::findIndex(ConfigLocation const* location) {
 	return false;
 }
 
-void		Response::setResponseStatus(int code, std::string reasonPhrase) { _codeStatus = to_string(code); _reasonPhrase = reasonPhrase; }
 
 //IF request path is a directory
 //	=> IF index page exist, serve it
@@ -127,6 +130,7 @@ void	Response::handleResponse() {
 		return ;
 	}
 }
+
 
 int	Response::sendResponse() {
 
