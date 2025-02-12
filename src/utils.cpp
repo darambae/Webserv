@@ -3,14 +3,11 @@
 std::string   fullPath(const std::string& name) {
     struct stat buffer;
     char resolved_path[1000]; //possible memory leak
-    LOG_INFO("Given path name: " + name);
+    //LOG_INFO("Given path name: " + name);
     std::string path = name[0] == '/' ? name.substr(1) : name;
-    if (realpath(path.c_str(), resolved_path) == NULL) {
-        LOG_DEBUG(path + " & " + resolved_path);
+    if (realpath(path.c_str(), resolved_path) == NULL)
         THROW("Realpath failed");
-    }
-        // THROW("Realpath failed");
-    LOG_INFO("Resolved path : " + std::string(resolved_path));
+    //LOG_INFO("Resolved path : " + std::string(resolved_path));
     if (stat(resolved_path, &buffer) == -1) 
         THROW("Invalid path");
     if (S_ISDIR(buffer.st_mode)) //if its a directory
