@@ -8,11 +8,35 @@ import os
 
 # PSEUDO CODE
 # 1. get_player(id)
-
+# 2. get_game(id)
 
 # def get_all_players():
 # form = cgi.FieldStorage()
 # player_id = form.getlist("player_id")
+
+def get_game(game_id):
+    file_path = os.path.realpath("record.json")
+    with open(file_path, "r") as file:
+        data = json.load(file) 
+    game_data = data["games"][game_id - 1].get("players") # Get the game data
+    player_data = data["players"] # Get the players data
+    #print(game_data)
+    #print(player_data)
+    player_names = []
+    total_scores = []
+    if game_data:
+        for player in player_data:
+            if int(player) <= len(game_data) and game_data[int(player) - 1]:
+                #print((player_data.get(player)).get("player_name"))
+                player_names.append((player_data.get(player)).get("player_name"))
+                total_scores.append(game_data[int(player) - 1].get("total_score"))
+    print("Player Names: ", player_names)
+    x_pos = range(len(player_names))
+    plt.bar(x_pos, total_scores, color='skyblue')
+    plt.ylabel('Score')
+    plt.title(f'Game {game_id} scores')
+    plt.xticks(x_pos, player_names) # Set label locations.
+    plt.show()
 
 def get_player(player_id): 
     file_path = os.path.realpath("record.json")
@@ -27,17 +51,18 @@ def get_player(player_id):
         return
 
     average_scores = []
-    winner_scores = []
+    max_scores = []
     for game_id in game_ids:
-        #now_score = for player_id in player_ids  game_id["players"][player_id]
         game = data["games"][game_id - 1]
-        #if game["total_score"] >= now_score:
+        max_score = max(player["total_score"] for player in game["players"]) 
+        max_scores.append(max_score)        
         total_score = sum(player["total_score"] for player in game["players"])
         num_players = len(game["players"])
         average_scores.append(total_score / num_players)
     
     x_pos = range(len(game_ids))
-    plt.scatter(x_pos, average_scores, label='Average Score', color='gray') 
+    plt.scatter(x_pos, max_scores, label='Max Score', color='red')
+    plt.scatter(x_pos, average_scores, label='Average Score', color='gray')
     plt.bar(x_pos, player_scores, label=f'{player_data["player_name"]} Scores', color='skyblue', alpha=0.6)
     
     plt.xlabel('nth game')
@@ -55,7 +80,7 @@ def get_player(player_id):
     # print(img_stream.read())
     # img_stream.close()
     # return img_stream
-
-get_player(1)
+get_game(3)
+#get_player(3)
 
 

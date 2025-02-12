@@ -1,15 +1,23 @@
 #include "../include/Utils.hpp"
 
-std::string   fullPath(const std::string& directoryName) {
+std::string   fullPath(const std::string& name) {
     struct stat buffer;
     char resolved_path[1000]; //possible memory leak
-    std::string path = directoryName[0] == '/' ? directoryName.substr(1) : directoryName;
+    LOG_INFO("Given path name: " + name);
+    std::string path = name[0] == '/' ? name.substr(1) : name;
     if (realpath(path.c_str(), resolved_path) == NULL) {
         LOG_DEBUG(path + " & " + resolved_path);
         THROW("Realpath failed");
     }
         // THROW("Realpath failed");
-    if (stat(resolved_path, &buffer) == -1 || S_ISDIR(buffer.st_mode) == 0)
+    LOG_INFO("Resolved path : " + std::string(resolved_path));
+    if (stat(resolved_path, &buffer) == -1) 
+        THROW("Invalid path");
+    if (S_ISDIR(buffer.st_mode)) //if its a directory
+        ;
+    else if (S_ISREG(buffer.st_mode)) //if its a file
+        ;
+    else
         THROW("Invalid path");
     return resolved_path;
 }
