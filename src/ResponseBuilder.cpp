@@ -17,7 +17,7 @@ std::string*	ResponseBuilder::buildResponse() {
 
 std::string	ResponseBuilder::buildFirstLine() {
 
-	std::string	firstLine = _setup.getRequest().getVersion() + " " + to_string(_setup.getCodeStatus()) + " " + _setup.getReasonPhrase() + "\r\n";
+	std::string	firstLine = _setup.getRequest().getVersion() + " " + _setup.getCodeStatus() + " " + _setup.getReasonPhrase() + "\r\n";
 	return firstLine;
 }
 
