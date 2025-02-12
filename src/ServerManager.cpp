@@ -25,6 +25,11 @@ void	ServerManager::launchServers() {
 			if (ALL_FDS[i].revents & POLLHUP) {
 				LOG_INFO("POLLHUP signal");
 				int hangup_fd = ALL_FDS[i].fd;
+				if (FD_DATA[hangup_fd]->status == CLIENT && FD_DATA[hangup_fd]->just_connected) {
+                    // Ignore POLLHUP for newly connected clients
+                    FD_DATA[hangup_fd]->just_connected = false;
+                    continue;
+                }
 				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
 				cleanClientFd(hangup_fd);
 				continue;
@@ -35,11 +40,12 @@ void	ServerManager::launchServers() {
 				int	readable_FD = ALL_FDS[i].fd;
 				if (FD_DATA[readable_FD]->status == SERVER) {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
-					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
+					if (new_client == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
 						cleanClientFd(new_client);
 						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
-					}
+					} else 
+						FD_DATA[new_client]->just_connected = true;
 				} else if (FD_DATA[readable_FD]->status == CLIENT) {
 					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
