@@ -12,15 +12,19 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
+                <li><a href="#upload">Upload file</a></li>
                 <li><a href="#history">History</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <section id="about">
-            <h2>About Webserv</h2>
-            <p>This is a simple web server project built for learning purposes.</p>
+        <section id="upload">
+            <h2>Upload a file</h2>
+            <p>Choose a file to upload.</p>
+            <form action="/data/uploads" method="post" enctype="multipart/form-data">
+                <input type="file" name="file" id="file">
+                <input type="submit" value="Upload" name="submit">
+            </form>
         </section>
         <section id="history">
             <h2>History</h2>

@@ -94,7 +94,6 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 		FD_DATA[fd]->request = new Request(fd);
 	else
 		FD_DATA[fd]->request = NULL;
-
 }
 
 void	Server::addFdToFds(int fd_to_add) {

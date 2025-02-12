@@ -197,9 +197,9 @@ void    ConfigParser::validReturn(const std::string& line) {
 void    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
-    if (line.find("/data") == std::string::npos)
-        fullPath("/data" + line);
-    else
+    // if (line.find("/data") == std::string::npos)
+    //     fullPath("/data" + line);
+    // else
         fullPath(line);
     //LOG_INFO("Root path is valid : " + std::string(root));
 }

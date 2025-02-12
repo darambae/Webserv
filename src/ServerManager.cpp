@@ -19,9 +19,6 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		//print_all_FD_DATA();
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
-			if (ALL_FDS[i].revents == 0)
-				continue;
-
 			if (ALL_FDS[i].revents & POLLHUP) {
 				LOG_INFO("POLLHUP signal");
 				int hangup_fd = ALL_FDS[i].fd;
