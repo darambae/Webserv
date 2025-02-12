@@ -35,7 +35,7 @@ void	ServerManager::launchServers() {
 				int	readable_FD = ALL_FDS[i].fd;
 				if (FD_DATA[readable_FD]->status == SERVER) {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
-					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
+					if (new_client == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
 						cleanClientFd(new_client);
 						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
