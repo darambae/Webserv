@@ -67,6 +67,7 @@ struct Fd_data
 	Response*		response;
 	int				port;
 	std::string		ip;
+	bool			just_connected;
 };
 
 extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)
