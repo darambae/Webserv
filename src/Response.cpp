@@ -49,8 +49,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 	struct stat	pathStat;
 		if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex(location)) {
-			setCodeStatus(200);
-			setReasonPhrase("OK");
+			setResponseStatus(200, "OK");
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
@@ -63,8 +62,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 				//page is supposed to be dynamic so we can navigate through website's repos and files via hypertext links
 			}
 			else {
-				setCodeStatus(404);
-				setReasonPhrase("Not found");
+				setResponseStatus(403, "Forbidden");
 				//handleError();
 			}
 		}
@@ -76,16 +74,14 @@ void	Response::handleGet(ConfigLocation const* location) {
 		LOG_INFO("Request file path: " + path);
 		setRequestedFile(path.c_str());
 		if (_requestedFile) {
-			setCodeStatus(200);
-			setReasonPhrase("OK");
+			setResponseStatus(200, "OK");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse();
 			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
-			setCodeStatus(404);
-			setReasonPhrase("Not found");
+			setResponseStatus(404, "Not found");
 			//handleError();
 		}
 	}
@@ -101,8 +97,7 @@ void	Response::handleResponse() {
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
 	if (!location) {
 		LOG_INFO("No location found for request path: " + requestPath);
-		setCodeStatus(404);
-		setReasonPhrase("Not found");
+		setResponseStatus(404, "Not found");
 		return ;
 	}
 
@@ -110,8 +105,7 @@ void	Response::handleResponse() {
 	std::set<std::string> allowedMethods = location->getAllowMethods();
 	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
 		LOG_INFO("Method not allowed");
-		setCodeStatus(405);
-		setReasonPhrase("Method not allowed");
+		setResponseStatus(405, "Method not allowed");
 		//handleError();
 		return ;
 	}
@@ -124,8 +118,7 @@ void	Response::handleResponse() {
 		//handleDelete();
 	else {
 		LOG_INFO("Method not implemented");
-		setCodeStatus(501);
-		setReasonPhrase("Method not implemented");
+		setResponseStatus(501, "Method not implemented");
 		//handleError();
 		return ;
 	}
