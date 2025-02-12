@@ -34,11 +34,20 @@ std::string Logger::getTime() {
 
 void    Logger::log(LogType type, const std::string& msg, bool errno_set) {
     std::string log_type;
-    switch (type) {
-        case DEBUG: log_type = "DEBUG"; break;
-        case INFO: log_type = "INFO"; break;
-        case ERROR: log_type = "ERROR"; break;
-        default: return; //if it's LOG OFF, don't print msg anywhere.
+    std::string log_color;
+    switch (type)
+    {
+    case DEBUG:
+        log_type = "DEBUG"; log_color = "\x1B[94m";
+        break;
+    case INFO:
+        log_type = "INFO"; log_color = "\x1B[97m";
+        break;
+    case ERROR:
+        log_type = "ERROR"; log_color = "\x1B[93m";
+        break;
+    default:
+        return; // if it's LOG OFF, don't print msg anywhere.
     }
 
     int save_errno = errno;
@@ -47,7 +56,7 @@ void    Logger::log(LogType type, const std::string& msg, bool errno_set) {
         log_msg += " : " + std::string(strerror(save_errno));
     log_msg += "\n";
     if (_output_type == CONSOLE_OUTPUT)
-        std::cout << log_msg;
+        std::cout << log_color << log_msg << "\x1B[0m";
     else if (_output_type == FILE_OUTPUT) {
         if (_logFile.is_open())
             _logFile << log_msg;
