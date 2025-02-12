@@ -70,6 +70,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         else if (line.find("location ") != std::string::npos && validBracket(line, '{', '}')) {
             ConfigLocation location;
             parseLocation(file, line, location);
+            if (location.getRoot().empty() && !server.getRoot().empty())
+                location.setRoot(server.getRoot());
             server.setLocations(location);
         }
     }
@@ -195,7 +197,10 @@ void    ConfigParser::validReturn(const std::string& line) {
 void    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
-    fullPath(line);
+    if (line.find("/data") == std::string::npos)
+        fullPath("/data" + line);
+    else
+        fullPath(line);
     //LOG_INFO("Root path is valid : " + std::string(root));
 }
 
