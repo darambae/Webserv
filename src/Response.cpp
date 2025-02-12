@@ -25,18 +25,49 @@ bool	Response::findIndex(ConfigLocation const* location) {
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-	std::vector<std::string>::const_iterator it = location->getIndex().begin();
-	for (; it != location->getIndex().end(); ++it) {
-		std::string	tryIndex = *it;
-		std::string	tryCompletePath = indexPath + tryIndex;
-		std::string path = fullPath(location->getRoot()) + tryCompletePath;
-		if (access(path.c_str(), F_OK) != -1) {
-			LOG_INFO("access to " + path + " success");
-			setRequestedFile(path);
-			return true;
+		
+	if (location) {
+		std::vector<std::string>::const_iterator it = location->getIndex().begin();
+		for (; it != location->getIndex().end(); ++it) {
+			std::string	tryIndex = *it;
+			std::string	tryCompletePath = indexPath + tryIndex;
+			std::string path = fullPath(location->getRoot()) + tryCompletePath;
+			if (access(path.c_str(), F_OK) != -1) {
+				LOG_INFO("access to " + path + " success");
+				setRequestedFile(path);
+				return true;
+			}
 		}
 	}
 	return false;
+}
+
+
+//IF error_page URI (FI /errors/404NotFound.html) defined in location block 
+//	=>	reprocess like it's a requestPath : find the location block to get the proper 
+//		root path (or default one if no root defined in the location block), 
+//		make a full path with it and build the response.
+//ELSE IF error_page URI is defined in server block
+//	=> same reprocess as above.
+//ELSE 
+//	-> serve default one.
+void	Response::handleError() {
+
+	std::string	path;
+	std::vector<ErrorPage>	errorPages = _config.getErrorPages();
+
+	std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
+	for (; it != errorPages.end(); ++it) {
+		std::set<int>::const_iterator codesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
+		if (codesIt !=  it->error_codes.end()) {
+			path = it->error_path;
+			break ;
+		}
+	}
+	if (it == errorPages.end()) {
+		generateDefaultErrorHtml();
+		path = "/defaultErrors";
+	}
 }
 
 
@@ -102,19 +133,19 @@ void	Response::handleResponse() {
 
 	//find the proper location block to read depending on the path given in the request
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
-	if (!location) {
-		LOG_INFO("No location found for request path: " + requestPath);
-		setResponseStatus(404, "Not found");
-		return ;
-	}
-
+	if (location) {
 	//check if the request's method is allowed in location block of server configuration
-	std::set<std::string> allowedMethods = location->getAllowMethods();
-	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
-		LOG_INFO("Method not allowed");
-		setResponseStatus(405, "Method not allowed");
-		//handleError();
-		return ;
+		if (!location->getAllowMethods().empty()) {
+			std::set<std::string> allowedMethods = location->getAllowMethods();
+			if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
+				LOG_INFO("Method not allowed");
+				setResponseStatus(405, "Method not allowed");
+				//handleError();
+				return ;
+			}
+		}
+	} else {
+		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
 	if (requestMethod == "GET")

@@ -57,4 +57,5 @@ private:
 	void	handlePost();
 	void	handleDelete();
 	void	handleError();
+	std::string	generateDefaultErrorHtml();
 };
