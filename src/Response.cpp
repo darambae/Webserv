@@ -35,6 +35,7 @@ bool	Response::findIndex(ConfigLocation const* location) {
 	return false;
 }
 
+void		Response::setResponseStatus(int code, std::string reasonPhrase) { _codeStatus = to_string(code); _reasonPhrase = reasonPhrase; }
 
 //IF request path is a directory
 //	=> IF index page exist, serve it
@@ -47,7 +48,8 @@ void	Response::handleGet(ConfigLocation const* location) {
 
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
-		if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+	LOG_INFO("Request path: " + _request.getPath());
+	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex(location)) {
 			setResponseStatus(200, "OK");
 			LOG_INFO("Index found");
@@ -69,9 +71,11 @@ void	Response::handleGet(ConfigLocation const* location) {
 	}
 	else {
 	// request path is a file
-
-		std::string	path = fullPath(location->getRoot()) + _request.getPath();
-		LOG_INFO("Request file path: " + path);
+		// std::string root = location->getRoot().empty() ? _config.getRoot(): location->getRoot();
+		// std::string	path = fullPath(root + _request.getPath());
+		std::string path = fullPath(location->getRoot() + _request.getPath());
+		// LOG_INFO("Request file path: " + path);
+		// LOG_INFO("Request file root: " + root);
 		setRequestedFile(path.c_str());
 		if (_requestedFile) {
 			setResponseStatus(200, "OK");

@@ -56,7 +56,7 @@ void	ServerManager::launchServers() {
 				//	stopServer();
 				continue;
 			}
-			if (ALL_FDS[i].revents & POLLOUT) {
+			else if (ALL_FDS[i].revents & POLLOUT) {
 				//LOG_INFO("POLLOUT signal");
 				int sendable_fd = ALL_FDS[i].fd;
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
