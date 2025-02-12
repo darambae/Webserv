@@ -136,7 +136,7 @@ int	Response::sendResponse() {
 
 		if (bytesSent <= 0) {
 			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				return -1; 
+				return -1;
 			}
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
@@ -155,6 +155,6 @@ int	Response::sendResponse() {
 		delete _responseBuilder;
 		_responseBuilder = NULL;
 	}
-	
+
 	return 0;
 }

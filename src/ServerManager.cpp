@@ -17,7 +17,8 @@ void	ServerManager::launchServers() {
         if (poll_count == -1)
             THROW("Poll failed");
 		//if new connection on one port of one server
-		for (int i = ALL_FDS.size() - 1; i >= 0; --i) {
+		//print_all_FD_DATA();
+		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents == 0)
 				continue;
 
@@ -36,11 +37,13 @@ void	ServerManager::launchServers() {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
 					if (new_client != -1 && FD_DATA[new_client]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
+						cleanClientFd(new_client);
 						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
 					}
 				} else if (FD_DATA[readable_FD]->status == CLIENT) {
 					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
+						cleanClientFd(readable_FD);
 						//LOG_ERROR(": "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
 					}
 					// LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
@@ -57,10 +60,18 @@ void	ServerManager::launchServers() {
 				//LOG_INFO("POLLOUT signal");
 				int sendable_fd = ALL_FDS[i].fd;
 				if (FD_DATA[sendable_fd]->status == CLIENT) {
-					if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == true) {
+					if (FD_DATA[sendable_fd]->response && FD_DATA[sendable_fd]->response->getResponseReadyToSend()) {
 						LOG_INFO("response ready to be sent");
-						FD_DATA[sendable_fd]->response->sendResponse();
-						//cleanClientFd(sendable_fd);
+						if (FD_DATA[sendable_fd]->response->sendResponse() == -1) {
+							LOG_ERROR("client FD "+to_string(sendable_fd)+" disconected for response error", 0);
+							cleanClientFd(sendable_fd);
+						}
+						delete FD_DATA[sendable_fd]->response;
+						FD_DATA[sendable_fd]->response = NULL;
+						delete FD_DATA[sendable_fd]->request;
+						FD_DATA[sendable_fd]->request = NULL;
+						FD_DATA[sendable_fd]->request = new Request(sendable_fd);
+						LOG_INFO("response send and delete");
 					}
 				}
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
@@ -78,6 +89,14 @@ void	ServerManager::launchServers() {
     }
 }
 
+void	ServerManager::print_all_FD_DATA() {
+	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
+		std::cout<<"Datas of FD "<<ALL_FDS[i].fd<<" are :\nIP : "<<FD_DATA[ALL_FDS[i].fd]->ip\
+		<<"\nPORT : "<<FD_DATA[ALL_FDS[i].fd]->port\
+		<<"\n status: "<<FD_DATA[ALL_FDS[i].fd]->status<<std::endl;
+	}
+}
+
 void	ServerManager::cleanClientFd(int FD) {
 	//clean fd in _all_fds; _mapFd_data;
 	close(FD);
@@ -92,6 +111,7 @@ void	ServerManager::cleanClientFd(int FD) {
 			break;
 		}
 	}
+	LOG_INFO("client fd : "+to_string(FD)+" is clean");
 }
 
 ServerManager::~ServerManager() {

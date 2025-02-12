@@ -20,9 +20,10 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 */
 
 Server::Server(ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(&config), _listen(listen) {
-	_len_address = sizeof(_address);
 	_client_count = 0;
 	for (size_t i = 0; i < _listen.size(); ++i) {
+		memset(&_address, 0, sizeof(_address));
+		_len_address = sizeof(_address);
 		initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
 	}
 }
@@ -83,28 +84,24 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 }
 
 void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request) {
-	Fd_data*	new_fd_data = new Fd_data;
-	new_fd_data->ip = ip;
-	new_fd_data->port = port;
-	new_fd_data->server = server;
-	new_fd_data->status = status;
-	new_fd_data->response = NULL;
-	//new_fd_data->config = _config;
-
-	if (request == true){
-		Request*	request = new Request(fd);
-		new_fd_data->request = request;
-	}
+	FD_DATA[fd] = new Fd_data;
+	FD_DATA[fd]->ip = ip;
+	FD_DATA[fd]->port = port;
+	FD_DATA[fd]->server = server;
+	FD_DATA[fd]->status = status;
+	FD_DATA[fd]->response = NULL;
+	if (request == true)
+		FD_DATA[fd]->request = new Request(fd);
 	else
-		new_fd_data->request = NULL;
-	FD_DATA[fd] = new_fd_data;
+		FD_DATA[fd]->request = NULL;
+
 }
 
 void	Server::addFdToFds(int fd_to_add) {
 	struct pollfd new_socket;
     new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;// to check write and read in a same time (subject order)
-	new_socket.revents = 0;
+	//new_socket.revents = 0;
 	ALL_FDS.push_back(new_socket);
 }
 
@@ -114,6 +111,8 @@ int	Server::createClientSocket(int fd) {
         std::cout << "Max clients reached, rejecting connection\n";
 		return -1;
 	}
+	memset(&_address, 0, sizeof(_address));
+	_len_address = sizeof(_address);
 	int new_socket = accept(fd, (struct sockaddr *)&_address, (socklen_t *)&_len_address);
     if (new_socket < 0) {
         perror("Accept failed");
@@ -122,6 +121,8 @@ int	Server::createClientSocket(int fd) {
 	_client_count++;
     //std::cout << "New client connected : " << "client socket(" << new_socket << ")" << std::endl;
 	LOG_INFO("New client connected : " + to_string(new_socket));
+	if (unblockFD(new_socket) == -1)
+		return -1;
 	addFdToFds(new_socket);
 	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, true);
 	return new_socket;
@@ -133,17 +134,10 @@ void	Server::decreaseClientCount() {_client_count--;}
 functions will send -1 instead to wait if there is no connection or if there is
 nothing to read or if there is no place to write*/
 int	Server::unblockFD(int fd) {
-	int flag = fcntl(fd, F_GETFL,0);//get fd's flags
-	if (flag == -1) {
-		LOG_ERROR("fcntl failed for the FD "+to_string(fd), true);
-		return -1;
-	}
-		//the fd have to be delete ??
-	if (fcntl(fd, F_SETFL, flag | O_NONBLOCK) == -1) {//add nonblocked flag
-		LOG_ERROR("fcntl failed for the FD "+to_string(fd), true);
-		return -1;
-	}
-	return 0;
+    int flags = fcntl(fd, F_GETFL, 0);
+    if (flags == -1)
+        return -1;
+    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
 }
 
 Server::~Server() {
