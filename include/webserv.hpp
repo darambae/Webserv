@@ -29,6 +29,8 @@ enum fd_status
 {
 	CLIENT,
 	SERVER,
+	CGI_parent,
+	CGI_children,
 };
 
 #include "ServerManager.hpp"
