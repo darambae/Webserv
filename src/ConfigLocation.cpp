@@ -37,10 +37,19 @@ void    ConfigLocation::setCgiExtension(const std::string& line) {
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
-void    ConfigLocation::setCgiPath(const std::string& line) {
-    ConfigParser::validRoot(line);
+void    ConfigLocation::setCgiPass(const std::string& line) {
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    while (!tmp_vector.empty()) {
+        // char resolved_path[1000];
+        // realpath(tmp_vector.front().c_str(), resolved_path);
+        // LOG_INFO("Resolved path of cgi pass : " + std::string(resolved_path));
+        // if (access(resolved_path, X_OK) == -1)
+        if (access(tmp_vector.front().c_str(), X_OK) == -1)
+            THROW("Invalid CGI pass");
+        this->_cgi_pass.push_back(tmp_vector.front());
+        tmp_vector.erase(tmp_vector.begin());
+    }
     LOG_DEBUG("Valid CGI path");
-    this->_cgi_path = line;
 }
 
 //loop through several status codes for one error page and save them in a set
@@ -98,8 +107,11 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
         printContainer(cgi_extension);
     }
 
-    if (!location.getCgiPath().empty())
-        os << "\tCGI Path: " << location.getCgiPath() << std::endl;
+    if (!location.getCgiPass().empty()) {
+        std::vector<std::string> cgi_pass = location.getCgiPass();
+        os << "\tCGI Pass: ";
+        printContainer(cgi_pass);
+    }
 
     std::vector<ErrorPage> error_pages = location.getErrorPages();
     if (!error_pages.empty()) {
