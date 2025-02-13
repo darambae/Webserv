@@ -51,10 +51,11 @@ private:
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
 	void	handleResponse();
-	bool	findIndex(ConfigLocation const* location);
+	int		findIndex(ConfigLocation const* location);
 	int		sendResponse();
 	void	handleGet(ConfigLocation const* location);
 	void	handlePost();
 	void	handleDelete();
 	void	handleError();
+	std::string	generateDefaultErrorHtml();
 };
