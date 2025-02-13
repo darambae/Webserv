@@ -12,17 +12,20 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="#upload">Upload file</a></li>
+                <li><a href="#upload">Add profile picture to players</a></li>
                 <li><a href="#history">Play History</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <section id="upload">
-            <h2>Upload a file</h2>
-            <p>Choose a file to upload.</p>
-            <form action="/uploads" method="post" enctype="multipart/form-data">
-                <input type="file" name="file" id="file">
+            <h2>Add profile picture</h2>
+            <p>Choose a player's id and a profile picture for the player</p>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <label for="player_id">Player ID:</label>
+                <input type="text" name="player_id" id="player_id" required>
+                <label for="file">Profile Picture:</label>
+                <input type="file" name="file" id="file" required>
                 <input type="submit" value="Upload" name="submit">
             </form>
         </section>
