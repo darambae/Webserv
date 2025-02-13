@@ -19,27 +19,34 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	return bestMatch;
 }
 
-
-bool	Response::findIndex(ConfigLocation const* location) {
+//find index page and set it up to be send in response if found (return 1).
+//Otherwise, return 0
+int	Response::findIndex(ConfigLocation const* location) {
 
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-		
+	
+	std::vector<std::string> indexesToTry;
+
 	if (location) {
-		std::vector<std::string>::const_iterator it = location->getIndex().begin();
-		for (; it != location->getIndex().end(); ++it) {
-			std::string	tryIndex = *it;
-			std::string	tryCompletePath = indexPath + tryIndex;
-			std::string path = fullPath(location->getRoot()) + tryCompletePath;
-			if (access(path.c_str(), F_OK) != -1) {
-				LOG_INFO("access to " + path + " success");
-				setRequestedFile(path);
-				return true;
-			}
+		indexesToTry = location->getIndex();
+	} else {
+		indexesToTry.push_back("index.html");
+	}
+
+	std::string rootPath = fullPath(location ? location->getRoot() : _config.getRoot());
+
+	std::vector<std::string>::const_iterator it = indexesToTry.begin();
+	for (; it != indexesToTry.end(); ++it) {
+		std::string path = rootPath + indexPath + *it;
+		if (access(path.c_str(), F_OK) != -1) {
+			LOG_INFO("access to " + path + " success");
+			setRequestedFile(path);
+			return 1 ;
 		}
 	}
-	return false;
+	return 0;
 }
 
 
@@ -51,7 +58,7 @@ bool	Response::findIndex(ConfigLocation const* location) {
 //	=> same reprocess as above.
 //ELSE 
 //	-> serve default one.
-void	Response::handleError() {
+/* void	Response::handleError() {
 
 	std::string	path;
 	std::vector<ErrorPage>	errorPages = _config.getErrorPages();
@@ -68,7 +75,7 @@ void	Response::handleError() {
 		generateDefaultErrorHtml();
 		path = "/defaultErrors";
 	}
-}
+} */
 
 
 //IF request path is a directory
@@ -84,7 +91,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 	struct stat	pathStat;
 	LOG_INFO("Request path: " + _request.getPath());
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
-		if (findIndex(location)) {
+		if (findIndex(location) == 1) {
 			setResponseStatus(200, "OK");
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
@@ -105,12 +112,10 @@ void	Response::handleGet(ConfigLocation const* location) {
 	}
 	else {
 	// request path is a file
-		// std::string root = location->getRoot().empty() ? _config.getRoot(): location->getRoot();
-		// std::string	path = fullPath(root + _request.getPath());
+
 		std::string path = fullPath(location->getRoot() + _request.getPath());
-		// LOG_INFO("Request file path: " + path);
-		// LOG_INFO("Request file root: " + root);
 		setRequestedFile(path.c_str());
+
 		if (_requestedFile) {
 			setResponseStatus(200, "OK");
 			_responseReadyToSend = true;
@@ -133,8 +138,10 @@ void	Response::handleResponse() {
 
 	//find the proper location block to read depending on the path given in the request
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
+	
 	if (location) {
-	//check if the request's method is allowed in location block of server configuration
+		//if specific methods are specified in the location block, check if the request's 
+		//method match with them
 		if (!location->getAllowMethods().empty()) {
 			std::set<std::string> allowedMethods = location->getAllowMethods();
 			if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
