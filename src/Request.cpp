@@ -22,7 +22,7 @@ int	Request::parseRequest() {
 	}
 
 	_tempBuffer.append(buffer, bytes);
-	std::cout<<buffer<<std::endl;
+	std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
 	//read request's first line if not read yet
 	if (_firstLine.empty() && _tempBuffer.find("\r\n") != std::string::npos) {
@@ -80,6 +80,7 @@ void	Request::parseHeader(std::string headerPart) {
 			_header[key] = value;
 			if (key == "Content-Length")
 				_contentLength = std::atoi(value.c_str());
+				
 		}
 	}
 }

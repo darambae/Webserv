@@ -38,6 +38,7 @@
     "players": {
         "1": {
             "player_name": "Kelly",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 100 },
                 { "game_id": 3, "total_score": 90 },
@@ -46,6 +47,7 @@
         },
         "2": {
             "player_name": "Gauthier",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 86 },
                 { "game_id": 2, "total_score": 95 },
@@ -54,6 +56,7 @@
         },
         "3": {
             "player_name": "Daram",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 90 },
                 { "game_id": 2, "total_score": 82 }
@@ -61,12 +64,14 @@
         },
         "4": {
             "player_name": "Thomas",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 95 }
             ]
         },
         "5": {
             "player_name": "Louna",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 80 },
                 { "game_id": 3, "total_score": 80 },
@@ -75,12 +80,14 @@
         },
         "6": {
             "player_name": "Agnes",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 2, "total_score": 93 }
             ]
         },
         "7": {
             "player_name": "Oceane",
+            "profile_pic" : "",
             "game_history": [
                 { "game_id": 3, "total_score": 90 }
             ]

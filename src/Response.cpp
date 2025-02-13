@@ -94,6 +94,9 @@ void	Response::handleGet(ConfigLocation const* location) {
 	}
 }
 
+void	Response::handlePost() {
+	
+}
 
 void	Response::handleResponse() {
 
