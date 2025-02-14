@@ -60,6 +60,16 @@ struct ErrorPage {
     std::string error_path;
 };
 
+struct CGI_env
+{
+	std::string	request_method;
+	std::string	query_string;//data from the query in URL
+	std::string	content_lenght;
+	std::string	content_type;
+	std::string	script_name;//path of the CGI executed
+	std::string	remote_addr;//client addr
+
+};
 
 
 struct Fd_data

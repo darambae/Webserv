@@ -1,8 +1,6 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(std::string	path_cgi, int fd_client, std::string	dataForCgi) : _path(path_cgi), _Fd_client(fd_client), _dataForCgi(dataForCgi) {
-	_responseReadyToBeSend = false;
-}
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
 int	CgiManager::forkProcess() {
 	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK |SOCK_CLOEXEC, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
@@ -13,7 +11,7 @@ int	CgiManager::forkProcess() {
 		LOG_ERROR("fork failed", true);
 		return -1;
 	}
-	Server*	server_cgi = FD_DATA[_Fd_client]->server;
+	Server*	server_cgi = FD_DATA[_request->getClientFD()]->server;
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, false);
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
 	server_cgi->addFdToFds(_sockets[0]);
@@ -23,7 +21,15 @@ int	CgiManager::forkProcess() {
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
 		close(_sockets[1]);
-		execve(_path.c_str(), convertVectorToChartab(_argv), convertVectorToChartab(_envp));
+		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
+		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
+		setenv("CONTENT_LENGHT", _cgi_env->content_lenght.c_str(), 1);
+		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
+		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
+		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
+		char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), nullptr};
+		char	*envp[] = {nullptr};
+		execve(argv[0], argv, envp);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
@@ -33,9 +39,12 @@ int	CgiManager::forkProcess() {
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
 }
+
 int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a POLLOUT for CGI_children
-	const void* buffer = static_cast<const void*>(_dataForCgi.data());//converti std::string en const void* data
-	write(_sockets[0], buffer, sizeof(buffer) - 1);
+	if (_cgi_env->request_method == "POST") {
+		const void* buffer = static_cast<const void*>(_request..data());//converti std::string en const void* data
+		write(_sockets[0], buffer, sizeof(buffer) - 1);
+	}
 	close(_sockets[0]);
 }
 
@@ -65,15 +74,6 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		LOG_ERROR("read from CGI failed", true);
 		return -1;
 	}
-}
-
-char**	CgiManager::convertVectorToChartab(std::vector<std::string>	vectorToConvert) {
-	std::vector<char*> argv;
-	for (size_t i = 0; i < vectorToConvert.size(); ++i) {
-		argv.push_back(const_cast<char*>(vectorToConvert[i].c_str()));  // Conversion en char*
-	}
-	argv.push_back(NULL);  // Important : execve() attend un tableau terminé par NULL
-	return &argv[0];
 }
 
 CgiManager::~CgiManager() {
