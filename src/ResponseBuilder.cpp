@@ -58,7 +58,7 @@ std::string	ResponseBuilder::buildTime(void) {
 
 std::string	ResponseBuilder::buildContentType() {
 	std::string	requestedFilePath = _setup.getRequestedFilePath();
-	std::string	contentType; // Should we initialize it?
+	std::string	contentType;
 
 	size_t	pos = requestedFilePath.find_last_of('.');
 	if (pos != std::string::npos) {
@@ -106,4 +106,5 @@ void	ResponseBuilder::initMimeTypes() {
 	_mimeTypes.insert(std::make_pair("mp4", "video/mp4"));
 	_mimeTypes.insert(std::make_pair("webm", "video/webm"));
 	_mimeTypes.insert(std::make_pair("ogv", "video/ogv"));
+
 }

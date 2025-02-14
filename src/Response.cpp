@@ -130,8 +130,30 @@ void	Response::handleGet(ConfigLocation const* location) {
 	}
 }
 
+
+
 void	Response::handlePost() {
 	
+}
+
+void	Response::handleUpload(ConfigLocation const* location) {
+	std::map<std::string, std::string> headers = _request.getHeader();
+	struct uploadData fileData = _request.parseBody();
+	LOG_INFO("Uploading file : " + fileData.fileName + " THE END OF FILENAME ");
+	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
+		std::string path = fullPath(location->getRoot() + _request.getPath() + "/" + fileData.fileName);
+		LOG_INFO("Uploading file to: " + path);
+		std::ofstream file(path.c_str(), std::ios::binary);
+		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
+		file.close();
+		setResponseStatus(200, "OK");
+		LOG_INFO("File uploaded successfully");
+	}
+	else {
+		LOG_INFO("Failed to upload the requested file");
+		setResponseStatus(400, "Bad request");
+	}
+
 }
 
 void	Response::handleResponse() {
@@ -158,11 +180,20 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	if (requestMethod == "GET")
-		handleGet(location);
-	else if (requestMethod == "POST") {}
-		//handlePost();
-	else if (requestMethod == "DELETE") {}
+	if (requestMethod == "GET") {
+		if (requestPath == "/cgi-bin") {}
+			//handleCGI();
+		else
+			handleGet(location);
+	} else if (requestMethod == "POST") {
+		if (requestPath == "/cgi-bin") {
+			//handleCGI();
+		}
+		else if (requestPath == "/upload") {
+			handleUpload(location);
+		} else
+			handlePost();
+	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
 		LOG_INFO("Method not implemented");

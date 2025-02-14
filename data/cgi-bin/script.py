@@ -9,10 +9,24 @@ import os
 # PSEUDO CODE
 # 1. get_player(id)
 # 2. get_game(id)
+# 3. get_num_players()
+# 4. get_num_games()
 
 # def get_all_players():
 # form = cgi.FieldStorage()
 # player_id = form.getlist("player_id")
+
+def get_num_players():
+    file_path = os.path.realpath("record.json")
+    with open(file_path, "r") as file:
+        data = json.load(file)
+    return len(data["players"])
+
+def get_num_games():
+    file_path = os.path.realpath("record.json")
+    with open(file_path, "r") as file:
+        data = json.load(file)
+    return len(data["games"])
 
 def get_game(game_id):
     file_path = os.path.realpath("record.json")
