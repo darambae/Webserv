@@ -34,6 +34,7 @@ enum fd_status
 };
 
 #include "ServerManager.hpp"
+#include "CgiManager.hpp"
 #include "ConfigServer.hpp"
 #include "Response.hpp"
 #include "Exception.hpp"
@@ -63,10 +64,11 @@ struct ErrorPage {
 
 struct Fd_data
 {
-	fd_status	status;
+	fd_status		status;
 	Server*			server;
 	Request*		request;
 	Response*		response;
+	CgiManager*		CGI;
 	int				port;
 	std::string		ip;
 	bool			just_connected; // In Mac OS to ignore POLLHUP for new clients after after new client connection is accepted

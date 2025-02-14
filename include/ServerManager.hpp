@@ -21,6 +21,6 @@ class	ServerManager {
 		virtual const char* what() const throw() {return _message.c_str();}
 		};
 		void	launchServers();
-		void	cleanClientFd(int	FD);
+		void	cleanFd(int	FD);
 		void	print_all_FD_DATA();
 };

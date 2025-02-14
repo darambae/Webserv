@@ -19,7 +19,9 @@ void	ServerManager::launchServers() {
 		//if new connection on one port of one server
 		//print_all_FD_DATA();
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
-			if (ALL_FDS[i].revents & POLLHUP) {
+			if (ALL_FDS[i].revents == 0)
+				continue;
+			else if (ALL_FDS[i].revents & POLLHUP) {
 				LOG_INFO("POLLHUP signal");
 				int hangup_fd = ALL_FDS[i].fd;
 				if (FD_DATA[hangup_fd]->status == CLIENT && FD_DATA[hangup_fd]->just_connected) {
@@ -28,36 +30,40 @@ void	ServerManager::launchServers() {
                     continue;
                 }
 				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-				cleanClientFd(hangup_fd);
+				cleanFd(hangup_fd);
 				continue;
 			}
-
-			if (ALL_FDS[i].revents & POLLIN) {
+			else if (ALL_FDS[i].revents & POLLIN) {
 				//LOG_INFO("POLLIN signal");
 				int	readable_FD = ALL_FDS[i].fd;
 				if (FD_DATA[readable_FD]->status == SERVER) {
 					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
 					if (new_client == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
-						cleanClientFd(new_client);
+						cleanFd(new_client);
 						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
-					} else 
+					} else
 						FD_DATA[new_client]->just_connected = true;
 				} else if (FD_DATA[readable_FD]->status == CLIENT) {
 					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
 						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
-						cleanClientFd(readable_FD);
-						//LOG_ERROR(": "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+						cleanFd(readable_FD);
 					}
-					// LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
-					// //LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-					// //cleanClientFd(ALL_FDS[i].fd);
-					// cleanClientFd(readable_FD);
 				}
-				//else if (FD_DATA[readable_FD] == CGI) CGI can read and treat the message
-				//else//it means it's the stopFD wich recv a signal
-				//	stopServer();
-				continue;
+				else if (FD_DATA[readable_FD]->status == CGI_parent) {
+					int result = FD_DATA[readable_FD]->CGI->recvFromCgi();
+					if (result == 0)
+						continue;//children don't finish
+					else if (result == -1) {
+						int fd_client = FD_DATA[readable_FD]->request->getClientFD();
+						FD_DATA[fd_client]->response->setResponseStatus(666, "doigt de metal dans le ciel");
+						FD_DATA[fd_client]->response->handleError();
+						cleanFd(FD_DATA[fd_client]->CGI->getSocketsChildren());
+						cleanFd(FD_DATA[fd_client]->CGI->getSocketsParent());
+						delete FD_DATA[fd_client]->CGI;
+						FD_DATA[fd_client]->CGI = NULL;
+					}
+				}
 			}
 			else if (ALL_FDS[i].revents & POLLOUT) {
 				//LOG_INFO("POLLOUT signal");
@@ -67,7 +73,7 @@ void	ServerManager::launchServers() {
 						LOG_INFO("response ready to be sent");
 						if (FD_DATA[sendable_fd]->response->sendResponse() == -1) {
 							LOG_ERROR("client FD "+to_string(sendable_fd)+" disconected for response error", 0);
-							cleanClientFd(sendable_fd);
+							cleanFd(sendable_fd);
 						}
 						delete FD_DATA[sendable_fd]->response;
 						FD_DATA[sendable_fd]->response = NULL;
@@ -77,9 +83,9 @@ void	ServerManager::launchServers() {
 						LOG_INFO("response send and delete");
 					}
 				}
-			// 	else if (FD_DATA[sendable_fd]->status == CGI) {
-			// 	response can be send to the client (by response class or CGI?)
-			// }
+				else if (FD_DATA[sendable_fd]->status == CGI_children) {
+					FD_DATA[sendable_fd]->CGI->sendToCgi();
+				}
 				continue;
 			}
 			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -87,7 +93,6 @@ void	ServerManager::launchServers() {
             //     LOG_INFO("Error or hangup on FD: " + to_string(error_fd));
 
             // }
-
 		}
     }
 }
@@ -100,12 +105,22 @@ void	ServerManager::print_all_FD_DATA() {
 	}
 }
 
-void	ServerManager::cleanClientFd(int FD) {
+void	ServerManager::cleanFd(int FD) {
 	//clean fd in _all_fds; _mapFd_data;
 	close(FD);
+	if (FD_DATA[FD]->status == CLIENT) {
+		FD_DATA[FD]->server->decreaseClientCount();
+		if (FD_DATA[FD]->request != NULL)
+			delete FD_DATA[FD]->request;
+		if (FD_DATA[FD]->response)
+			delete FD_DATA[FD]->response;
+		if (FD_DATA[FD]->CGI) {
+			cleanFd(FD_DATA[FD]->CGI->getSocketsChildren());
+			cleanFd(FD_DATA[FD]->CGI->getSocketsParent());
+			delete FD_DATA[FD]->CGI;
+		}
+	}
 	std::map<int, Fd_data*>::iterator	it = FD_DATA.find(FD);
-	it->second->server->decreaseClientCount();
-	delete it->second->request;
 	delete it->second;
 	FD_DATA.erase(it);
 	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
@@ -114,7 +129,7 @@ void	ServerManager::cleanClientFd(int FD) {
 			break;
 		}
 	}
-	LOG_INFO("client fd : "+to_string(FD)+" is clean");
+	LOG_INFO("The FD : "+to_string(FD)+" was cleaned");
 }
 
 ServerManager::~ServerManager() {
