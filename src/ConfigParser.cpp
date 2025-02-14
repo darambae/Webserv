@@ -77,8 +77,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
     }
     if (!validBracket(line, '}', '{'))
         THROW("Server block bracket isn't closed properly");
-    if (server.getErrorPages().empty())
-        server.setDefaultErrorPages();
+/*     if (server.getErrorPages().empty())
+        server.setDefaultErrorPages(); */
     if (server.getListen().empty())
         server.setDefaultListen();
 }
@@ -111,8 +111,8 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
     }
     if (!validBracket(line, '}', '{'))
         THROW("Location block bracket isn't closed properly");
-    if (location.getErrorPages().empty())
-        location.setDefaultErrorPages();
+/*     if (location.getErrorPages().empty())
+        location.setDefaultErrorPages(); */
 }
 
 void    ConfigParser::validMethods(const std::string& methods) {

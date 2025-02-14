@@ -44,6 +44,9 @@ class Request {
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 
+	/* setters */
+	void	setPath(std::string path) { _path = path; }
+
 	/* methods */
 	int		handleRequest();
 	int		parseRequest();

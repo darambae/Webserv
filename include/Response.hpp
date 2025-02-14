@@ -11,22 +11,23 @@ class ResponseBuilder;
 class Response {
 
 private:
-	ResponseBuilder*	_responseBuilder;
-	std::string*		_builtResponse;
-	ConfigServer const&	_config;
-	Request&			_request;
-	std::string			_codeStatus;
-	std::string			_reasonPhrase;
-	std::string			_requestedFilePath;
-	std::ifstream		_requestedFile;
+	ResponseBuilder*		_responseBuilder;
+	std::string*			_builtResponse;
+	ConfigServer const&		_config;
+	ConfigLocation const*	_location;
+	Request&				_request;
+	std::string				_codeStatus;
+	std::string				_reasonPhrase;
+	std::string				_requestedFilePath;
+	std::ifstream			_requestedFile;
 	std::map<std::string, std::string>	_header;
-	bool				_responseReadyToSend;
-	size_t				_totalBytesSent;
+	bool					_responseReadyToSend;
+	size_t					_totalBytesSent;
 
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
 	/* setters / getters */
@@ -51,11 +52,11 @@ private:
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
 	void	handleResponse();
-	int		findIndex(ConfigLocation const* location);
+	int		findIndex();
 	int		sendResponse();
-	void	handleGet(ConfigLocation const* location);
+	void	handleGet();
 	void	handlePost();
 	void	handleDelete();
 	void	handleError();
-	std::string	generateDefaultErrorHtml();
+	int		generateDefaultErrorHtml();
 };
