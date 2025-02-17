@@ -21,7 +21,7 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 
 //find index page and set it up to be send in response if found (return 1).
 //Otherwise, return 0
-int	Response::findIndex(ConfigLocation const* location) {
+int	Response::findIndex() {
 
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
@@ -29,13 +29,13 @@ int	Response::findIndex(ConfigLocation const* location) {
 	
 	std::vector<std::string> indexesToTry;
 
-	if (location) {
-		indexesToTry = location->getIndex();
+	if (_location) {
+		indexesToTry = _location->getIndex();
 	} else {
 		indexesToTry.push_back("index.html");
 	}
 
-	std::string rootPath = fullPath(location ? location->getRoot() : _config.getRoot());
+	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 
 	std::vector<std::string>::const_iterator it = indexesToTry.begin();
 	for (; it != indexesToTry.end(); ++it) {
@@ -49,6 +49,45 @@ int	Response::findIndex(ConfigLocation const* location) {
 	return 0;
 }
 
+int	Response::generateDefaultErrorHtml() {
+
+	std::string	directory = "defaultError";
+	struct stat	info;
+
+	if (stat(directory.c_str(), &info) != 0) {
+		if (mkdir(directory.c_str(), 0755) != 0) {
+			LOG_ERROR("couldn't create defaultError directory", 0);
+			return -1;
+		}
+	}
+
+	std::ofstream	file((directory + "/defaultError.html").c_str());
+
+	if (!file) {
+		LOG_ERROR("defaultError.html couldn't be created", 0);
+		return -1;
+	}
+
+	file << "<!DOCTYPE html>\n"
+			<< "<html>\n"
+			<< "<head>\n"
+			<< "    <meta charset=\"UTF-8\">\n"
+			<< "    <title>Erreur " << _codeStatus << "</title>\n"
+			<< "    <style>\n"
+			<< "        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\n"
+			<< "        h1 { color: red; }\n"
+			<< "    </style>\n"
+			<< "</head>\n"
+			<< "<body>\n"
+			<< "    <h1>Erreur " << _codeStatus << " - " << _reasonPhrase << "</h1>\n"
+			<< "    <p>La page demandée a rencontré un problème.</p>\n"
+			<< "</body>\n"
+			<< "</html>\n";
+	
+	file.close();
+
+	return 0;
+}
 
 //IF error_page URI (FI /errors/404NotFound.html) defined in location block 
 //	=>	reprocess like it's a requestPath : find the location block to get the proper 
@@ -58,24 +97,41 @@ int	Response::findIndex(ConfigLocation const* location) {
 //	=> same reprocess as above.
 //ELSE 
 //	-> serve default one.
-/* void	Response::handleError() {
+void	Response::handleError() {
 
 	std::string	path;
-	std::vector<ErrorPage>	errorPages = _config.getErrorPages();
+	std::vector<ErrorPage>	errorPages = (_location && !_location->getErrorPages().empty()) ? _location->getErrorPages() : _config.getErrorPages();
+	bool	errorPageFound = false;
 
-	std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
-	for (; it != errorPages.end(); ++it) {
-		std::set<int>::const_iterator codesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
-		if (codesIt !=  it->error_codes.end()) {
-			path = it->error_path;
-			break ;
+	if (!errorPages.empty()) {
+		std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
+		for (; it != errorPages.end(); ++it) {
+			std::set<int>::const_iterator errorCodesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
+			if (errorCodesIt !=  it->error_codes.end()) {
+				_request.setPath(it->error_path);
+				errorPageFound = true;
+				LOG_INFO("error_path: " + it->error_path);
+				const char* errorPathChar = it->error_path.c_str();
+				std::cout << errorPathChar << std::endl;
+				_location = findRequestLocation(_config, _request.getPath());
+				LOG_INFO("Location block for error: " + _location->getPath());
+				handleGet();
+				break ;
+			}
+		}
+	} 
+	
+	if (!errorPageFound) {
+		if (generateDefaultErrorHtml() == 0) {
+			path = fullPath("/defaultError/defaultError.html");
+			setRequestedFile(path);
+			_responseReadyToSend = true;
+			setResponseStatus(200, "OK");
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
 		}
 	}
-	if (it == errorPages.end()) {
-		generateDefaultErrorHtml();
-		path = "/defaultErrors";
-	}
-} */
+}
 
 
 //IF request path is a directory
@@ -85,13 +141,13 @@ int	Response::findIndex(ConfigLocation const* location) {
 //ELSE IF request path is a file
 //	=> IF file exist, serve it
 //	=> ELSE, error 404 not found
-void	Response::handleGet(ConfigLocation const* location) {
+void	Response::handleGet() {
 
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
 	LOG_INFO("Request path: " + _request.getPath());
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
-		if (findIndex(location) == 1) {
+		if (findIndex() == 1) {
 			setResponseStatus(200, "OK");
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
@@ -100,20 +156,26 @@ void	Response::handleGet(ConfigLocation const* location) {
 			//LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
-			if (location->getAutoindex()) {
+			if (_location->getAutoindex()) {
 				//generate html page with all the files and repos present in the repo asked in the request
 				//page is supposed to be dynamic so we can navigate through website's repos and files via hypertext links
 			}
 			else {
 				setResponseStatus(403, "Forbidden");
-				//handleError();
+				handleError();
 			}
 		}
 	}
 	else {
 	// request path is a file
-
-		std::string path = fullPath(location->getRoot() + _request.getPath());
+		std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
+		const char*	rootPathChar = rootPath.c_str();
+		std::string path = rootPath + _request.getPath();
+		const char*	pathChar = path.c_str();
+		std::cout << rootPathChar << " " << pathChar << std::endl;
+		LOG_INFO("rootPath: " + rootPath);
+		LOG_INFO("request path before concatenation: " + _request.getPath());
+		LOG_INFO("path: " + path);
 		setRequestedFile(path.c_str());
 
 		if (_requestedFile) {
@@ -125,7 +187,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 		}
 		else {
 			setResponseStatus(404, "Not found");
-			//handleError();
+			handleError();
 		}
 	}
 }
@@ -192,17 +254,17 @@ void	Response::handleResponse() {
 	std::string requestMethod = _request.getMethod();
 
 	//find the proper location block to read depending on the path given in the request
-	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
+	_location = findRequestLocation(_config, requestPath);
 	
-	if (location) {
+	if (_location) {
 		//if specific methods are specified in the location block, check if the request's 
 		//method match with them
-		if (!location->getAllowMethods().empty()) {
-			std::set<std::string> allowedMethods = location->getAllowMethods();
+		if (!_location->getAllowMethods().empty()) {
+			std::set<std::string> allowedMethods = _location->getAllowMethods();
 			if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
 				LOG_INFO("Method not allowed");
 				setResponseStatus(405, "Method not allowed");
-				//handleError();
+				handleError();
 				return ;
 			}
 		}
@@ -228,7 +290,7 @@ void	Response::handleResponse() {
 	else {
 		LOG_INFO("Method not implemented");
 		setResponseStatus(501, "Method not implemented");
-		//handleError();
+		handleError();
 		return ;
 	}
 }
@@ -254,6 +316,8 @@ int	Response::sendResponse() {
 		}
 		_totalBytesSent += bytesSent;
 	}
+
+
 
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");

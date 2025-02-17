@@ -51,7 +51,12 @@ public:
 	std::string	getVersion() const { return _version; }
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
+
+	/* setters */
+	void	setPath(std::string path) { _path = path; }
+
 	std::string	getBody() const { return _body; }
+
 	/* methods */
 	int		handleRequest();
 	int		parseRequest();
