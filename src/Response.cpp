@@ -137,8 +137,13 @@ void	Response::handlePost() {
 }
 
 void	Response::handleUpload(ConfigLocation const* location) {
-	std::map<std::string, std::string> headers = _request.getHeader();
 	struct uploadData fileData = _request.parseBody();
+	//Accept only a file with .jpg, .jpeg or .png extension
+	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
+		LOG_INFO("File format not supported");
+		setResponseStatus(400, "Bad request"); // <-------Need to handle error page
+		return ;
+	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
 		std::string upload_location = location->getRoot() + _request.getPath();
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
@@ -190,7 +195,6 @@ void	Response::handleResponse() {
 
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
-
 	//find the proper location block to read depending on the path given in the request
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
 	
@@ -219,7 +223,7 @@ void	Response::handleResponse() {
 		if (requestPath == "/cgi-bin") {
 			//handleCGI();
 		}
-		else if (requestPath == "/upload") {
+		else if (requestPath == "/upload" ) {
 			handleUpload(location);
 		} else
 			handlePost();
