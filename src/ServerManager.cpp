@@ -69,12 +69,20 @@ void	ServerManager::launchServers() {
 							LOG_ERROR("client FD "+to_string(sendable_fd)+" disconected for response error", 0);
 							cleanClientFd(sendable_fd);
 						}
-						delete FD_DATA[sendable_fd]->response;
-						FD_DATA[sendable_fd]->response = NULL;
-						delete FD_DATA[sendable_fd]->request;
-						FD_DATA[sendable_fd]->request = NULL;
-						FD_DATA[sendable_fd]->request = new Request(sendable_fd);
-						LOG_INFO("response send and delete");
+						if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == false) {
+							delete FD_DATA[sendable_fd]->response;
+							FD_DATA[sendable_fd]->response = NULL;
+							delete FD_DATA[sendable_fd]->request;
+							FD_DATA[sendable_fd]->request = NULL;
+							FD_DATA[sendable_fd]->request = new Request(sendable_fd);
+							LOG_INFO("response send and delete");
+						}
+						// delete FD_DATA[sendable_fd]->response;
+						// FD_DATA[sendable_fd]->response = NULL;
+						// delete FD_DATA[sendable_fd]->request;
+						// FD_DATA[sendable_fd]->request = NULL;
+						// FD_DATA[sendable_fd]->request = new Request(sendable_fd);
+						// LOG_INFO("response send and delete");
 					}
 				}
 			// 	else if (FD_DATA[sendable_fd]->status == CGI) {

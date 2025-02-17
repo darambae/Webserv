@@ -97,7 +97,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-			LOG_INFO("Response built:\n" + *_builtResponse);
+			//LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			if (location->getAutoindex()) {
@@ -121,7 +121,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-			LOG_INFO("Response built:\n" + *_builtResponse);
+			//LOG_INFO("Response built:\n" /*+ *_builtResponse*/);
 		}
 		else {
 			setResponseStatus(404, "Not found");
@@ -165,17 +165,19 @@ void	Response::handleUpload(ConfigLocation const* location) {
         responseBody << "<head>\n";
         responseBody << "<meta charset=\"UTF-8\">\n";
         responseBody << "<title>File Upload Success</title>\n";
-        responseBody << "</head>\n";
+		responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
+		responseBody << "</head>\n";
         responseBody << "<body>\n";
         responseBody << "<h1>File Upload Successful</h1>\n";
         responseBody << "<p>Your file has been uploaded successfully.</p>\n";
         responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
-		responseBody << "<img src=\"" << "/upload/404.jpg" << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
 		responseBody << "</body>\n";
         responseBody << "</html>\n";
-		LOG_INFO("Response body set : " + _responseBuilder->getBody());
+		//LOG_INFO("Response body set : " + _responseBuilder->getBody());
 		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
-		LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
+		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
 	else {
 		LOG_INFO("Failed to upload the requested file");
@@ -250,19 +252,16 @@ int	Response::sendResponse() {
 			_responseReadyToSend = false;
 			return -1;
 		}
-
 		_totalBytesSent += bytesSent;
 	}
 
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
+		if (_responseBuilder) {
+			delete _responseBuilder;
+			_responseBuilder = NULL;
+		}
 	}
-
-	if (_responseBuilder) {
-		delete _responseBuilder;
-		_responseBuilder = NULL;
-	}
-
-	return 0;
+	return 1;
 }

@@ -21,6 +21,7 @@ $(NAME): $(OBJ)
 clean:
 	rm -rf $(OBJ_DIR)
 	rm -f log.txt
+	rm -f data/upload/*
 
 fclean: clean
 	rm -f $(NAME)
