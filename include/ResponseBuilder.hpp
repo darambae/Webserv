@@ -28,10 +28,9 @@ class ResponseBuilder {
 	/* setters/getters */
 	std::string const&	getBody() const { return _body; }
 	std::string const&	getBuiltResponse() const { return _builtResponse; }
-
 	/* methods */
 	void				initMimeTypes();
-	std::string*		buildResponse();
+	std::string*		buildResponse(std::string body);
 	std::string			buildFirstLine();
 	std::string			buildHeaders();
 	std::string			buildTime();

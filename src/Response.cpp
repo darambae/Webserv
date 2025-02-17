@@ -19,25 +19,63 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	return bestMatch;
 }
 
-
-bool	Response::findIndex(ConfigLocation const* location) {
+//find index page and set it up to be send in response if found (return 1).
+//Otherwise, return 0
+int	Response::findIndex(ConfigLocation const* location) {
 
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-	std::vector<std::string>::const_iterator it = location->getIndex().begin();
-	for (; it != location->getIndex().end(); ++it) {
-		std::string	tryIndex = *it;
-		std::string	tryCompletePath = indexPath + tryIndex;
-		std::string path = fullPath(location->getRoot()) + tryCompletePath;
+	
+	std::vector<std::string> indexesToTry;
+
+	if (location) {
+		indexesToTry = location->getIndex();
+	} else {
+		indexesToTry.push_back("index.html");
+	}
+
+	std::string rootPath = fullPath(location ? location->getRoot() : _config.getRoot());
+
+	std::vector<std::string>::const_iterator it = indexesToTry.begin();
+	for (; it != indexesToTry.end(); ++it) {
+		std::string path = rootPath + indexPath + *it;
 		if (access(path.c_str(), F_OK) != -1) {
 			LOG_INFO("access to " + path + " success");
 			setRequestedFile(path);
-			return true;
+			return 1 ;
 		}
 	}
-	return false;
+	return 0;
 }
+
+
+//IF error_page URI (FI /errors/404NotFound.html) defined in location block 
+//	=>	reprocess like it's a requestPath : find the location block to get the proper 
+//		root path (or default one if no root defined in the location block), 
+//		make a full path with it and build the response.
+//ELSE IF error_page URI is defined in server block
+//	=> same reprocess as above.
+//ELSE 
+//	-> serve default one.
+/* void	Response::handleError() {
+
+	std::string	path;
+	std::vector<ErrorPage>	errorPages = _config.getErrorPages();
+
+	std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
+	for (; it != errorPages.end(); ++it) {
+		std::set<int>::const_iterator codesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
+		if (codesIt !=  it->error_codes.end()) {
+			path = it->error_path;
+			break ;
+		}
+	}
+	if (it == errorPages.end()) {
+		generateDefaultErrorHtml();
+		path = "/defaultErrors";
+	}
+} */
 
 
 //IF request path is a directory
@@ -53,12 +91,12 @@ void	Response::handleGet(ConfigLocation const* location) {
 	struct stat	pathStat;
 	LOG_INFO("Request path: " + _request.getPath());
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
-		if (findIndex(location)) {
+		if (findIndex(location) == 1) {
 			setResponseStatus(200, "OK");
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
@@ -74,17 +112,15 @@ void	Response::handleGet(ConfigLocation const* location) {
 	}
 	else {
 	// request path is a file
-		// std::string root = location->getRoot().empty() ? _config.getRoot(): location->getRoot();
-		// std::string	path = fullPath(root + _request.getPath());
+
 		std::string path = fullPath(location->getRoot() + _request.getPath());
-		// LOG_INFO("Request file path: " + path);
-		// LOG_INFO("Request file root: " + root);
 		setRequestedFile(path.c_str());
+
 		if (_requestedFile) {
 			setResponseStatus(200, "OK");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
@@ -95,6 +131,59 @@ void	Response::handleGet(ConfigLocation const* location) {
 }
 
 
+
+void	Response::handlePost() {
+	
+}
+
+void	Response::handleUpload(ConfigLocation const* location) {
+	std::map<std::string, std::string> headers = _request.getHeader();
+	struct uploadData fileData = _request.parseBody();
+	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
+		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
+		std::ofstream file(path.c_str(), std::ios::binary);
+		if (!file.is_open()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
+		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
+		if (file.fail()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
+		file.close();
+		setResponseStatus(200, "OK");
+		LOG_INFO("File uploaded successfully");
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		std::ostringstream responseBody;
+        responseBody << "<!DOCTYPE html>\n";
+        responseBody << "<html lang=\"en\">\n";
+        responseBody << "<head>\n";
+        responseBody << "<meta charset=\"UTF-8\">\n";
+        responseBody << "<title>File Upload Success</title>\n";
+        responseBody << "</head>\n";
+        responseBody << "<body>\n";
+        responseBody << "<h1>File Upload Successful</h1>\n";
+        responseBody << "<p>Your file has been uploaded successfully.</p>\n";
+        responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
+		responseBody << "<img src=\"" << "/upload/404.jpg" << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "</body>\n";
+        responseBody << "</html>\n";
+		LOG_INFO("Response body set : " + _responseBuilder->getBody());
+		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+		LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
+	}
+	else {
+		LOG_INFO("Failed to upload the requested file");
+		setResponseStatus(400, "Bad request");
+	}
+
+}
+
 void	Response::handleResponse() {
 
 	std::string requestPath = _request.getPath();
@@ -102,26 +191,37 @@ void	Response::handleResponse() {
 
 	//find the proper location block to read depending on the path given in the request
 	ConfigLocation const*	location = findRequestLocation(_config, requestPath);
-	if (!location) {
+	
+	if (location) {
+		//if specific methods are specified in the location block, check if the request's 
+		//method match with them
+		if (!location->getAllowMethods().empty()) {
+			std::set<std::string> allowedMethods = location->getAllowMethods();
+			if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
+				LOG_INFO("Method not allowed");
+				setResponseStatus(405, "Method not allowed");
+				//handleError();
+				return ;
+			}
+		}
+	} else {
 		LOG_INFO("No location found for request path: " + requestPath);
-		setResponseStatus(404, "Not found");
-		return ;
 	}
 
-	//check if the request's method is allowed in location block of server configuration
-	std::set<std::string> allowedMethods = location->getAllowMethods();
-	if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
-		LOG_INFO("Method not allowed");
-		setResponseStatus(405, "Method not allowed");
-		//handleError();
-		return ;
-	}
-
-	if (requestMethod == "GET")
-		handleGet(location);
-	else if (requestMethod == "POST") {}
-		//handlePost();
-	else if (requestMethod == "DELETE") {}
+	if (requestMethod == "GET") {
+		if (requestPath == "/cgi-bin") {}
+			//handleCGI();
+		else
+			handleGet(location);
+	} else if (requestMethod == "POST") {
+		if (requestPath == "/cgi-bin") {
+			//handleCGI();
+		}
+		else if (requestPath == "/upload") {
+			handleUpload(location);
+		} else
+			handlePost();
+	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
 		LOG_INFO("Method not implemented");
