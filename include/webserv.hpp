@@ -29,9 +29,12 @@ enum fd_status
 {
 	CLIENT,
 	SERVER,
+	CGI_parent,
+	CGI_children,
 };
 
 #include "ServerManager.hpp"
+#include "CgiManager.hpp"
 #include "ConfigServer.hpp"
 #include "Response.hpp"
 #include "Exception.hpp"
@@ -57,14 +60,25 @@ struct ErrorPage {
     std::string error_path;
 };
 
+struct CGI_env
+{
+	std::string	request_method;
+	std::string	query_string;//data from the query in URL
+	std::string	content_lenght;
+	std::string	content_type;
+	std::string	script_name;//path of the CGI executed
+	std::string	remote_addr;//client addr
+
+};
 
 
 struct Fd_data
 {
-	fd_status	status;
+	fd_status		status;
 	Server*			server;
 	Request*		request;
 	Response*		response;
+	CgiManager*		CGI;
 	int				port;
 	std::string		ip;
 	bool			just_connected; // In Mac OS to ignore POLLHUP for new clients after after new client connection is accepted

@@ -47,8 +47,11 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
-        else
+        else {
             error_page.error_path = tmp_vector.front();
+            const char* toPrint = error_page.error_path.c_str();
+            std::cout << toPrint << std::endl;
+        }
         tmp_vector.erase(tmp_vector.begin());
     }
     this->_error_pages.push_back(error_page);
@@ -58,12 +61,12 @@ void    ConfigServer::setLocations(const ConfigLocation& location) {
     this->_locations.push_back(location);
 }
 
-void    ConfigServer::setDefaultErrorPages() {
+/* void    ConfigServer::setDefaultErrorPages() {
     ErrorPage error_page;
     error_page.error_codes.insert(404);
-    error_page.error_path = "/data/www/errors/404.html";
+    error_page.error_path = "/errors/404.html";
     this->_error_pages.push_back(error_page);
-}
+} */
 
 void    ConfigServer::setDefaultListen() {
     this->_listen.push_back(std::make_pair("0.0.0.0", 8080));

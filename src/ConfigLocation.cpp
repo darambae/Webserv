@@ -69,12 +69,12 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
     _error_pages.push_back(error_page);
 }
 
-void    ConfigLocation::setDefaultErrorPages() {
+/* void    ConfigLocation::setDefaultErrorPages() {
     ErrorPage error_page;
     error_page.error_codes.insert(404);
     error_page.error_path = "/data/www/errors/404.html";
     this->_error_pages.push_back(error_page);
-}
+} */
 
 void    ConfigLocation::setReturn(const std::string& line) {
     ConfigParser::validReturn(line);
