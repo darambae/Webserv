@@ -101,6 +101,7 @@ void	Response::handleError() {
 
 	std::string	path;
 	std::vector<ErrorPage>	errorPages = (_location && !_location->getErrorPages().empty()) ? _location->getErrorPages() : _config.getErrorPages();
+	bool	errorPageFound = false;
 
 	if (!errorPages.empty()) {
 		std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
@@ -108,6 +109,7 @@ void	Response::handleError() {
 			std::set<int>::const_iterator errorCodesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
 			if (errorCodesIt !=  it->error_codes.end()) {
 				_request.setPath(it->error_path);
+				errorPageFound = true;
 				LOG_INFO("error_path: " + it->error_path);
 				const char* errorPathChar = it->error_path.c_str();
 				std::cout << errorPathChar << std::endl;
@@ -117,9 +119,16 @@ void	Response::handleError() {
 				break ;
 			}
 		}
-	} else {
+	} 
+	
+	if (!errorPageFound) {
 		if (generateDefaultErrorHtml() == 0) {
-			path = fullPath("/defaultErrors/");
+			path = fullPath("/defaultError/defaultError.html");
+			setRequestedFile(path);
+			_responseReadyToSend = true;
+			setResponseStatus(200, "OK");
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse();
 		}
 	}
 }
@@ -244,6 +253,8 @@ int	Response::sendResponse() {
 
 		_totalBytesSent += bytesSent;
 	}
+
+
 
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
