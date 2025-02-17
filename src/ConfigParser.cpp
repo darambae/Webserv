@@ -75,6 +75,9 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             server.setLocations(location);
         }
     }
+    //Checking if server block has minimum required directives
+    if (server.getRoot().empty() || server.getLocations().empty())
+        THROW("Server block must have a root and at least one location block");
     if (!validBracket(line, '}', '{'))
         THROW("Server block bracket isn't closed properly");
 /*     if (server.getErrorPages().empty())
@@ -107,8 +110,17 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             if (error_pages.size() == 1 && error_pages.front().error_codes.count(404) && error_pages.front().error_path == "/data/www/errors/404.html")
                 error_pages.clear();
             location.setErrorPages(line.substr(start_pos, len));
-        }
+        } else if (line.find("cgi_extension ") != std::string::npos && endingSemicolon(line))
+            location.setCgiExtension(line.substr(start_pos, len));
+        else if (line.find("cgi_pass ") != std::string::npos && endingSemicolon(line))
+            location.setCgiPass(line.substr(start_pos, len));
     }
+    //Checking if cgi location block has cgi_extension and cgi_pass
+    if (location.getPath() == "/cgi-bin" && (location.getCgiExtension().empty() || location.getCgiPass().empty()))
+        THROW("CGI location block must have cgi_extension and cgi_pass");
+    //Checking if location block has minimum required directives
+    if (location.getPath() != "/cgi-bin" && location.getRoot().empty() && location.getIndex().empty() && location.getReturn().empty())
+        THROW("Location block must have at least one directive");
     if (!validBracket(line, '}', '{'))
         THROW("Location block bracket isn't closed properly");
 /*     if (location.getErrorPages().empty())
@@ -197,11 +209,7 @@ void    ConfigParser::validReturn(const std::string& line) {
 void    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
-    if (line.find("/data") == std::string::npos)
-        fullPath("/data" + line);
-    else
-        fullPath(line);
-    //LOG_INFO("Root path is valid : " + std::string(root));
+    fullPath(line);
 }
 
 void    ConfigParser::validBodySize(const std::string& line) {
@@ -218,7 +226,7 @@ void    ConfigParser::validCgiExtension(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     while (!tmp_vector.empty()) {
         const std::string& token = tmp_vector.front();
-        if (token != ".py" && token != ".php" && token != ".cgi")
+        if (token != ".py" && token != ".php")
             THROW("Invalid CGI extension");
         tmp_vector.erase(tmp_vector.begin());
     }

@@ -12,6 +12,11 @@
 
 class Response;
 
+struct uploadData {
+	std::string		fileName;
+	std::string		fileContent;
+};
+
 class Request {
 
 	private:
@@ -22,20 +27,23 @@ class Request {
 	bool			isRequestPathDirectory;
 	int				_clientFd;
 	int				_contentLength;
-
-	std::string	_firstLine;
+	// CGI data struct to be implemented
+	// std::string _content_type;
+	std::string _firstLine;
 	std::string	_method, _path, _version; //1st line parts (GET/POST/DELETE ; / /index.html ; HTTP/1.1)
 	std::string	_tempBuffer;
 	std::map<std::string, std::string>	_header;
 	std::string	_body;
+	// std::string player_id;
 	Request();
 
-	public:
+public:
 
 	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
 					_clientFd(fd), _contentLength(0) {}
 	~Request() {}
 
+	struct uploadData	uploadData;
 	/* getters */
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 	std::string	getMethod() const { return _method; }
@@ -47,9 +55,13 @@ class Request {
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
 
+	std::string	getBody() const { return _body; }
+
 	/* methods */
 	int		handleRequest();
 	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
+	struct uploadData	parseBody();
+
 };

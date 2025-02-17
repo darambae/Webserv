@@ -54,6 +54,32 @@ footer {
     margin-top: 20px;
 }
 
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+.button {
+    display: inline-block;
+    padding: 10px 20px;
+    margin: 20px 0;
+    font-size: 16px;
+    color: #fff;
+    background-color: #71abe9;
+    border: none;
+    border-radius: 5px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
 /* Responsive Styles */
 @media (max-width: 600px) {
     nav ul {

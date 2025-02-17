@@ -152,8 +152,8 @@ void	Response::handleGet() {
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
-			LOG_INFO("Response built:\n" + *_builtResponse);
+			_builtResponse = _responseBuilder->buildResponse("");
+			//LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			if (_location->getAutoindex()) {
@@ -182,8 +182,8 @@ void	Response::handleGet() {
 			setResponseStatus(200, "OK");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
-			LOG_INFO("Response built:\n" + *_builtResponse);
+			_builtResponse = _responseBuilder->buildResponse("");
+			//LOG_INFO("Response built:\n" /*+ *_builtResponse*/);
 		}
 		else {
 			setResponseStatus(404, "Not found");
@@ -192,6 +192,61 @@ void	Response::handleGet() {
 	}
 }
 
+
+
+void	Response::handlePost() {
+	
+}
+
+void	Response::handleUpload(ConfigLocation const* location) {
+	std::map<std::string, std::string> headers = _request.getHeader();
+	struct uploadData fileData = _request.parseBody();
+	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
+		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
+		std::ofstream file(path.c_str(), std::ios::binary);
+		if (!file.is_open()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
+		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
+		if (file.fail()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
+		file.close();
+		setResponseStatus(200, "OK");
+		LOG_INFO("File uploaded successfully");
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		std::ostringstream responseBody;
+        responseBody << "<!DOCTYPE html>\n";
+        responseBody << "<html lang=\"en\">\n";
+        responseBody << "<head>\n";
+        responseBody << "<meta charset=\"UTF-8\">\n";
+        responseBody << "<title>File Upload Success</title>\n";
+		responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
+		responseBody << "</head>\n";
+        responseBody << "<body>\n";
+        responseBody << "<h1>File Upload Successful</h1>\n";
+        responseBody << "<p>Your file has been uploaded successfully.</p>\n";
+        responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
+		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
+		responseBody << "</body>\n";
+        responseBody << "</html>\n";
+		//LOG_INFO("Response body set : " + _responseBuilder->getBody());
+		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
+	}
+	else {
+		LOG_INFO("Failed to upload the requested file");
+		setResponseStatus(400, "Bad request");
+	}
+
+}
 
 void	Response::handleResponse() {
 
@@ -217,11 +272,20 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	if (requestMethod == "GET")
-		handleGet();
-	else if (requestMethod == "POST") {}
-		//handlePost();
-	else if (requestMethod == "DELETE") {}
+	if (requestMethod == "GET") {
+		if (requestPath == "/cgi-bin") {}
+			//handleCGI();
+		else
+			handleGet(location);
+	} else if (requestMethod == "POST") {
+		if (requestPath == "/cgi-bin") {
+			//handleCGI();
+		}
+		else if (requestPath == "/upload") {
+			handleUpload(location);
+		} else
+			handlePost();
+	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
 		LOG_INFO("Method not implemented");
@@ -250,7 +314,6 @@ int	Response::sendResponse() {
 			_responseReadyToSend = false;
 			return -1;
 		}
-
 		_totalBytesSent += bytesSent;
 	}
 
@@ -259,12 +322,10 @@ int	Response::sendResponse() {
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
+		if (_responseBuilder) {
+			delete _responseBuilder;
+			_responseBuilder = NULL;
+		}
 	}
-
-	if (_responseBuilder) {
-		delete _responseBuilder;
-		_responseBuilder = NULL;
-	}
-
-	return 0;
+	return 1;
 }

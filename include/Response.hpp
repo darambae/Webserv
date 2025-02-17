@@ -10,6 +10,8 @@ class ResponseBuilder;
 
 class Response {
 
+
+
 private:
 	ResponseBuilder*		_responseBuilder;
 	std::string*			_builtResponse;
@@ -30,6 +32,7 @@ private:
 	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
+
 	/* setters / getters */
 	void		setRequestedFile(std::string const& filePath) {
 		_requestedFilePath = filePath;
@@ -38,8 +41,7 @@ private:
 	}
 	void		setResponseStatus(int code, std::string reasonPhrase);
 	void		setHeader(std::string key, std::string value) { _header[key] = value; }
-
-	Request&			getRequest() const { return _request; }
+	Request &getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
 	std::string const&	getReasonPhrase() const { return _reasonPhrase; }
 	std::string			getRequestedFilePath() const { return _requestedFilePath; }
@@ -58,4 +60,6 @@ private:
 	void	handleDelete();
 	void	handleError();
 	int		generateDefaultErrorHtml();
+	void 	handleUpload(ConfigLocation const* location);
+
 };

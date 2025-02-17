@@ -1,7 +1,20 @@
-To do list:
-1. Grammar check - whitespace, '/', ';', '{}' (DONE)
-2. Validity check for each directive (done for principal directives)
-3. Add additional directives (for future)
+
+>>Configuration file Grammar
+1. Minimum required directives
+ 1> server block : root , one location block
+ 2> location block : at least one directive among index, root, return, (proxy_pass is not implemented yet)
+
+2. Default-set directives if not included in the file
+ 1> server block : listen & error page
+ 2> location block : error page
+   ①
+   ②
+   ③
+   ④
+   ⑤
+
+
+
 
 >>Compile command lines 
 1> Daram's : 

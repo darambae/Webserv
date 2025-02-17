@@ -12,19 +12,36 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="#about">About</a></li>
-                <li><a href="#history">History</a></li>
+                <li><a href="#upload">Add profile picture to players</a></li>
+                <li><a href="#history">Play History</a></li>
             </ul>
         </nav>
     </header>
     <main>
-        <section id="about">
-            <h2>About Webserv</h2>
-            <p>This is a simple web server project built for learning purposes.</p>
+        <section id="upload">
+            <h2>Add profile picture</h2>
+            <p>Choose a player's id and a profile picture for the player</p>
+            <form action="/upload" method="post" enctype="multipart/form-data">
+                <!-- <label for="player_id">Player ID:</label>
+                <input type="text" name="player_id" id="player_id" required> -->
+                <label for="avatar">Profile Picture:</label>
+                <input type="file" name="avatar" id="file" required>
+                <input type="submit" value="Upload" name="submit">
+            </form>
         </section>
-        <section id="history">
-            <h2>History</h2>
-            <p>Contact us at <a href="mailto:info@webserv.com">info@webserv.com</a>.</p>
+        <b id="history">
+            <h2>Play History</h2>
+            <h4>Choose a player id</h4>
+            <form action="/cgi-bin/script.py" method="post">
+                <input type="text" name="player_id" id="player_id">
+                <input type="submit" value="Submit" name="submit">
+            </form>
+            </br>
+            <h4>Choose a game id</h4>
+            <form action="/cgi-bin/script.py" method="post">
+                <input type="text" name="game_id" id="game_id">
+                <input type="submit" value="Submit" name="submit">
+            </form>
         </section>
     </main>
     <footer>
