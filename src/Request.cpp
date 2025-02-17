@@ -22,7 +22,7 @@ int	Request::parseRequest() {
 	}
 
 	_tempBuffer.append(buffer, bytes);
-	std::cout<< "What's read in buffer : " << buffer<<std::endl;
+	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
 	//read request's first line if not read yet
 	if (_firstLine.empty() && _tempBuffer.find("\r\n") != std::string::npos) {
@@ -90,7 +90,7 @@ uploadData Request::parseBody() {
 	struct uploadData data;
 	std::string content;
 	//LOG_INFO("Body to parse: " + _body);
-	std::string filename = _body.substr(_body.find("filename=") + 9, _body.find("\"\r\n") - (_body.find("filename=") + 9));
+	std::string filename = _body.substr(_body.find("filename=") + 10, _body.find("\"\r\n") - (_body.find("filename=") + 10));
 	size_t start_pos = _body.find("\r\n\r\n");
 	size_t end_pos = _body.find("\r\n------");
 	if (start_pos != std::string::npos)

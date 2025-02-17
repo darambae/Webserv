@@ -96,7 +96,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
@@ -120,7 +120,7 @@ void	Response::handleGet(ConfigLocation const* location) {
 			setResponseStatus(200, "OK");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
@@ -139,15 +139,43 @@ void	Response::handlePost() {
 void	Response::handleUpload(ConfigLocation const* location) {
 	std::map<std::string, std::string> headers = _request.getHeader();
 	struct uploadData fileData = _request.parseBody();
-	LOG_INFO("Uploading file : " + fileData.fileName + " THE END OF FILENAME ");
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string path = fullPath(location->getRoot() + _request.getPath() + "/" + fileData.fileName);
-		LOG_INFO("Uploading file to: " + path);
+		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
+		if (!file.is_open()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
 		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
+		if (file.fail()) {
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400, "Bad request");
+			return ;
+		}
 		file.close();
 		setResponseStatus(200, "OK");
 		LOG_INFO("File uploaded successfully");
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		std::ostringstream responseBody;
+        responseBody << "<!DOCTYPE html>\n";
+        responseBody << "<html lang=\"en\">\n";
+        responseBody << "<head>\n";
+        responseBody << "<meta charset=\"UTF-8\">\n";
+        responseBody << "<title>File Upload Success</title>\n";
+        responseBody << "</head>\n";
+        responseBody << "<body>\n";
+        responseBody << "<h1>File Upload Successful</h1>\n";
+        responseBody << "<p>Your file has been uploaded successfully.</p>\n";
+        responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
+		responseBody << "<img src=\"" << "/upload/404.jpg" << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "</body>\n";
+        responseBody << "</html>\n";
+		LOG_INFO("Response body set : " + _responseBuilder->getBody());
+		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+		LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
 	else {
 		LOG_INFO("Failed to upload the requested file");

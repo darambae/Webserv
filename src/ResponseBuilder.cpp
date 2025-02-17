@@ -1,10 +1,14 @@
 #include "../include/ResponseBuilder.hpp"
 
-std::string*	ResponseBuilder::buildResponse() {
+std::string*	ResponseBuilder::buildResponse(std::string body) {
 
-	std::stringstream buffer;
-	buffer << _setup.getRequestedFile().rdbuf();
-	_body = buffer.str();
+	if (!body.empty())
+		_body = body;
+	else {
+		std::stringstream buffer;
+		buffer << _setup.getRequestedFile().rdbuf();
+		_body = buffer.str();
+	}
 
 	initMimeTypes();
 
