@@ -53,6 +53,7 @@ private:
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
 	void	handleResponse();
+	void	handleCgi();
 	int		findIndex(ConfigLocation const* location);
 	int		sendResponse();
 	void	handleGet(ConfigLocation const* location);

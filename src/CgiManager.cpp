@@ -1,6 +1,7 @@
 #include "../include/CgiManager.hpp"
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
+
 int	CgiManager::forkProcess() {
 	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK |SOCK_CLOEXEC, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
@@ -42,7 +43,7 @@ int	CgiManager::forkProcess() {
 
 int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a POLLOUT for CGI_children
 	if (_cgi_env->request_method == "POST") {
-		const void* buffer = static_cast<const void*>(_request..data());//converti std::string en const void* data
+		const void* buffer = static_cast<const void*>(_request->getBody().data());//converti std::string en const void* data
 		write(_sockets[0], buffer, sizeof(buffer) - 1);
 	}
 	close(_sockets[0]);
@@ -67,6 +68,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	if (bytes > 0) {
 		buffer[bytes] = '\0';
+		_response.
 		_dataForClient.assign(buffer);
 		_responseReadyToBeSend = true;
 	}

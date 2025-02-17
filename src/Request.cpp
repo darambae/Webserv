@@ -69,6 +69,13 @@ void	Request::parseFirstLine() {
 		isRequestPathDirectory = true;
 }
 
+std::string	Request::getValueFromHeader(const std::string& key) const {
+	std::map<std::string, std::string>::const_iterator	it = _header.find(key);
+	if (it != _header.end())
+		return it->second;
+	return "";
+}
+
 void	Request::parseHeader(std::string headerPart) {
 	std::istringstream stream(headerPart);
 	std::string	line;
@@ -81,7 +88,6 @@ void	Request::parseHeader(std::string headerPart) {
 			_header[key] = value;
 			if (key == "Content-Length")
 				_contentLength = std::atoi(value.c_str());
-
 		}
 	}
 }
@@ -98,6 +104,15 @@ uploadData Request::parseBody() {
 	data.fileName = filename;
 	data.fileContent = content;
 	return data;
+}
+
+int	Request::parseQueryString() {
+	if (_path.find("?") != std::string::npos) {
+		size_t	pos = _path.find("?");
+		_queryString = _path.substr(pos, _path.size() - pos);
+		return _queryString.size();
+	}
+	return 0;
 }
 
 int	Request::handleRequest() {
