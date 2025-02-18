@@ -212,7 +212,7 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
-		setResponseStatus(400, "File format not supported"); // <-------Need to handle error page
+		setResponseStatus(400); // <-------Need to handle error page
 		handleError();
 		return ;
 	}
@@ -230,7 +230,7 @@ void	Response::handlePost() {
 		if (file.fail()) {
 			LOG_INFO("Failed to upload the requested file");
 			setResponseStatus(400);
-      handleError();
+      		handleError();
 			return ;
 		}
 		file.close();
