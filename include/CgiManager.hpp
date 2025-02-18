@@ -1,7 +1,10 @@
-/* #pragma once
+#pragma once
 
 #include "webserv.hpp"
 
+class Request;
+class Response;
+struct CGI_env;
 class	CgiManager {
 	private:
 		CGI_env*	_cgi_env;
@@ -19,4 +22,4 @@ class	CgiManager {
 		int	recvFromCgi();
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();
-}; */
+};

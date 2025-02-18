@@ -4,17 +4,17 @@ void	Response::setResponseStatus(int code) {
 	_codeStatus = to_string(code);
 
 	switch (code) {
-		case 200: _reasonPhrase = "OK";
-		case 301: _reasonPhrase = "Moved Permanently";
-		case 302: _reasonPhrase = "Found";
-		case 400: _reasonPhrase = "Bad Request";
-		case 403: _reasonPhrase = "Forbidden";
-		case 404: _reasonPhrase = "Not Found";
-		case 405: _reasonPhrase = "Method Not Allowed";
-		case 501: _reasonPhrase = "Not Implemented";
-		case 502: _reasonPhrase = "Bad Gateway";
+		case 200: _reasonPhrase = "OK"; break;
+		case 301: _reasonPhrase = "Moved Permanently"; break;
+		case 302: _reasonPhrase = "Found"; break;
+		case 400: _reasonPhrase = "Bad Request"; break;
+		case 403: _reasonPhrase = "Forbidden"; break;
+		case 404: _reasonPhrase = "Not Found"; break;
+		case 405: _reasonPhrase = "Method Not Allowed"; break;
+		case 501: _reasonPhrase = "Not Implemented"; break;
+		case 502: _reasonPhrase = "Bad Gateway"; break;
 	}
-		
+
 }
 
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
@@ -39,7 +39,7 @@ int	Response::findIndex() {
 	std::string indexPath = _request.getPath();
 	if (!_request.getIsRequestPathDirectory())
 		indexPath += "/";
-	
+
 	std::vector<std::string> indexesToTry;
 
 	if (_location) {
@@ -96,19 +96,19 @@ int	Response::generateDefaultErrorHtml() {
 			<< "    <p>La page demandée a rencontré un problème.</p>\n"
 			<< "</body>\n"
 			<< "</html>\n";
-	
+
 	file.close();
 
 	return 0;
 }
 
-//IF error_page URI (FI /errors/404NotFound.html) defined in location block 
-//	=>	reprocess like it's a requestPath : find the location block to get the proper 
-//		root path (or default one if no root defined in the location block), 
+//IF error_page URI (FI /errors/404NotFound.html) defined in location block
+//	=>	reprocess like it's a requestPath : find the location block to get the proper
+//		root path (or default one if no root defined in the location block),
 //		make a full path with it and build the response.
 //ELSE IF error_page URI is defined in server block
 //	=> same reprocess as above.
-//ELSE 
+//ELSE
 //	-> serve default one.
 void	Response::handleError() {
 
@@ -132,8 +132,8 @@ void	Response::handleError() {
 				break ;
 			}
 		}
-	} 
-	
+	}
+
 	if (!errorPageFound) {
 		if (generateDefaultErrorHtml() == 0) {
 			path = fullPath("/defaultError/defaultError.html");
@@ -250,7 +250,7 @@ void	Response::handlePost() {
         responseBody << "<h1>File Upload Successful</h1>\n";
         responseBody << "<p>Your file has been uploaded successfully.</p>\n";
         responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
-		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";      
+		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";
 		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
 		responseBody << "</body>\n";
         responseBody << "</html>\n";
@@ -272,9 +272,9 @@ void	Response::handleResponse() {
 	std::string requestMethod = _request.getMethod();
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
-	
+
 	if (_location) {
-		//if specific methods are specified in the location block, check if the request's 
+		//if specific methods are specified in the location block, check if the request's
 		//method match with them
 		if (!_location->getAllowMethods().empty()) {
 			std::set<std::string> allowedMethods = _location->getAllowMethods();
@@ -290,13 +290,22 @@ void	Response::handleResponse() {
 	}
 
 	if (requestMethod == "GET") {
-		if (requestPath == "/cgi-bin") {}
-			//handleCGI();
+		if (requestPath == "/cgi-bin") {
+			if (handleCgi() == -1) {
+				setResponseStatus(666);
+				handleError();
+				return ;
+			}
+		}
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath == "/cgi-bin") {
-			//handleCGI();
+			if (handleCgi() == -1) {
+				setResponseStatus(666);
+				handleError();
+				return ;
+			}
 		}
 		else if (requestPath == "/upload") {
 			handlePost();
@@ -311,6 +320,29 @@ void	Response::handleResponse() {
 	}
 }
 
+int	Response::handleCgi() {
+	CGI_env*	cgi = new CGI_env;
+	cgi->request_method = _request.getMethod();
+	if (cgi->request_method == "GET") {
+		cgi->content_length = "";
+		cgi->content_type = "";
+		cgi->query_string = _request.parseQueryString();
+	}
+	else {
+		cgi->content_length = _request.getValueFromHeader("Content-Lenght");
+		cgi->content_type = _request.getValueFromHeader("Content-Type");
+		cgi->query_string = "";
+	}
+	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
+	cgi->script_name = _request.getPath();
+	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
+	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
+}
+
+void	Response::setBuiltResponse(std::string	responseComplete) {
+	_builtResponse->assign(responseComplete);
+	_responseReadyToSend = true;
+}
 
 int	Response::sendResponse() {
 
