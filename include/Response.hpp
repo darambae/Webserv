@@ -39,7 +39,7 @@ private:
 		_requestedFile.open(filePath.c_str(), std::ios::binary);
 
 	}
-	void		setResponseStatus(int code, std::string reasonPhrase);
+	void		setResponseStatus(int code);
 	void		setHeader(std::string key, std::string value) { _header[key] = value; }
 	Request &getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
