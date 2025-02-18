@@ -60,6 +60,6 @@ private:
 	void	handleDelete();
 	void	handleError();
 	int		generateDefaultErrorHtml();
-	void 	handleUpload(ConfigLocation const* location);
+	void 	handleUpload();
 
 };

@@ -129,6 +129,7 @@ void	Response::handleError() {
 			setResponseStatus(200, "OK");
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
+
 		}
 	}
 }
@@ -198,11 +199,16 @@ void	Response::handlePost() {
 	
 }
 
-void	Response::handleUpload(ConfigLocation const* location) {
-	std::map<std::string, std::string> headers = _request.getHeader();
+void	Response::handleUpload() {
 	struct uploadData fileData = _request.parseBody();
+	//Accept only a file with .jpg, .jpeg or .png extension
+	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
+		LOG_INFO("File format not supported");
+		setResponseStatus(400, "Bad request"); // <-------Need to handle error page
+		return ;
+	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string upload_location = _location->getRoot() + _request.getPath();
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
@@ -252,7 +258,6 @@ void	Response::handleResponse() {
 
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
-
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
 	
@@ -282,7 +287,7 @@ void	Response::handleResponse() {
 			//handleCGI();
 		}
 		else if (requestPath == "/upload") {
-			handleUpload(_location);
+			handleUpload(location);
 		} else
 			handlePost();
 	} else if (requestMethod == "DELETE") {}
