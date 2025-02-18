@@ -14,7 +14,7 @@ void	Response::setResponseStatus(int code) {
 		case 501: _reasonPhrase = "Not Implemented";
 		case 502: _reasonPhrase = "Bad Gateway";
 	}
-		
+
 }
 
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
@@ -212,7 +212,7 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
-		setResponseStatus(400, "File format not supported"); // <-------Need to handle error page
+		setResponseStatus(400); // <-------Need to handle error page
 		handleError();
 		return ;
 	}
@@ -292,7 +292,7 @@ void	Response::handleResponse() {
 	if (requestMethod == "GET") {
 		if (requestPath == "/cgi-bin")
 			if (handleCgi() == -1) {
-				setResponseStatus(666, "CGI died in excruciating pain");
+				setResponseStatus(666);
 				handleError();
 				return ;
 			}
@@ -301,7 +301,7 @@ void	Response::handleResponse() {
 	} else if (requestMethod == "POST") {
 		if (requestPath == "/cgi-bin") {
 			if (handleCgi() == -1) {
-				setResponseStatus(666, "CGI died in excruciating pain");
+				setResponseStatus(666);
 				handleError();
 				return ;
 			}
