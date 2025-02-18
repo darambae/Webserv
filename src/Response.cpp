@@ -329,7 +329,7 @@ int	Response::handleCgi() {
 		cgi->query_string = _request.parseQueryString();
 	}
 	else {
-		cgi->content_length = _request.getValueFromHeader("Content-Lenght");
+		cgi->content_length = _request.getValueFromHeader("Content-Length");
 		cgi->content_type = _request.getValueFromHeader("Content-Type");
 		cgi->query_string = "";
 	}
