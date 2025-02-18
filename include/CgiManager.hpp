@@ -2,6 +2,9 @@
 
 #include "webserv.hpp"
 
+class Request;
+class Response;
+struct CGI_env;
 class	CgiManager {
 	private:
 		CGI_env*	_cgi_env;

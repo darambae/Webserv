@@ -28,8 +28,8 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), nullptr};
-		char	*envp[] = {nullptr};
+		char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
+		char	*envp[] = {NULL};
 		execve(argv[0], argv, envp);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
@@ -42,11 +42,13 @@ int	CgiManager::forkProcess() {
 }
 
 int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a POLLOUT for CGI_children
+	int	returnValue = 0;
 	if (_cgi_env->request_method == "POST") {
 		const void* buffer = static_cast<const void*>(_request->getBody().data());//converti std::string en const void* data
-		write(_sockets[0], buffer, sizeof(buffer) - 1);
+		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
 	}
 	close(_sockets[0]);
+	return returnValue;
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
@@ -54,9 +56,10 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
-	if (result == -1)//children doesn't exist anymore
+	if (result == -1) {//children doesn't exist anymore
 		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
 		return -1;
+	}
 	if (result == _children_pid) {
 		if (WIFEXITED(status))//if true children finish normally with exit
 			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
@@ -69,6 +72,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (bytes > 0) {
 		buffer[bytes] = '\0';
 		_response->setBuiltResponse(buffer);
+		return bytes;
 	}
 	else {
 		LOG_ERROR("read from CGI failed", true);

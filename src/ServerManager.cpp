@@ -50,20 +50,15 @@ void	ServerManager::launchServers() {
 						cleanFd(readable_FD);
 					}
 				}
-				/* else if (FD_DATA[readable_FD]->status == CGI_parent) {
+				else if (FD_DATA[readable_FD]->status == CGI_parent) {
 					int result = FD_DATA[readable_FD]->CGI->recvFromCgi();
 					if (result == 0)
 						continue;//children don't finish
-					else if (result == -1) {
-						int fd_client = FD_DATA[readable_FD]->request->getClientFD();
-						FD_DATA[fd_client]->response->setResponseStatus(666, "doigt de metal dans le ciel");
-						FD_DATA[fd_client]->response->handleError();
-						cleanFd(FD_DATA[fd_client]->CGI->getSocketsChildren());
-						cleanFd(FD_DATA[fd_client]->CGI->getSocketsParent());
-						delete FD_DATA[fd_client]->CGI;
-						FD_DATA[fd_client]->CGI = NULL;
-					}
-				} */
+					else if (result == -1)
+						closeCgi(501, readable_FD);
+					else//children finish and send the response to the response class
+						closeCgi(0, readable_FD);
+				}
 			}
 			else if (ALL_FDS[i].revents & POLLOUT) {
 				//LOG_INFO("POLLOUT signal");
@@ -85,9 +80,12 @@ void	ServerManager::launchServers() {
 						}
 					}
 				}
-				/* else if (FD_DATA[sendable_fd]->status == CGI_children) {
-					FD_DATA[sendable_fd]->CGI->sendToCgi();
-				} */
+				else if (FD_DATA[sendable_fd]->status == CGI_children) {
+					if (FD_DATA[sendable_fd]->CGI->sendToCgi() == -1) {
+						LOG_ERROR("write to send the body to CGI failed", true);
+						closeCgi(501, sendable_fd);
+					}
+				}
 				continue;
 			}
 			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -97,6 +95,18 @@ void	ServerManager::launchServers() {
             // }
 		}
     }
+}
+
+void	ServerManager::closeCgi(int errorNumber, int FdCGI) {
+	int fd_client = FD_DATA[FdCGI]->request->getClientFD();
+	if (errorNumber > 0) {
+		FD_DATA[fd_client]->response->setResponseStatus(errorNumber);
+		FD_DATA[fd_client]->response->handleError();
+	}
+	cleanFd(FD_DATA[fd_client]->CGI->getSocketsChildren());
+	cleanFd(FD_DATA[fd_client]->CGI->getSocketsParent());
+	delete FD_DATA[fd_client]->CGI;
+	FD_DATA[fd_client]->CGI = NULL;
 }
 
 void	ServerManager::print_all_FD_DATA() {

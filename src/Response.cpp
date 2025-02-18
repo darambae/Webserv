@@ -4,15 +4,15 @@ void	Response::setResponseStatus(int code) {
 	_codeStatus = to_string(code);
 
 	switch (code) {
-		case 200: _reasonPhrase = "OK";
-		case 301: _reasonPhrase = "Moved Permanently";
-		case 302: _reasonPhrase = "Found";
-		case 400: _reasonPhrase = "Bad Request";
-		case 403: _reasonPhrase = "Forbidden";
-		case 404: _reasonPhrase = "Not Found";
-		case 405: _reasonPhrase = "Method Not Allowed";
-		case 501: _reasonPhrase = "Not Implemented";
-		case 502: _reasonPhrase = "Bad Gateway";
+		case 200: _reasonPhrase = "OK"; break;
+		case 301: _reasonPhrase = "Moved Permanently"; break;
+		case 302: _reasonPhrase = "Found"; break;
+		case 400: _reasonPhrase = "Bad Request"; break;
+		case 403: _reasonPhrase = "Forbidden"; break;
+		case 404: _reasonPhrase = "Not Found"; break;
+		case 405: _reasonPhrase = "Method Not Allowed"; break;
+		case 501: _reasonPhrase = "Not Implemented"; break;
+		case 502: _reasonPhrase = "Bad Gateway"; break;
 	}
 
 }
@@ -290,12 +290,13 @@ void	Response::handleResponse() {
 	}
 
 	if (requestMethod == "GET") {
-		if (requestPath == "/cgi-bin")
+		if (requestPath == "/cgi-bin") {
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
 				return ;
 			}
+		}
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
