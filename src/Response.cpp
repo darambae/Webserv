@@ -1,7 +1,20 @@
 #include "../include/Response.hpp"
 
-void	Response::setResponseStatus(int code, std::string reasonPhrase) {
-	_codeStatus = to_string(code); _reasonPhrase = reasonPhrase;
+void	Response::setResponseStatus(int code) {
+	_codeStatus = to_string(code);
+
+	switch (code) {
+		case 200: _reasonPhrase = "OK";
+		case 301: _reasonPhrase = "Moved Permanently";
+		case 302: _reasonPhrase = "Found";
+		case 400: _reasonPhrase = "Bad Request";
+		case 403: _reasonPhrase = "Forbidden";
+		case 404: _reasonPhrase = "Not Found";
+		case 405: _reasonPhrase = "Method Not Allowed";
+		case 501: _reasonPhrase = "Not Implemented";
+		case 502: _reasonPhrase = "Bad Gateway";
+	}
+		
 }
 
 ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, std::string requestPath) {
@@ -126,7 +139,7 @@ void	Response::handleError() {
 			path = fullPath("/defaultError/defaultError.html");
 			setRequestedFile(path);
 			_responseReadyToSend = true;
-			setResponseStatus(200, "OK");
+			setResponseStatus(200);
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
 
@@ -149,7 +162,7 @@ void	Response::handleGet() {
 	LOG_INFO("Request path: " + _request.getPath());
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex() == 1) {
-			setResponseStatus(200, "OK");
+			setResponseStatus(200);
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
@@ -162,7 +175,7 @@ void	Response::handleGet() {
 				//page is supposed to be dynamic so we can navigate through website's repos and files via hypertext links
 			}
 			else {
-				setResponseStatus(403, "Forbidden");
+				setResponseStatus(403);
 				handleError();
 			}
 		}
@@ -180,14 +193,14 @@ void	Response::handleGet() {
 		setRequestedFile(path.c_str());
 
 		if (_requestedFile) {
-			setResponseStatus(200, "OK");
+			setResponseStatus(200);
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
 			//LOG_INFO("Response built:\n" /*+ *_builtResponse*/);
 		}
 		else {
-			setResponseStatus(404, "Not found");
+			setResponseStatus(404);
 			handleError();
 		}
 	}
@@ -208,19 +221,21 @@ void	Response::handlePost() {
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
-			setResponseStatus(400, "Failed to upload the requested file");
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400);
 			handleError();
 			return ;
 		}
 		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
 		if (file.fail()) {
-			setResponseStatus(400, "Failed to upload the requested file");
-			handleError();
+			LOG_INFO("Failed to upload the requested file");
+			setResponseStatus(400);
+      handleError();
 			return ;
 		}
 		file.close();
-		setResponseStatus(200, "OK");
-		//LOG_INFO("File uploaded successfully");
+		setResponseStatus(200);
+		LOG_INFO("File uploaded successfully");
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
 		std::ostringstream responseBody;
@@ -244,7 +259,8 @@ void	Response::handlePost() {
 		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
 	else {
-		setResponseStatus(400, "Failed to upload the requested file");
+		LOG_INFO("Failed to upload the requested file");
+		setResponseStatus(400);
 		handleError();
 	}
 
@@ -264,7 +280,7 @@ void	Response::handleResponse() {
 			std::set<std::string> allowedMethods = _location->getAllowMethods();
 			if (allowedMethods.find(requestMethod) == allowedMethods.end()) {
 				LOG_INFO("Method not allowed");
-				setResponseStatus(405, "Method not allowed");
+				setResponseStatus(405);
 				handleError();
 				return ;
 			}
@@ -289,7 +305,7 @@ void	Response::handleResponse() {
 		//handleDelete();
 	else {
 		LOG_INFO("Method not implemented");
-		setResponseStatus(501, "Method not implemented");
+		setResponseStatus(501);
 		handleError();
 		return ;
 	}
