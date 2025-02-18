@@ -53,6 +53,7 @@ enum fd_status
 class	Server;
 class	Request;
 class	Response;
+class	CgiManager;
 
 struct ErrorPage {
     std::set<int> error_codes;
@@ -63,7 +64,7 @@ struct CGI_env
 {
 	std::string	request_method;
 	std::string	query_string;//data from the query in URL
-	std::string	content_lenght;
+	std::string	content_length;
 	std::string	content_type;
 	std::string	script_name;//path of the CGI executed
 	std::string	remote_addr;//client addr

@@ -142,6 +142,7 @@ void	Response::handleError() {
 			setResponseStatus(200);
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
+
 		}
 	}
 }
@@ -208,25 +209,28 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
-	
-}
-
-void	Response::handleUpload(ConfigLocation const* location) {
-	std::map<std::string, std::string> headers = _request.getHeader();
 	struct uploadData fileData = _request.parseBody();
+	//Accept only a file with .jpg, .jpeg or .png extension
+	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
+		setResponseStatus(400, "File format not supported"); // <-------Need to handle error page
+		handleError();
+		return ;
+	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string upload_location = _location->getRoot() + _request.getPath();
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
 			LOG_INFO("Failed to upload the requested file");
 			setResponseStatus(400);
+			handleError();
 			return ;
 		}
 		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
 		if (file.fail()) {
 			LOG_INFO("Failed to upload the requested file");
 			setResponseStatus(400);
+      handleError();
 			return ;
 		}
 		file.close();
@@ -257,6 +261,7 @@ void	Response::handleUpload(ConfigLocation const* location) {
 	else {
 		LOG_INFO("Failed to upload the requested file");
 		setResponseStatus(400);
+		handleError();
 	}
 
 }
@@ -265,7 +270,6 @@ void	Response::handleResponse() {
 
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
-
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
 	
@@ -295,9 +299,8 @@ void	Response::handleResponse() {
 			//handleCGI();
 		}
 		else if (requestPath == "/upload") {
-			handleUpload(_location);
-		} else
 			handlePost();
+		}
 	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
