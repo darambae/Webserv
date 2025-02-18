@@ -50,7 +50,7 @@ void	ServerManager::launchServers() {
 						cleanFd(readable_FD);
 					}
 				}
-				else if (FD_DATA[readable_FD]->status == CGI_parent) {
+				/* else if (FD_DATA[readable_FD]->status == CGI_parent) {
 					int result = FD_DATA[readable_FD]->CGI->recvFromCgi();
 					if (result == 0)
 						continue;//children don't finish
@@ -63,7 +63,7 @@ void	ServerManager::launchServers() {
 						delete FD_DATA[fd_client]->CGI;
 						FD_DATA[fd_client]->CGI = NULL;
 					}
-				}
+				} */
 			}
 			else if (ALL_FDS[i].revents & POLLOUT) {
 				//LOG_INFO("POLLOUT signal");
@@ -83,17 +83,11 @@ void	ServerManager::launchServers() {
 							FD_DATA[sendable_fd]->request = new Request(sendable_fd);
 							LOG_INFO("response send and delete");
 						}
-						// delete FD_DATA[sendable_fd]->response;
-						// FD_DATA[sendable_fd]->response = NULL;
-						// delete FD_DATA[sendable_fd]->request;
-						// FD_DATA[sendable_fd]->request = NULL;
-						// FD_DATA[sendable_fd]->request = new Request(sendable_fd);
-						// LOG_INFO("response send and delete");
 					}
 				}
-				else if (FD_DATA[sendable_fd]->status == CGI_children) {
+				/* else if (FD_DATA[sendable_fd]->status == CGI_children) {
 					FD_DATA[sendable_fd]->CGI->sendToCgi();
-				}
+				} */
 				continue;
 			}
 			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
@@ -122,11 +116,11 @@ void	ServerManager::cleanFd(int FD) {
 			delete FD_DATA[FD]->request;
 		if (FD_DATA[FD]->response)
 			delete FD_DATA[FD]->response;
-		if (FD_DATA[FD]->CGI) {
+		/* if (FD_DATA[FD]->CGI) {
 			cleanFd(FD_DATA[FD]->CGI->getSocketsChildren());
 			cleanFd(FD_DATA[FD]->CGI->getSocketsParent());
 			delete FD_DATA[FD]->CGI;
-		}
+		} */
 	}
 	std::map<int, Fd_data*>::iterator	it = FD_DATA.find(FD);
 	delete it->second;

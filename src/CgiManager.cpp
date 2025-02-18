@@ -3,7 +3,7 @@
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
 
 int	CgiManager::forkProcess() {
-	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK |SOCK_CLOEXEC, 0, _sockets) == -1) {
+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
 	}
@@ -24,7 +24,7 @@ int	CgiManager::forkProcess() {
 		close(_sockets[1]);
 		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
 		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
-		setenv("CONTENT_LENGHT", _cgi_env->content_lenght.c_str(), 1);
+		setenv("CONTENT_LENGTH", _cgi_env->content_length.c_str(), 1);
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
@@ -68,9 +68,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	if (bytes > 0) {
 		buffer[bytes] = '\0';
-		_response.
-		_dataForClient.assign(buffer);
-		_responseReadyToBeSend = true;
+		_response->setBuiltResponse(buffer);
 	}
 	else {
 		LOG_ERROR("read from CGI failed", true);

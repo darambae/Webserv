@@ -128,7 +128,8 @@ void	Response::handleError() {
 			_responseReadyToSend = true;
 			setResponseStatus(200, "OK");
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
+
 		}
 	}
 }
@@ -195,30 +196,31 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
-
-}
-
-void	Response::handleUpload(ConfigLocation const* location) {
-	std::map<std::string, std::string> headers = _request.getHeader();
 	struct uploadData fileData = _request.parseBody();
+	//Accept only a file with .jpg, .jpeg or .png extension
+	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
+		setResponseStatus(400, "File format not supported"); // <-------Need to handle error page
+		handleError();
+		return ;
+	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string upload_location = _location->getRoot() + _request.getPath();
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400, "Bad request");
+			setResponseStatus(400, "Failed to upload the requested file");
+			handleError();
 			return ;
 		}
 		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
 		if (file.fail()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400, "Bad request");
+			setResponseStatus(400, "Failed to upload the requested file");
+			handleError();
 			return ;
 		}
 		file.close();
 		setResponseStatus(200, "OK");
-		LOG_INFO("File uploaded successfully");
+		//LOG_INFO("File uploaded successfully");
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
 		std::ostringstream responseBody;
@@ -242,8 +244,8 @@ void	Response::handleUpload(ConfigLocation const* location) {
 		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
 	else {
-		LOG_INFO("Failed to upload the requested file");
-		setResponseStatus(400, "Bad request");
+		setResponseStatus(400, "Failed to upload the requested file");
+		handleError();
 	}
 
 }
@@ -252,7 +254,6 @@ void	Response::handleResponse() {
 
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
-
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
 
@@ -290,9 +291,8 @@ void	Response::handleResponse() {
 			}
 		}
 		else if (requestPath == "/upload") {
-			handleUpload(_location);
-		} else
 			handlePost();
+		}
 	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {
@@ -307,12 +307,12 @@ int	Response::handleCgi() {
 	CGI_env*	cgi = new CGI_env;
 	cgi->request_method = _request.getMethod();
 	if (cgi->request_method == "GET") {
-		cgi->content_lenght = "";
+		cgi->content_length = "";
 		cgi->content_type = "";
 		cgi->query_string = _request.parseQueryString();
 	}
 	else {
-		cgi->content_lenght = _request.getValueFromHeader("Content-Lenght");
+		cgi->content_length = _request.getValueFromHeader("Content-Lenght");
 		cgi->content_type = _request.getValueFromHeader("Content-Type");
 		cgi->query_string = "";
 	}
@@ -320,6 +320,11 @@ int	Response::handleCgi() {
 	cgi->script_name = _request.getPath();
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
+}
+
+void	Response::setBuiltResponse(std::string	responseComplete) {
+	_builtResponse->assign(responseComplete);
+	_responseReadyToSend = true;
 }
 
 int	Response::sendResponse() {

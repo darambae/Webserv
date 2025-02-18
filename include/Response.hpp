@@ -41,6 +41,7 @@ private:
 	}
 	void		setResponseStatus(int code, std::string reasonPhrase);
 	void		setHeader(std::string key, std::string value) { _header[key] = value; }
+	void		setBuiltResponse(std::string	responseComplete);
 	Request &getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
 	std::string const&	getReasonPhrase() const { return _reasonPhrase; }
@@ -48,7 +49,6 @@ private:
 	std::ifstream&		getRequestedFile() { return _requestedFile; }
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 	bool				getResponseReadyToSend() {return _responseReadyToSend;}
-
 
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
@@ -61,6 +61,5 @@ private:
 	void	handleDelete();
 	void	handleError();
 	int		generateDefaultErrorHtml();
-	void 	handleUpload(ConfigLocation const* location);
 
 };
