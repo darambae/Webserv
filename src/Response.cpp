@@ -128,7 +128,7 @@ void	Response::handleError() {
 			_responseReadyToSend = true;
 			setResponseStatus(200, "OK");
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse("");
+			_builtResponse = _responseBuilder->buildResponse();
 		}
 	}
 }
