@@ -31,13 +31,13 @@
         <section id="history">
             <h2>Play History</h2>
             <h4>Choose a player id</h4>
-            <form action="/cgi-bin/script.py" method="get">
+            <form action="/cgi-bin/get_player_data.py" method="get">
                 <input type="text" name="player_id" id="player_id">
                 <button type="submit">Send</button>
             </form>
             <br>
             <h4>Choose a game id</h4>
-            <form action="/cgi-bin/script.py" method="get">
+            <form action="/cgi-bin/get_game_data.py" method="get">
                 <input type="text" name="game_id" id="game_id">
                 <button type="submit">Send</button>
             </form>
@@ -45,7 +45,7 @@
         <section id="add-result">
             <h2>Add a game result</h2>
             <br>
-            <form action="/cgi-bin/script.py" method="post">
+            <form action="/cgi-bin/add_game_result/py" method="post">
                 <label for="game_id">Game ID:</label>
                 <input type="text" name="game_id" id="game_id" required>
                 <label for="player_id">Player ID:</label>

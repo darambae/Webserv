@@ -159,7 +159,7 @@ void	Response::handleGet() {
 
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
-	LOG_INFO("Request path: " + _request.getPath());
+	//LOG_INFO("Request path: " + _request.getPath());
 	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex() == 1) {
 			setResponseStatus(200);
@@ -187,9 +187,9 @@ void	Response::handleGet() {
 		std::string path = rootPath + _request.getPath();
 		const char*	pathChar = path.c_str();
 		std::cout << rootPathChar << " " << pathChar << std::endl;
-		LOG_INFO("rootPath: " + rootPath);
-		LOG_INFO("request path before concatenation: " + _request.getPath());
-		LOG_INFO("path: " + path);
+		// LOG_INFO("rootPath: " + rootPath);
+		// LOG_INFO("request path before concatenation: " + _request.getPath());
+		// LOG_INFO("path: " + path);
 		setRequestedFile(path.c_str());
 
 		if (_requestedFile) {
@@ -290,7 +290,7 @@ void	Response::handleResponse() {
 	}
 
 	if (requestMethod == "GET") {
-		if (requestPath == "/cgi-bin") {
+		if (requestPath.find("/cgi-bin") != std::string::npos) {
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
@@ -300,7 +300,7 @@ void	Response::handleResponse() {
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
-		if (requestPath == "/cgi-bin") {
+		if (requestPath.find("/cgi-bin") != std::string::npos) {
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
