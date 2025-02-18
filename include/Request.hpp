@@ -34,7 +34,7 @@ class Request {
 	std::string	_tempBuffer;
 	std::map<std::string, std::string>	_header;
 	std::string	_body;
-	// std::string player_id;
+	std::map<std::string, std::string>	_query_map;
 	Request();
 
 public:
@@ -65,6 +65,7 @@ public:
 	void	parseHeader(std::string headerPart);
 	struct uploadData	parseBody();
 	std::string		parseQueryString();
+	void	createQueryMap(std::string path);
 
 
 };

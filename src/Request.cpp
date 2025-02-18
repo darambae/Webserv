@@ -62,11 +62,29 @@ int	Request::parseRequest() {
 }
 
 void	Request::parseFirstLine() {
-	std::istringstream	firstLineStream(_firstLine);
+	std::istringstream firstLineStream(_firstLine);
 	firstLineStream >> _method >> _path >> _version;
+	if (_path.find("?") != std::string::npos)
+		createQueryMap(_path);		
 
 	if (_path[_path.size() - 1] == '/')
 		isRequestPathDirectory = true;
+}
+
+void	Request::createQueryMap(std::string path) {
+	std::map<std::string, std::string> query_map;
+	_path = path.substr(0, path.find("?"));
+	std::string query = path.substr(path.find("?") + 1);
+	while (query.find("&") != std::string::npos) {
+		std::string key = query.substr(0, query.find("="));
+		std::string value = query.substr(query.find("=") + 1, query.find("&") - query.find("=") - 1);
+		query_map[key] = value;
+		query = query.substr(query.find("&") + 1);
+	}
+	std::string key = query.substr(0, query.find("="));
+	std::string value = query.substr(query.find("=") + 1);
+	query_map[key] = value;
+	_query_map = query_map;
 }
 
 std::string	Request::getValueFromHeader(const std::string& key) const {
