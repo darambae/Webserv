@@ -100,7 +100,7 @@ void	Server::addFdToFds(int fd_to_add) {
 	struct pollfd new_socket;
     new_socket.fd = fd_to_add;
     new_socket.events = POLLIN | POLLOUT;// to check write and read in a same time (subject order)
-	//new_socket.revents = 0;
+	new_socket.revents = 0;
 	ALL_FDS.push_back(new_socket);
 }
 

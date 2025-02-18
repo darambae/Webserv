@@ -6,7 +6,7 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 		_body = body;
 	else {
 		std::stringstream buffer;
-		buffer << _setup.getRequestedFile().rdbuf();
+		buffer << _response.getRequestedFile().rdbuf();
 		_body = buffer.str();
 	}
 
@@ -21,7 +21,7 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 std::string	ResponseBuilder::buildFirstLine() {
 
-	std::string	firstLine = _setup.getRequest().getVersion() + " " + _setup.getCodeStatus() + " " + _setup.getReasonPhrase() + "\r\n";
+	std::string	firstLine = _response.getRequest().getVersion() + " " + _response.getCodeStatus() + " " + _response.getReasonPhrase() + "\r\n";
 	return firstLine;
 }
 
@@ -61,7 +61,7 @@ std::string	ResponseBuilder::buildTime(void) {
 }
 
 std::string	ResponseBuilder::buildContentType() {
-	std::string	requestedFilePath = _setup.getRequestedFilePath();
+	std::string	requestedFilePath = _response.getRequestedFilePath();
 	std::string	contentType;
 
 	size_t	pos = requestedFilePath.find_last_of('.');
@@ -89,6 +89,7 @@ void	ResponseBuilder::initMimeTypes() {
 	_mimeTypes.insert(std::make_pair("css", "text/css"));
 	_mimeTypes.insert(std::make_pair("xml", "text/xml"));
 	// Application Content Types
+	_mimeTypes.insert(std::make_pair("py", "application/python"));
 	_mimeTypes.insert(std::make_pair("js", "application/javascript"));
 	_mimeTypes.insert(std::make_pair("json", "application/json"));
 	_mimeTypes.insert(std::make_pair("pdf", "application/pdf"));
