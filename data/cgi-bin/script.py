@@ -13,9 +13,9 @@ import os
 # 4. get_num_games()
 
 # def get_all_players():
-# form = cgi.FieldStorage()
-# player_id = form.getlist("player_id")
-
+form = cgi.FieldStorage()
+player_id = form.getlist("player_id")
+print(player_id)
 def get_num_players():
     file_path = os.path.realpath("record.json")
     with open(file_path, "r") as file:
