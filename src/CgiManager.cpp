@@ -44,7 +44,8 @@ int	CgiManager::forkProcess() {
 int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a POLLOUT for CGI_children
 	int	returnValue = 0;
 	if (_cgi_env->request_method == "POST") {
-		const void* buffer = static_cast<const void*>(_request->getBody().data());//converti std::string en const void* data
+		std::string body = _request->getBody();
+		const void* buffer = static_cast<const void*>(body.data());//converti std::string en const void* data
 		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
 	}
 	close(_sockets[0]);
