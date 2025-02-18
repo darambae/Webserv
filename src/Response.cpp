@@ -196,15 +196,11 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
-	
-}
-
-void	Response::handleUpload() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
-		LOG_INFO("File format not supported");
-		setResponseStatus(400, "Bad request"); // <-------Need to handle error page
+		setResponseStatus(400, "File format not supported"); // <-------Need to handle error page
+		handleError();
 		return ;
 	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
@@ -212,19 +208,19 @@ void	Response::handleUpload() {
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400, "Bad request");
+			setResponseStatus(400, "Failed to upload the requested file");
+			handleError();
 			return ;
 		}
 		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
 		if (file.fail()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400, "Bad request");
+			setResponseStatus(400, "Failed to upload the requested file");
+			handleError();
 			return ;
 		}
 		file.close();
 		setResponseStatus(200, "OK");
-		LOG_INFO("File uploaded successfully");
+		//LOG_INFO("File uploaded successfully");
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
 		std::ostringstream responseBody;
@@ -248,8 +244,8 @@ void	Response::handleUpload() {
 		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
 	else {
-		LOG_INFO("Failed to upload the requested file");
-		setResponseStatus(400, "Bad request");
+		setResponseStatus(400, "Failed to upload the requested file");
+		handleError();
 	}
 
 }
@@ -287,9 +283,8 @@ void	Response::handleResponse() {
 			//handleCGI();
 		}
 		else if (requestPath == "/upload") {
-			handleUpload(location);
-		} else
 			handlePost();
+		}
 	} else if (requestMethod == "DELETE") {}
 		//handleDelete();
 	else {

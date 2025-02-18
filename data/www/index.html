@@ -27,22 +27,23 @@
                 <input type="text" name="player_id" id="player_id" required> -->
                 <label for="avatar">Profile Picture:</label>
                 <input type="file" name="avatar" id="file" required>
-                <input type="submit" value="Upload" name="submit">
+                <button type="submit">Upload</button>
             </form>
         </section>
         <b id="history">
             <h2>Play History</h2>
             <h4>Choose a player id</h4>
-            <form action="/cgi-bin/script.py" method="post">
+            <form action="/cgi-bin/script.py" method="get">
                 <input type="text" name="player_id" id="player_id">
-                <input type="submit" value="Submit" name="submit">
+                <button type="submit">Send</button>
             </form>
             </br>
             <h4>Choose a game id</h4>
-            <form action="/cgi-bin/script.py" method="post">
+            <form action="/cgi-bin/script.py" method="get">
                 <input type="text" name="game_id" id="game_id">
-                <input type="submit" value="Submit" name="submit">
+                <button type="submit">Send</button>
             </form>
+            <h4>Add a game result</h4>
         </section>
     </main>
     <footer>

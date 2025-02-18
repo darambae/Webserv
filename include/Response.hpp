@@ -60,6 +60,5 @@ private:
 	void	handleDelete();
 	void	handleError();
 	int		generateDefaultErrorHtml();
-	void 	handleUpload();
 
 };
