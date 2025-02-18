@@ -75,6 +75,7 @@ void	Request::createQueryMap(std::string path) {
 	std::map<std::string, std::string> query_map;
 	_path = path.substr(0, path.find("?"));
 	std::string query = path.substr(path.find("?") + 1);
+	_query = query;
 	while (query.find("&") != std::string::npos) {
 		std::string key = query.substr(0, query.find("="));
 		std::string value = query.substr(query.find("=") + 1, query.find("&") - query.find("=") - 1);

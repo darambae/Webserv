@@ -326,7 +326,7 @@ int	Response::handleCgi() {
 	if (cgi->request_method == "GET") {
 		cgi->content_length = "";
 		cgi->content_type = "";
-		cgi->query_string = _request.parseQueryString();
+		cgi->query_string = _request.getQuery();
 	}
 	else {
 		cgi->content_length = _request.getValueFromHeader("Content-Length");
@@ -335,6 +335,7 @@ int	Response::handleCgi() {
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
 	cgi->script_name = _request.getPath();
+	LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
 }

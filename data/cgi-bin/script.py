@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import cgi
 import matplotlib.pyplot as plt
@@ -13,9 +15,8 @@ import os
 # 4. get_num_games()
 
 # def get_all_players():
-form = cgi.FieldStorage()
-player_id = form.getlist("player_id")
-print(player_id)
+
+
 def get_num_players():
     file_path = os.path.realpath("record.json")
     with open(file_path, "r") as file:
@@ -94,7 +95,5 @@ def get_player(player_id):
     # print(img_stream.read())
     # img_stream.close()
     # return img_stream
-get_game(3)
-#get_player(3)
 
 

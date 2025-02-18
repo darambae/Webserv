@@ -17,6 +17,8 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
+	LOG_INFO("QUERY_STRING : " + _cgi_env->query_string);
+	LOG_INFO("SCRIPT_NAME : " + _cgi_env->script_name);
 	if (pid == 0) {
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);

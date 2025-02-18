@@ -34,6 +34,7 @@ class Request {
 	std::string	_tempBuffer;
 	std::map<std::string, std::string>	_header;
 	std::string	_body;
+	std::string _query;
 	std::map<std::string, std::string>	_query_map;
 	Request();
 
@@ -52,7 +53,7 @@ public:
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 	std::string	getValueFromHeader(const std::string& key) const;
-
+	std::string getQuery() const { return _query; }
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
 
