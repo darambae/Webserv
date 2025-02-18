@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 import json
 import cgi
 import matplotlib.pyplot as plt
@@ -10,7 +12,7 @@ import os
 # 1. get_player(id)
 # 2. get_game(id)
 # 3. get_num_players()
-# 4. get_num_games()
+# 4. get_num_games()Merge pull request #34 from darambae/gautier
 
 # def get_all_players():
 form = cgi.FieldStorage()
