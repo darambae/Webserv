@@ -49,7 +49,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			LOG_INFO("Body received");
+			LOG_INFO("Body received : " + _body);
 		}
 	}
 

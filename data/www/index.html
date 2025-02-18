@@ -12,38 +12,86 @@
         <nav>
             <ul>
                 <li><a href="#">Home</a></li>
-                <li><a href="#upload">Add profile picture to players</a></li>
+                <li><a href="#upload">Upload image</a></li>
                 <li><a href="#history">Play History</a></li>
+                <li><a herf="#add-result">Add game result</a></li>
             </ul>
         </nav>
     </header>
     <main>
         <section id="upload">
             <h2>Add profile picture</h2>
-            <!-- <p>Choose a player's id and a profile picture for the player</p> -->
-            <p>Choose an image file to upload(Only jpg, jpeg, png accepted)</p>
+            <p>Choose an image file to upload (Only jpg, jpeg, png accepted)</p>
             <form action="/upload" method="post" enctype="multipart/form-data">
-                <!-- <label for="player_id">Player ID:</label>
-                <input type="text" name="player_id" id="player_id" required> -->
                 <label for="avatar">Profile Picture:</label>
                 <input type="file" name="avatar" id="file" required>
                 <button type="submit">Upload</button>
             </form>
         </section>
-        <b id="history">
+        <section id="history">
             <h2>Play History</h2>
             <h4>Choose a player id</h4>
             <form action="/cgi-bin/script.py" method="get">
                 <input type="text" name="player_id" id="player_id">
                 <button type="submit">Send</button>
             </form>
-            </br>
+            <br>
             <h4>Choose a game id</h4>
             <form action="/cgi-bin/script.py" method="get">
                 <input type="text" name="game_id" id="game_id">
                 <button type="submit">Send</button>
             </form>
-            <h4>Add a game result</h4>
+        </section>
+        <section id="add-result">
+            <h2>Add a game result</h2>
+            <br>
+            <form action="/cgi-bin/script.py" method="post">
+                <label for="game_id">Game ID:</label>
+                <input type="text" name="game_id" id="game_id" required>
+                <label for="player_id">Player ID:</label>
+                <input type="text" name="player_id" id="player_id" required>
+                <div class="grid-container">
+                    <div>
+                        <label for="sq_1">Square 1:</label>
+                        <input type="text" name="sq_1" id="sq_1" required>
+                    </div>
+                    <div>
+                        <label for="sq_2">Square 2:</label>
+                        <input type="text" name="sq_2" id="sq_2" required>
+                    </div>
+                    <div>
+                        <label for="sq_3">Square 3:</label>
+                        <input type="text" name="sq_3" id="sq_3" required>
+                    </div>
+                    <div>
+                        <label for="sq_4">Square 4:</label>
+                        <input type="text" name="sq_4" id="sq_4" required>
+                    </div>
+                    <div>
+                        <label for="sq_5">Square 5:</label>
+                        <input type="text" name="sq_5" id="sq_5" required>
+                    </div>
+                    <div>
+                        <label for="sq_6">Square 6:</label>
+                        <input type="text" name="sq_6" id="sq_6" required>
+                    </div>
+                    <div>
+                        <label for="sq_7">Square 7:</label>
+                        <input type="text" name="sq_7" id="sq_7" required>
+                    </div>
+                    <div>
+                        <label for="sq_8">Square 8:</label>
+                        <input type="text" name="sq_8" id="sq_8" required>
+                    </div>
+                    <div>
+                        <label for="sq_9">Square 9:</label>
+                        <input type="text" name="sq_9" id="sq_9" required>
+                    </div>
+                </div>
+                <label for="keys">Keys:</label>
+                <input type="text" name="keys" id="keys" required>
+                <button type="submit">Submit</button>
+            </form>
         </section>
     </main>
     <footer>
