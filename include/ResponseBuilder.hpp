@@ -15,14 +15,14 @@ class ResponseBuilder {
 		std::string	_contentLength;
 	}; 
 
-	Response&		_setup;
+	Response&		_response;
 	std::string		_builtResponse;
 	s_headers		_headers;
 	std::string		_body;
 	std::map<std::string, std::string>	_mimeTypes;
 
 	public:
-	ResponseBuilder(Response& setup): _setup(setup) {}
+	ResponseBuilder(Response& setup): _response(setup) {}
 	~ResponseBuilder() {}
 
 	/* setters/getters */
