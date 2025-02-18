@@ -273,13 +273,21 @@ void	Response::handleResponse() {
 	}
 
 	if (requestMethod == "GET") {
-		if (requestPath == "/cgi-bin") {}
-			//handleCGI();
+		if (requestPath == "/cgi-bin")
+			if (handleCgi() == -1) {
+				setResponseStatus(666, "CGI died in excruciating pain");
+				handleError();
+				return ;
+			}
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath == "/cgi-bin") {
-			//handleCGI();
+			if (handleCgi() == -1) {
+				setResponseStatus(666, "CGI died in excruciating pain");
+				handleError();
+				return ;
+			}
 		}
 		else if (requestPath == "/upload") {
 			handleUpload(_location);
@@ -295,6 +303,24 @@ void	Response::handleResponse() {
 	}
 }
 
+int	Response::handleCgi() {
+	CGI_env*	cgi = new CGI_env;
+	cgi->request_method = _request.getMethod();
+	if (cgi->request_method == "GET") {
+		cgi->content_lenght = "";
+		cgi->content_type = "";
+		cgi->query_string = _request.parseQueryString();
+	}
+	else {
+		cgi->content_lenght = _request.getValueFromHeader("Content-Lenght");
+		cgi->content_type = _request.getValueFromHeader("Content-Type");
+		cgi->query_string = "";
+	}
+	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
+	cgi->script_name = _request.getPath();
+	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
+	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
+}
 
 int	Response::sendResponse() {
 

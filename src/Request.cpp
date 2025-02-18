@@ -106,13 +106,14 @@ uploadData Request::parseBody() {
 	return data;
 }
 
-int	Request::parseQueryString() {
+std::string	Request::parseQueryString() {
+	std::string	queryString;
 	if (_path.find("?") != std::string::npos) {
 		size_t	pos = _path.find("?");
-		_queryString = _path.substr(pos, _path.size() - pos);
-		return _queryString.size();
+		queryString = _path.substr(pos, _path.size() - pos);
+		return queryString;
 	}
-	return 0;
+	return "";
 }
 
 int	Request::handleRequest() {

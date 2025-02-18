@@ -51,6 +51,7 @@ public:
 	std::string	getVersion() const { return _version; }
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
+	std::string	getValueFromHeader(const std::string& key) const;
 
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
@@ -63,5 +64,7 @@ public:
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
 	struct uploadData	parseBody();
+	std::string		parseQueryString();
+
 
 };
