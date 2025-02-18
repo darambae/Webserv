@@ -128,7 +128,7 @@ void	Response::handleError() {
 			_responseReadyToSend = true;
 			setResponseStatus(200, "OK");
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 		}
 	}
 }
@@ -198,7 +198,7 @@ void	Response::handlePost() {
 	
 }
 
-void	Response::handleUpload(ConfigLocation const* location) {
+void	Response::handleUpload() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
@@ -207,7 +207,7 @@ void	Response::handleUpload(ConfigLocation const* location) {
 		return ;
 	}
 	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string upload_location = location->getRoot() + _request.getPath();
+		std::string upload_location = _location->getRoot() + _request.getPath();
 		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
 		std::ofstream file(path.c_str(), std::ios::binary);
 		if (!file.is_open()) {
@@ -280,13 +280,13 @@ void	Response::handleResponse() {
 		if (requestPath == "/cgi-bin") {}
 			//handleCGI();
 		else
-			handleGet(location);
+			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath == "/cgi-bin") {
 			//handleCGI();
 		}
 		else if (requestPath == "/upload" ) {
-			handleUpload(location);
+			handleUpload();
 		} else
 			handlePost();
 	} else if (requestMethod == "DELETE") {}

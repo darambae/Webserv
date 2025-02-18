@@ -2,7 +2,7 @@
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
 int	CgiManager::forkProcess() {
-	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK |SOCK_CLOEXEC, 0, _sockets) == -1) {
+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
 	}
@@ -23,7 +23,7 @@ int	CgiManager::forkProcess() {
 		close(_sockets[1]);
 		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
 		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
-		setenv("CONTENT_LENGHT", _cgi_env->content_lenght.c_str(), 1);
+		setenv("CONTENT_LENGTH", _cgi_env->content_length.c_str(), 1);
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
@@ -42,7 +42,7 @@ int	CgiManager::forkProcess() {
 
 int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a POLLOUT for CGI_children
 	if (_cgi_env->request_method == "POST") {
-		const void* buffer = static_cast<const void*>(_request..data());//converti std::string en const void* data
+		const void* buffer = static_cast<const void*>(_request.data());//converti std::string en const void* data
 		write(_sockets[0], buffer, sizeof(buffer) - 1);
 	}
 	close(_sockets[0]);
