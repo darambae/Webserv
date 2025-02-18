@@ -128,7 +128,7 @@ void	Response::handleError() {
 			_responseReadyToSend = true;
 			setResponseStatus(200, "OK");
 			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse();
+			_builtResponse = _responseBuilder->buildResponse("");
 		}
 	}
 }
@@ -276,13 +276,13 @@ void	Response::handleResponse() {
 		if (requestPath == "/cgi-bin") {}
 			//handleCGI();
 		else
-			handleGet(location);
+			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath == "/cgi-bin") {
 			//handleCGI();
 		}
 		else if (requestPath == "/upload") {
-			handleUpload(location);
+			handleUpload(_location);
 		} else
 			handlePost();
 	} else if (requestMethod == "DELETE") {}
