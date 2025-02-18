@@ -1,4 +1,4 @@
-#pragma once
+/* #pragma once
 
 #include "webserv.hpp"
 
@@ -19,4 +19,4 @@ class	CgiManager {
 		int	recvFromCgi();
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();
-};
+}; */

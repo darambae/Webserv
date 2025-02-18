@@ -1,4 +1,4 @@
-#include "../include/CgiManager.hpp"
+/* #include "../include/CgiManager.hpp"
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
 int	CgiManager::forkProcess() {
@@ -79,3 +79,4 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 CgiManager::~CgiManager() {
 	LOG_INFO("CGI finish");
 }
+ */
