@@ -13,6 +13,8 @@ class ResponseBuilder {
 		std::string	_timeStamp;
 		std::string	_contentType;
 		std::string	_contentLength;
+		std::string	_location;
+		std::string	_connection;
 	}; 
 
 	Response&		_response;

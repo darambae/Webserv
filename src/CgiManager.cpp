@@ -1,6 +1,12 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {
+	std::ifstream   interpreter_path("python3_path.txt");
+	if (!interpreter_path.is_open())
+		LOG_ERROR("The file that has Python3 path can't be opened", 1);
+	std::getline(interpreter_path, _interpreter);
+	interpreter_path.close();
+}
 
 int	CgiManager::forkProcess() {
 	if (socketpair(AF_UNIX, SOCK_STREAM /*| SOCK_NONBLOCK | SOCK_CLOEXEC*/, 0, _sockets) == -1) {
@@ -28,10 +34,11 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
-		char	*envp[] = {NULL};
+		//char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
+		//char	*envp[] = {NULL};
 		LOG_INFO("execve(" + _cgi_env->script_name + ")");
-		execve(argv[0], argv, envp);
+		//execve(argv[0], argv, envp);
+		execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
