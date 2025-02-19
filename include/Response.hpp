@@ -42,18 +42,19 @@ private:
 	void		setResponseStatus(int code);
 	void		setHeader(std::string key, std::string value) { _header[key] = value; }
 	void		setBuiltResponse(std::string	responseComplete);
-	Request &getRequest() const { return _request; }
+
+	Request 			&getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
 	std::string const&	getReasonPhrase() const { return _reasonPhrase; }
 	std::string			getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&		getRequestedFile() { return _requestedFile; }
+	bool				getResponseReadyToSend() { return _responseReadyToSend; }
 	std::map<std::string, std::string>	getHeader() const { return _header; }
-	bool				getResponseReadyToSend() {return _responseReadyToSend;}
 
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
 	void	handleResponse();
-	int	handleCgi();
+	int		handleCgi();
 	int		findIndex();
 	int		sendResponse();
 	void	handleGet();
