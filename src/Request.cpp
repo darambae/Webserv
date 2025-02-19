@@ -8,19 +8,19 @@
 int	Request::parseRequest() {
 
 	char	buffer[1024];
-	std::cout<<"trying to read fd "<<_clientFd<<std::endl;
+	// std::cout<<"trying to read fd "<<_clientFd<<std::endl;
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 	//ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
-	std::cout<<"succeed to read fd "<<_clientFd<<std::endl;
+	// std::cout<<"succeed to read fd "<<_clientFd<<std::endl;
 	if (bytes < 0) {
 		LOG_ERROR("Error reading from client_fd(" + to_string(_clientFd) +")", 1);
 		return -1; //client disconnected
 	} else if (bytes == 0) {
-		LOG_INFO("Client disconnected");
+		LOG_INFO("0 bytes read, Client disconnected");
 		return -1;
 	}
-
+	LOG_INFO("request received : \n"+std::string(buffer)+"\n");
 	_tempBuffer.append(buffer, bytes);
 	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
@@ -137,7 +137,7 @@ std::string	Request::parseQueryString() {
 }
 
 int	Request::handleRequest() {
-
+	LOG_INFO("FD "+to_string(_clientFd)+" received a request");
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
 	if (parseRequest() == -1) {
 		LOG_INFO("Request parsing failed");

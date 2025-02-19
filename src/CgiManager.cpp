@@ -26,6 +26,7 @@ int	CgiManager::forkProcess() {
 	}
 	Server*	server_cgi = FD_DATA[_request->getClientFD()]->server;
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, false);
+	LOG_INFO("socketpair created : \nFD : "+to_string(_sockets[0])+" is the Parent\nFD : "+to_string(_sockets[1])+" is the Children");
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
