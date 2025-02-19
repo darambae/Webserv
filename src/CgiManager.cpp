@@ -1,9 +1,14 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {}
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {
+	// _interpreter = realpath("python3", NULL);
+	// if (_interpreter.empty()) {
+	// 	LOG_ERROR("realpath failed", true);
+	// }
+}
 
 int	CgiManager::forkProcess() {
-	if (socketpair(AF_UNIX, SOCK_STREAM /*| SOCK_NONBLOCK | SOCK_CLOEXEC*/, 0, _sockets) == -1) {
+	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
 	}
@@ -18,6 +23,7 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
 	if (pid == 0) {
+		signal(SIGPIPE, SIG_IGN);
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);

@@ -56,7 +56,6 @@ public:
 	std::string getQuery() const { return _query; }
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
-
 	std::string	getBody() const { return _body; }
 
 	/* methods */

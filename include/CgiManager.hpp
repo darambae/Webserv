@@ -12,6 +12,7 @@ class	CgiManager {
 		Response*	_response;
 		int			_sockets[2];
 		pid_t		_children_pid;
+		// std::string	_interpreter;
 
 	public:
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);

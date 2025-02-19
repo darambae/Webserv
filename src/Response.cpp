@@ -291,6 +291,7 @@ void	Response::handleResponse() {
 
 	LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
+		
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
@@ -366,8 +367,6 @@ int	Response::sendResponse() {
 		}
 		_totalBytesSent += bytesSent;
 	}
-
-
 
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
