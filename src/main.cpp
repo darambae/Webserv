@@ -45,7 +45,6 @@ void    signalHandler(int signal) {
 
 int main(int ac, char **av)
 {
-    LOG_INFO("FULL PATH of python3 : " + fullPath("python3"));
     (void)av;
     signal(SIGPIPE, SIG_IGN);
     struct sigaction sa;
