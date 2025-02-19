@@ -292,6 +292,7 @@ void	Response::handleResponse() {
 	LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
+			LOG_INFO("Handling GET request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
@@ -302,6 +303,7 @@ void	Response::handleResponse() {
 			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
+			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
