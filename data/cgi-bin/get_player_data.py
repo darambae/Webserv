@@ -1,4 +1,3 @@
-#!/usr/bin/python3
 
 import json
 import cgi
@@ -10,7 +9,7 @@ from io import BytesIO
 def handle_request():
     form = cgi.FieldStorage()
     player_id = int(form.getvalue("player_id"))
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     player_data = data["players"].get(str(player_id))

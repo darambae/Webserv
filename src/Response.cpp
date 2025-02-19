@@ -124,8 +124,6 @@ void	Response::handleError() {
 				_request.setPath(it->error_path);
 				errorPageFound = true;
 				LOG_INFO("error_path: " + it->error_path);
-				const char* errorPathChar = it->error_path.c_str();
-				std::cout << errorPathChar << std::endl;
 				_location = findRequestLocation(_config, _request.getPath());
 				LOG_INFO("Location block for error: " + _location->getPath());
 				handleGet();
@@ -183,13 +181,13 @@ void	Response::handleGet() {
 	else {
 	// request path is a file
 		std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
-		const char*	rootPathChar = rootPath.c_str();
 		std::string path = rootPath + _request.getPath();
-		const char*	pathChar = path.c_str();
-		std::cout << rootPathChar << " " << pathChar << std::endl;
-		// LOG_INFO("rootPath: " + rootPath);
-		// LOG_INFO("request path before concatenation: " + _request.getPath());
-		// LOG_INFO("path: " + path);
+		// const char*	rootPathChar = rootPath.c_str();
+		// const char*	pathChar = path.c_str();
+		// std::cout << rootPathChar << " " << pathChar << std::endl;
+		LOG_INFO("rootPath: " + rootPath);
+		LOG_INFO("request path before concatenation: " + _request.getPath());
+		LOG_INFO("path: " + path);
 		setRequestedFile(path.c_str());
 
 		if (_requestedFile) {
@@ -197,7 +195,7 @@ void	Response::handleGet() {
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-			//LOG_INFO("Response built:\n" /*+ *_builtResponse*/);
+			LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			setResponseStatus(404);
@@ -205,7 +203,6 @@ void	Response::handleGet() {
 		}
 	}
 }
-
 
 
 void	Response::handlePost() {
@@ -293,6 +290,7 @@ void	Response::handleResponse() {
 	if (requestMethod == "GET") {
 		
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
+			LOG_INFO("Handling GET request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();
@@ -303,6 +301,7 @@ void	Response::handleResponse() {
 			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
+			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
 				handleError();

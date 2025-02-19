@@ -5,7 +5,11 @@ OBJ= $(SRC:%.cpp=$(OBJ_DIR)%.o)
 CC= c++
 CPPFLAGS= -g -Wall -Wextra -Werror -std=c++98 -Iinclude
 
-all: $(NAME)
+all: setup $(NAME)
+
+setup:
+	@which python3 > python3_path.txt
+	@chmod +x data/cgi-bin/*.py
 
 $(OBJ_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
@@ -20,7 +24,7 @@ $(NAME): $(OBJ)
 
 clean:
 	rm -rf $(OBJ_DIR)
-	rm -f log.txt
+	rm -f log.txt python3_path.txt
 	rm -f data/upload/*
 
 fclean: clean
