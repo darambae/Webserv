@@ -38,10 +38,12 @@ int	CgiManager::forkProcess() {
 		//char	*envp[] = {NULL};
 		LOG_INFO("execve(" + _cgi_env->script_name + ")");
 		//execve(argv[0], argv, envp);
+
 		execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
+	LOG_ERROR("CGI parent process", false);
 	_children_pid = pid;
 	close(_sockets[1]);
 	return 0;
@@ -76,7 +78,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (result == _children_pid) {
 		if (WIFEXITED(status))//if true children finish normally with exit
 			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execve failed", false);
+				LOG_ERROR("CGI failed, execl failed", false);
 				return -1;
 			}
 	}
