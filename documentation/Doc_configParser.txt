@@ -16,26 +16,30 @@
 
 
 
->>Compile command lines 
-1> Daram's : 
+>>Compile command lines
+1> Daram's :
     c++ -std=c++98 -Wall -Wextra -Werror -Iinclude -o webserv src/Logger.cpp src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp
-2> Kelly's + Daram's : 
+2> Kelly's + Daram's :
     c++ -std=c++98 -Wall -Wextra -Werror -Iinclude -o webserv src/utils.cpp src/main.cpp src/ConfigLocation.cpp src/ConfigParser.cpp src/ConfigServer.cpp src/Logger.cpp src/ServerManager.cpp src/server.cpp
 
 >>How to use Logger and Exception classes
  Logger usage cases
- 1> When error found and program needs to stop fully 
+ 1> When error found and program needs to stop fully
     THROW("PUT YOUR ERROR MESSAGE");
     ---> this macro function uses Exception class, which will be caught in main.cpp.(it will print where the error location is)
 
- 2> When the error is related to system functions like 'open', 'read', etc, ( which means errno is set), so 
+ 2> When the error is related to system functions like 'open', 'read', etc, ( which means errno is set), so
  you want to use error msg already set by the system
     LOG_ERROR("PUT YOUR ERROR MESSAGE", 1);
 
- 3> When the error doesn't affect errno, but you want to print only a customized error msg 
+ 3> When the error doesn't affect errno, but you want to print only a customized error msg
     LOG_ERROR("PUT YOUR ERROR MESSAGE");
 
- 4> For informational purpose, you want to print a successful msg or what is processed 
+ 4> For informational purpose, you want to print a successful msg or what is processed
     LOG_INFO("MSG");
+ 5> to test a big amount of connection :
+		launch the server in one terminal
+		in another terminal, launch this command (don't forget to change the ip (command :ip a)):
+			docker run --rm -t jstarcher/siege -c100 -r200 10.12.1.6:8080 | grep -v "HTTP"
 
 *MACROs are defined in webserv.hpp
