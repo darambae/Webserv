@@ -147,7 +147,7 @@ int	Request::handleRequest() {
 		FD_DATA[_clientFd]->response = new Response(*this, *config);
 		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
-		LOG_INFO("Response: " + _Response->getReasonPhrase());
+		// LOG_INFO("Response: " + _Response->getReasonPhrase());
 	}
 	return 0;
 }

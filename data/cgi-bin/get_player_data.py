@@ -4,6 +4,7 @@ import json
 import cgi
 import os
 import matplotlib.pyplot as plt
+import base64
 from io import BytesIO
 
 def handle_request():
@@ -43,7 +44,26 @@ def handle_request():
     
     plt.xticks(x_pos, game_ids) # Set label locations.
     plt.legend()
-    plt.show()
+
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='png')
+    img_buffer.seek(0)
+
+    # Encode the image in base64
+    img_base64 = base64.b64encode(img_buffer.read()).decode('utf-8')
+    img_buffer.close()
+
+    # Generate the HTML response
+    print("Content-Type: text/html")
+    print()
+    print("<html><body>")
+    print(f"<h1>Player Data for {player_id}</h1>")
+    print(f"<p>Player Name: {player_data['player_name']}</p>")
+    print(f"<p>Game History: {player_data['game_history']}</p>")
+    print(f'<img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/>')
+    print("<a href='/'>Go back</a>")
+    print("</body></html>")
 
 if __name__ == "__main__":
     handle_request()

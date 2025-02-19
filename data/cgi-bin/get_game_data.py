@@ -27,7 +27,7 @@ def handle_request():
     plt.ylabel('Score')
     plt.title(f'Game {game_id} scores')
     plt.xticks(x_pos, player_names) # Set label locations.
-    plt.show()
+    
 
 if __name__ == "__main__":
     handle_request()

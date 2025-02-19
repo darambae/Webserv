@@ -17,8 +17,6 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
-	LOG_INFO("QUERY_STRING : " + _cgi_env->query_string);
-	LOG_INFO("SCRIPT_NAME : " + _cgi_env->script_name);
 	if (pid == 0) {
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
@@ -32,6 +30,7 @@ int	CgiManager::forkProcess() {
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
 		char	*envp[] = {NULL};
+		LOG_INFO("execve(" + _cgi_env->script_name + ")");
 		execve(argv[0], argv, envp);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
@@ -49,6 +48,10 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 		std::string body = _request->getBody();
 		const void* buffer = static_cast<const void*>(body.data());//converti std::string en const void* data
 		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
+		LOG_DEBUG("returnValue : " + to_string(returnValue));
+	} else {
+		returnValue = write(_sockets[0], _cgi_env->query_string.c_str(), _cgi_env->query_string.size());
+		LOG_DEBUG("returnValue : " + to_string(returnValue));
 	}
 	close(_sockets[0]);
 	return returnValue;
