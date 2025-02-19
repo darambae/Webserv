@@ -21,6 +21,7 @@ class	CgiManager {
 		int	forkProcess();
 		int	sendToCgi();
 		int	recvFromCgi();
+		pid_t	getPid() {return _children_pid;}
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();
 };

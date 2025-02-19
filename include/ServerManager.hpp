@@ -21,6 +21,9 @@ class	ServerManager {
 		virtual const char* what() const throw() {return _message.c_str();}
 		};
 		void	launchServers();
+		void	handlePollhup(int FD);
+		void	handlePollin(int FD);
+		void	handlePollout(int FD);
 		void	cleanFd(int	FD);
 		void	closeCgi(int errorNumber, int FdCGI);
 		void	print_all_FD_DATA();

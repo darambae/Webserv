@@ -2,19 +2,20 @@
 
 std::string*	ResponseBuilder::buildResponse(std::string body) {
 
-	if (!body.empty())
-		_body = body;
-	else {
+	if (_response.getRequestedFile()) {
 		std::stringstream buffer;
 		buffer << _response.getRequestedFile().rdbuf();
 		_body = buffer.str();
+	} else {
+		_body = body;
 	}
 
 	initMimeTypes();
 
 	_builtResponse = buildFirstLine();
 	_builtResponse += buildHeaders();
-	_builtResponse += _body;
+	if (!_body.empty())
+		_builtResponse += _body;
 
 	return &_builtResponse;
 }
@@ -28,12 +29,21 @@ std::string	ResponseBuilder::buildFirstLine() {
 std::string	ResponseBuilder::buildHeaders() {
 	
 	std::string	header;
+	std::string	headerEnd = "\r\n\r\n";
 
 	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
-	_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
-	_headers._contentLength = "Content-Length: " + to_string(_body.size()) + "\r\n\r\n";
+	header += _headers._timeStamp;
+	if (!_body.empty()) {
+		_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
+		header += _headers._contentType;
+	}
+	_headers._contentLength = "Content-Length: " + to_string(_body.size()) + "\r\n";
+	header += _headers._contentLength;
+	_headers._connection = "Connection: keep-alive";
+	header += _headers._connection;
+	header += headerEnd;
 
-	return (header = _headers._timeStamp + _headers._contentType + _headers._contentLength);
+	return (header);
 }
 
 std::string	ResponseBuilder::buildTime(void) {
