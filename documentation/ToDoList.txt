@@ -3,6 +3,7 @@ KELLY:
 - pid children /parent
 - split main loop in several functionality
 - cgi handling
+- who have to handle the response building, webserv or cgi ? what are the normes of CGI
 
 GAUTIER:
 chill and watch other (way smarter) team mates work;

@@ -21,73 +21,12 @@ void	ServerManager::launchServers() {
 		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 			if (ALL_FDS[i].revents == 0)
 				continue;
-			else if (ALL_FDS[i].revents & POLLHUP) {
-				LOG_INFO("POLLHUP signal");
-				int hangup_fd = ALL_FDS[i].fd;
-				if (FD_DATA[hangup_fd]->status == CLIENT && FD_DATA[hangup_fd]->just_connected) {
-                    // Ignore POLLHUP for newly connected clients
-                    FD_DATA[hangup_fd]->just_connected = false;
-                    continue;
-                }
-				//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-				cleanFd(hangup_fd);
-				continue;
-			}
-			else if (ALL_FDS[i].revents & POLLIN) {
-				//LOG_INFO("POLLIN signal");
-				int	readable_FD = ALL_FDS[i].fd;
-				if (FD_DATA[readable_FD]->status == SERVER) {
-					int new_client = FD_DATA[readable_FD]->server->createClientSocket(readable_FD);
-					if (new_client == -1) {
-						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : SERVER");
-						cleanFd(new_client);
-						//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
-					} else
-						FD_DATA[new_client]->just_connected = true;
-				} else if (FD_DATA[readable_FD]->status == CLIENT) {
-					if (FD_DATA[readable_FD]->request->handleRequest() == -1) {
-						LOG_INFO("The status of FD_DATA[" + to_string(readable_FD) +"] : CLIENT");
-						cleanFd(readable_FD);
-					}
-				}
-				else if (FD_DATA[readable_FD]->status == CGI_parent) {
-					int result = FD_DATA[readable_FD]->CGI->recvFromCgi();
-					if (result == 0)
-						continue;//children don't finish
-					else if (result == -1)
-						closeCgi(501, FD_DATA[readable_FD]->request->getClientFD());
-					else//children finish and send the response to the response class
-						closeCgi(0, FD_DATA[readable_FD]->request->getClientFD());
-				}
-			}
-			else if (ALL_FDS[i].revents & POLLOUT) {
-				//LOG_INFO("POLLOUT signal");
-				int sendable_fd = ALL_FDS[i].fd;
-				if (FD_DATA[sendable_fd]->status == CLIENT) {
-					if (FD_DATA[sendable_fd]->response && FD_DATA[sendable_fd]->response->getResponseReadyToSend()) {
-						LOG_INFO("response ready to be sent");
-						if (FD_DATA[sendable_fd]->response->sendResponse() == -1) {
-							LOG_ERROR("client FD "+to_string(sendable_fd)+" disconected for response error", 0);
-							cleanFd(sendable_fd);
-						}
-						if (FD_DATA[sendable_fd]->response->getResponseReadyToSend() == false) {
-							delete FD_DATA[sendable_fd]->response;
-							FD_DATA[sendable_fd]->response = NULL;
-							delete FD_DATA[sendable_fd]->request;
-							FD_DATA[sendable_fd]->request = NULL;
-							FD_DATA[sendable_fd]->request = new Request(sendable_fd);
-							LOG_INFO("response send and delete");
-						}
-					}
-				}
-				else if (FD_DATA[sendable_fd]->status == CGI_children) {
-					if (FD_DATA[sendable_fd]->CGI->sendToCgi() == -1) {
-						LOG_ERROR("write to send the body to CGI failed", true);
-						closeCgi(501, FD_DATA[sendable_fd]->request->getClientFD());
-					}
-				}
-				continue;
-			}
+			else if (ALL_FDS[i].revents & POLLHUP)
+				handlePollhup(ALL_FDS[i].fd);
+			else if (ALL_FDS[i].revents & POLLIN)
+				handlePollin(ALL_FDS[i].fd);
+			else if (ALL_FDS[i].revents & POLLOUT)
+				handlePollout(ALL_FDS[i].fd);
 			// else if (ALL_FDS[i].revents & (POLLERR | POLLHUP | POLLNVAL)) {
             //     int error_fd = ALL_FDS[i].fd;
             //     LOG_INFO("Error or hangup on FD: " + to_string(error_fd));
@@ -95,6 +34,67 @@ void	ServerManager::launchServers() {
             // }
 		}
     }
+}
+
+void	ServerManager::handlePollhup(int FD) {
+	LOG_INFO("POLLHUP signal");
+	if (FD_DATA[FD]->status == CLIENT && FD_DATA[FD]->just_connected) {
+	// Ignore POLLHUP for newly connected clients
+    FD_DATA[FD]->just_connected = false;
+    }
+	//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
+	cleanFd(FD);
+}
+
+void	ServerManager::handlePollin(int FD) {
+	//LOG_INFO("POLLIN signal");
+	if (FD_DATA[FD]->status == SERVER) {
+		int new_client = FD_DATA[FD]->server->createClientSocket(FD);
+		if (new_client == -1) {
+			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : SERVER");
+			cleanFd(new_client);
+			//LOG_ERROR(": "+to_string(new_client)+" is disconnected", 0);
+		} else
+			FD_DATA[new_client]->just_connected = true;
+	} else if (FD_DATA[FD]->status == CLIENT) {
+		if (FD_DATA[FD]->request->handleRequest() == -1) {
+			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
+			cleanFd(FD);
+		}
+	} else if (FD_DATA[FD]->status == CGI_parent) {
+		int result = FD_DATA[FD]->CGI->recvFromCgi();
+		if (result == -1)
+			closeCgi(501, FD_DATA[FD]->request->getClientFD());
+		else if (result > 0)//children finish and send the response to the response class
+			closeCgi(0, FD_DATA[FD]->request->getClientFD());
+	}
+}
+
+void	ServerManager::handlePollout(int FD) {
+	//LOG_INFO("POLLOUT signal");
+	if (FD_DATA[FD]->status == CLIENT) {
+		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
+			LOG_INFO("response ready to be sent");
+			if (FD_DATA[FD]->response->sendResponse() == -1) {
+				LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
+				cleanFd(FD);
+			}
+			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
+				delete FD_DATA[FD]->response;
+				FD_DATA[FD]->response = NULL;
+				delete FD_DATA[FD]->request;
+				FD_DATA[FD]->request = NULL;
+				FD_DATA[FD]->request = new Request(FD);
+				LOG_INFO("response send and delete");
+			}
+		}
+	}
+	else if (FD_DATA[FD]->status == CGI_children) {
+		if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
+			LOG_ERROR("write to send the body to CGI failed", true);
+			closeCgi(501, FD_DATA[FD]->request->getClientFD());
+		}
+	}
 }
 
 void	ServerManager::closeCgi(int errorNumber, int FdClient) {
@@ -148,8 +148,17 @@ ServerManager::~ServerManager() {
 	if (FD_DATA.size() > 0) {
 		for (std::map<int, Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);
-			if (it->second->status == CLIENT)
+			if (it->second->request) {
 				delete it->second->request;
+				it->second->request = NULL;
+			}
+			if (it->second->response) {
+				delete it->second->response;
+				it->second->response = NULL;
+			}
+			if (it->second->CGI) {
+				closeCgi(0, it->first);
+			}
 			delete it->second;
 		}
 		FD_DATA.clear();
