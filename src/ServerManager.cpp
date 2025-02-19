@@ -55,9 +55,9 @@ void	ServerManager::launchServers() {
 					if (result == 0)
 						continue;//children don't finish
 					else if (result == -1)
-						closeCgi(501, readable_FD);
+						closeCgi(501, FD_DATA[readable_FD]->request->getClientFD());
 					else//children finish and send the response to the response class
-						closeCgi(0, readable_FD);
+						closeCgi(0, FD_DATA[readable_FD]->request->getClientFD());
 				}
 			}
 			else if (ALL_FDS[i].revents & POLLOUT) {
@@ -83,7 +83,7 @@ void	ServerManager::launchServers() {
 				else if (FD_DATA[sendable_fd]->status == CGI_children) {
 					if (FD_DATA[sendable_fd]->CGI->sendToCgi() == -1) {
 						LOG_ERROR("write to send the body to CGI failed", true);
-						closeCgi(501, sendable_fd);
+						closeCgi(501, FD_DATA[sendable_fd]->request->getClientFD());
 					}
 				}
 				continue;
@@ -97,16 +97,15 @@ void	ServerManager::launchServers() {
     }
 }
 
-void	ServerManager::closeCgi(int errorNumber, int FdCGI) {
-	int fd_client = FD_DATA[FdCGI]->request->getClientFD();
+void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	if (errorNumber > 0) {
-		FD_DATA[fd_client]->response->setResponseStatus(errorNumber);
-		FD_DATA[fd_client]->response->handleError();
+		FD_DATA[FdClient]->response->setResponseStatus(errorNumber);
+		FD_DATA[FdClient]->response->handleError();
 	}
-	cleanFd(FD_DATA[fd_client]->CGI->getSocketsChildren());
-	cleanFd(FD_DATA[fd_client]->CGI->getSocketsParent());
-	delete FD_DATA[fd_client]->CGI;
-	FD_DATA[fd_client]->CGI = NULL;
+	cleanFd(FD_DATA[FdClient]->CGI->getSocketsChildren());
+	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
+	delete FD_DATA[FdClient]->CGI;
+	FD_DATA[FdClient]->CGI = NULL;
 }
 
 void	ServerManager::print_all_FD_DATA() {
@@ -126,11 +125,8 @@ void	ServerManager::cleanFd(int FD) {
 			delete FD_DATA[FD]->request;
 		if (FD_DATA[FD]->response)
 			delete FD_DATA[FD]->response;
-		/* if (FD_DATA[FD]->CGI) {
-			cleanFd(FD_DATA[FD]->CGI->getSocketsChildren());
-			cleanFd(FD_DATA[FD]->CGI->getSocketsParent());
-			delete FD_DATA[FD]->CGI;
-		} */
+		if (FD_DATA[FD]->CGI)
+			closeCgi(0, FD);
 	}
 	std::map<int, Fd_data*>::iterator	it = FD_DATA.find(FD);
 	delete it->second;

@@ -87,5 +87,9 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 }
 
 CgiManager::~CgiManager() {
+	if (_cgi_env) {
+		delete _cgi_env;
+		_cgi_env = NULL;
+	}
 	LOG_INFO("CGI finish");
 }
