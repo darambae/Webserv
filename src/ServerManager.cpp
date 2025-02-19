@@ -102,6 +102,8 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 		FD_DATA[FdClient]->response->setResponseStatus(errorNumber);
 		FD_DATA[FdClient]->response->handleError();
 	}
+	pid_t parentPid = FD_DATA[FdClient]->CGI->getPid();
+	kill(-parentPid, SIGKILL);  // Tue tous les enfants du processus parent
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsChildren());
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
 	delete FD_DATA[FdClient]->CGI;

@@ -1,0 +1,42 @@
+[2025-02-19 12:09:05] [DEBUG] Valid root
+[2025-02-19 12:09:05] [DEBUG] Valid error page
+[2025-02-19 12:09:05] [DEBUG] Valid error page
+[2025-02-19 12:09:05] [DEBUG] Valid error page
+[2025-02-19 12:09:05] [DEBUG] Valid body size
+[2025-02-19 12:09:05] [DEBUG] Valid path
+[2025-02-19 12:09:05] [DEBUG] Valid root
+[2025-02-19 12:09:05] [DEBUG] Valid autoindex
+[2025-02-19 12:09:05] [DEBUG] Valid methods
+[2025-02-19 12:09:05] [DEBUG] Valid path
+[2025-02-19 12:09:05] [DEBUG] Valid root
+[2025-02-19 12:09:05] [DEBUG] Valid methods
+[2025-02-19 12:09:05] [DEBUG] Valid autoindex
+[2025-02-19 12:09:05] [DEBUG] Valid path
+[2025-02-19 12:09:05] [DEBUG] Valid CGI path
+[2025-02-19 12:09:05] [DEBUG] Valid CGI extension
+[2025-02-19 12:09:05] [DEBUG] Valid methods
+[2025-02-19 12:09:05] [DEBUG] Valid root
+[2025-02-19 12:09:05] [DEBUG] Valid path
+[2025-02-19 12:09:05] [DEBUG] Valid root
+[2025-02-19 12:09:22] [DEBUG] CGI script name: /cgi-bin/get_player_data.py
+[2025-02-19 12:09:38] [DEBUG] Valid root
+[2025-02-19 12:09:38] [DEBUG] Valid error page
+[2025-02-19 12:09:38] [DEBUG] Valid error page
+[2025-02-19 12:09:38] [DEBUG] Valid error page
+[2025-02-19 12:09:38] [DEBUG] Valid body size
+[2025-02-19 12:09:38] [DEBUG] Valid path
+[2025-02-19 12:09:38] [DEBUG] Valid root
+[2025-02-19 12:09:38] [DEBUG] Valid autoindex
+[2025-02-19 12:09:38] [DEBUG] Valid methods
+[2025-02-19 12:09:38] [DEBUG] Valid path
+[2025-02-19 12:09:38] [DEBUG] Valid root
+[2025-02-19 12:09:38] [DEBUG] Valid methods
+[2025-02-19 12:09:38] [DEBUG] Valid autoindex
+[2025-02-19 12:09:38] [DEBUG] Valid path
+[2025-02-19 12:09:38] [DEBUG] Valid CGI path
+[2025-02-19 12:09:38] [DEBUG] Valid CGI extension
+[2025-02-19 12:09:38] [DEBUG] Valid methods
+[2025-02-19 12:09:38] [DEBUG] Valid root
+[2025-02-19 12:09:38] [DEBUG] Valid path
+[2025-02-19 12:09:38] [DEBUG] Valid root
+[2025-02-19 12:09:49] [DEBUG] CGI script name: /cgi-bin/get_player_data.py

@@ -1,8 +1,8 @@
 KELLY:
-- we should add a response class pointer in fd_data structure
-- we should add a booleen in response class wich say response is ready or not
-- when the client fd is pollout, we can send it the response if it's ready.
 - make a fonction which stop everything, if it's not allready done.
+- pid children /parent
+- split main loop in several functionality
+- cgi handling
 
 GAUTIER:
 chill and watch other (way smarter) team mates work;
