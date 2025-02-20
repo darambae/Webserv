@@ -1,14 +1,13 @@
 
 import json
-import cgi
 import os
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
 
 def handle_request():
-    form = cgi.FieldStorage()
-    player_id = int(form.getvalue("player_id"))
+    player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
+    print(player_id)
     file_path = os.path.realpath("data/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -56,6 +55,7 @@ def handle_request():
     # Generate the HTML response
     print("Content-Type: text/html")
     print()
+    print("<!DOCTYPE html>")
     print("<html><body>")
     print(f"<h1>Player Data for {player_id}</h1>")
     print(f"<p>Player Name: {player_data['player_name']}</p>")
@@ -63,6 +63,7 @@ def handle_request():
     print(f'<img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/>')
     print("<a href='/'>Go back</a>")
     print("</body></html>")
+    return
 
 if __name__ == "__main__":
     handle_request()

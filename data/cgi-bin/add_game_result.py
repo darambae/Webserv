@@ -1,32 +1,40 @@
 import json
-import cgi
 import os
 
 def load_data():
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     return data
 
 def save_data(data):
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/record.json")
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
 def handle_request():
-    form = cgi.FieldStorage()
-    game_id = int(form.getvalue("game_id"))
-    player_id = int(form.getvalue("player_id"))
-    sq_1 = int(form.getvalue("sq_1"))
-    sq_2 = int(form.getvalue("sq_2"))
-    sq_3 = int(form.getvalue("sq_3"))
-    sq_4 = int(form.getvalue("sq_4"))
-    sq_5 = int(form.getvalue("sq_5"))
-    sq_6 = int(form.getvalue("sq_6"))
-    sq_7 = int(form.getvalue("sq_7"))
-    sq_8 = int(form.getvalue("sq_8"))
-    sq_9 = int(form.getvalue("sq_9"))
-    keys = int(form.getvalue("keys"))
+    form = os.environ.get("QUERY_STRING")
+    if not form:
+        print("Content-Type: text/html")
+        print()
+        print("<html><body>")
+        print("<h1>Invalid request</h1>")
+        print("<a href='/'>Go back</a>")
+        print("</body></html>")
+        return
+    form_data = dict(qc.split("=") for qc in form.split("&"))
+    game_id = int(form_data.get("game_id"))
+    player_id = int(form_data.get("player_id"))            
+    sq_1 = int(form_data.get("sq_1"))
+    sq_2 = int(form_data.get("sq_2"))
+    sq_3 = int(form_data.get("sq_3"))
+    sq_4 = int(form_data.get("sq_4"))
+    sq_5 = int(form_data.get("sq_5"))
+    sq_6 = int(form_data.get("sq_6"))
+    sq_7 = int(form_data.get("sq_7"))
+    sq_8 = int(form_data.get("sq_8"))
+    sq_9 = int(form_data.get("sq_9"))
+    keys = int(form_data.get("keys"))
 
     total_score = sq_1 + sq_2 + sq_3 + sq_4 + sq_5 + sq_6 + sq_7 + sq_8 + sq_9 + keys
 
@@ -76,10 +84,12 @@ def handle_request():
 
     print("Content-Type: text/html")
     print()
+    print("<!DOCTYPE html>")
     print("<html><body>")
     print("<h1>Game result added successfully!</h1>")
     print("<a href='/'>Go back</a>")
     print("</body></html>")
+    return
 
 if __name__ == "__main__":
     handle_request()
