@@ -53,14 +53,14 @@ private:
 
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
-	void	handleResponse();
-	int		handleCgi();
-	int		findIndex();
-	int		sendResponse();
-	void	handleGet();
-	void	handlePost();
-	void	handleDelete();
-	void	handleError();
-	int		generateDefaultErrorHtml();
-
+	void		handleResponse();
+	int			handleCgi();
+	int			findIndex();
+	int			sendResponse();
+	void		handleGet();
+	void		handlePost();
+	void		handleDelete();
+	void		handleError();
+	int			generateDefaultErrorHtml();
+	std::string	generateAutoIndex(std::string path);
 };
