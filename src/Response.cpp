@@ -145,6 +145,36 @@ void	Response::handleError() {
 	}
 }
 
+std::string	Response::generateAutoIndex(std::string path) {
+
+	std::stringstream	html;
+	html << "<!DOCTYPE html>\n<html>\n<head>\n";
+	html << "<title>Index of " << path << "</title>\n</head>\n<body>\n";
+	html << "<h1>Index of " << path << "</h1>\n<ul>\n";
+
+	DIR *dir = opendir(path.c_str());
+	if (!dir) {
+		LOG_ERROR("failed to open directory: " + path, 1);
+		setResponseStatus(500);
+		handleError();
+		return NULL;
+	}
+
+	struct dirent *entry;
+	while ((entry = readdir(dir)) != NULL) {
+		std::string	fileName = entry->d_name;
+		if (fileName == ".")
+			continue;
+		if (fileName == "..")
+			html << "<li><a href=\"../\">../ (Parent Directory)</a></li>\n";
+		else
+			html << "<li><a href=\"" << fileName << "\">" << fileName << "</a></li>\n";		
+	}
+	closedir(dir);
+	html << "</ul>\n</body>\n</html>\n";
+	
+	return html.str();
+}
 
 //IF request path is a directory
 //	=> IF index page exist, serve it
@@ -169,8 +199,12 @@ void	Response::handleGet() {
 		}
 		else {
 			if (_location->getAutoindex()) {
-				//generate html page with all the files and repos present in the repo asked in the request
-				//page is supposed to be dynamic so we can navigate through website's repos and files via hypertext links
+				LOG_INFO("Autoindex enabled, generating directory listing...");
+				std::string autoIndexPage = generateAutoIndex(_request.getPath());
+				setResponseStatus(200);
+				_responseReadyToSend = true;
+				_responseBuilder = new ResponseBuilder(*this);
+				_builtResponse = _responseBuilder->buildResponse(autoIndexPage);
 			}
 			else {
 				setResponseStatus(403);
