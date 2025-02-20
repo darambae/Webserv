@@ -24,7 +24,7 @@ def handle_request():
             if int(player) <= len(game_data) and game_data[int(player) - 1]:
                 player_names.append((player_data.get(player)).get("player_name"))
                 total_scores.append(game_data[int(player) - 1].get("total_score"))
-    else
+    else:
         print(f"<h1>No game with ID {game_id} found</h1><a href='/'>Go back</a></body></html>")
         return
     

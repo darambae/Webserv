@@ -14,7 +14,6 @@ def save_data(data):
 
 def handle_request():
     form = os.environ.get("QUERY_STRING")
-    print("")
     print("Content-Type: text/html")
     print()
     print("<html><body>")
@@ -26,7 +25,6 @@ def handle_request():
     form_data = dict(qc.split("=") for qc in form.split("&"))
     game_id = int(form_data.get("game_id"))
     player_id = int(form_data.get("player_id"))
-    player_name = form_data.get("player_name")     
     sq_1 = int(form_data.get("sq_1"))
     sq_2 = int(form_data.get("sq_2"))
     sq_3 = int(form_data.get("sq_3"))

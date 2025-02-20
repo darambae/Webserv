@@ -7,7 +7,7 @@ def load_data():
         data = json.load(file)
     return data
 
-def handle_request:
+def handle_request():
     data = load_data()
     print("Content-Type: text/html")
     print()
@@ -20,7 +20,7 @@ def handle_request:
         num_player = data.get("players").size()
         for player in data.get("players") :
             print(f"<p>Player Name(id) : {player.get("player_name")}({player.key()})</p>")
-    else
+    else:
         print("<h1>No game data found</h1>")
     print("</body></html>")
     return
