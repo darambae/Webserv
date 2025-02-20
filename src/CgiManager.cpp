@@ -15,7 +15,7 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 }
 
 int	CgiManager::forkProcess() {
-	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, _sockets) == -1) {
+	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
 	}

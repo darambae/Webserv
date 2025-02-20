@@ -27,6 +27,7 @@ class Request {
 	bool			isRequestPathDirectory;
 	int				_clientFd;
 	int				_contentLength;
+	std::string		_savedErrorCode;
 	// CGI data struct to be implemented
 	// std::string _content_type;
 	std::string _firstLine;
