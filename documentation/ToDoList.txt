@@ -1,7 +1,5 @@
 KELLY:
 - make a fonction which stop everything, if it's not allready done.
-- pid children /parent
-- split main loop in several functionality
 - cgi handling
 - who have to handle the response building, webserv or cgi ? what are the normes of CGI
 
