@@ -1,11 +1,17 @@
 #include "../include/CgiManager.hpp"
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {
-	std::ifstream   interpreter_path("python3_path.txt");
-	if (!interpreter_path.is_open())
+	std::ifstream   python_path("python3_path.txt");
+	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
-	std::getline(interpreter_path, _interpreter);
-	interpreter_path.close();
+	std::getline(python_path, _python_path);
+	python_path.close();
+
+	std::ifstream   php_path("php_path.txt");
+	if (!php_path.is_open())
+		LOG_ERROR("The file that has php path can't be opened", 1);
+	std::getline(php_path, _php_path);
+	php_path.close();	
 }
 
 int	CgiManager::forkProcess() {
@@ -25,6 +31,7 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
 	if (pid == 0) {
+		signal(SIGPIPE, SIG_IGN);
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
@@ -35,12 +42,12 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		//char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
-		//char	*envp[] = {NULL};
-		LOG_INFO("execve(" + _cgi_env->script_name + ")");
-		//execve(argv[0], argv, envp);
+		std::string fullpath_script = fullPath(_cgi_env->script_name);
+		char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
+		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
+		execve(interpreter.c_str(), argv, NULL);
 
-		execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
+		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
 	}

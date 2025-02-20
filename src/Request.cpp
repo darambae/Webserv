@@ -64,9 +64,10 @@ int	Request::parseRequest() {
 void	Request::parseFirstLine() {
 	std::istringstream firstLineStream(_firstLine);
 	firstLineStream >> _method >> _path >> _version;
-	if (_path.find("?") != std::string::npos)
+	if (_path.find("?") != std::string::npos) {
+		_query = parseQueryString();
 		createQueryMap(_path);
-
+	}
 	if (_path[_path.size() - 1] == '/')
 		isRequestPathDirectory = true;
 }
