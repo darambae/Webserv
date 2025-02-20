@@ -12,7 +12,8 @@ class	CgiManager {
 		Response*	_response;
 		int			_sockets[2];
 		pid_t		_children_pid;
-		std::string	_interpreter;
+		std::string	_python_path;
+		std::string _php_path;
 
 	public:
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
