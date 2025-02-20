@@ -15,6 +15,7 @@ def save_data(data):
 def handle_request():
     form = os.environ.get("QUERY_STRING")
     if not form:
+        print("")
         print("Content-Type: text/html")
         print()
         print("<html><body>")

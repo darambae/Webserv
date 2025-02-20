@@ -9,7 +9,7 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 }
 
 int	CgiManager::forkProcess() {
-	if (socketpair(AF_UNIX, SOCK_STREAM | SOCK_NONBLOCK | SOCK_CLOEXEC, 0, _sockets) == -1) {
+	if (socketpair(AF_UNIX, SOCK_STREAM /*| SOCK_NONBLOCK | SOCK_CLOEXEC*/, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
 	}
@@ -35,12 +35,13 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		//char	*argv[] = {const_cast<char*>(_cgi_env->script_name.c_str()), NULL};
+		std::string fullpath_script = fullPath(_cgi_env->script_name);
+		char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
 		//char	*envp[] = {NULL};
 		LOG_INFO("execve(" + _cgi_env->script_name + ")");
-		//execve(argv[0], argv, envp);
+		execve(_interpreter.c_str(), argv, NULL);
 
-		execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
+		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
