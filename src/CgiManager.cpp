@@ -46,6 +46,8 @@ int	CgiManager::forkProcess() {
 	LOG_ERROR("CGI parent process", false);
 	_children_pid = pid;
 	close(_sockets[1]);
+	if (_cgi_env->request_method == "GET")
+		close(_sockets[0]);
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -58,11 +60,8 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 		const void* buffer = static_cast<const void*>(body.data());//converti std::string en const void* data
 		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
 		LOG_DEBUG("returnValue : " + to_string(returnValue));
-	} else {
-		returnValue = write(_sockets[0], _cgi_env->query_string.c_str(), _cgi_env->query_string.size());
-		LOG_DEBUG("returnValue : " + to_string(returnValue));
+		close(_sockets[0]);
 	}
-	close(_sockets[0]);
 	return returnValue;
 }
 
