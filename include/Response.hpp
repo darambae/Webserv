@@ -39,9 +39,11 @@ private:
 		_requestedFile.open(filePath.c_str(), std::ios::binary);
 
 	}
-	void		setResponseStatus(int code);
-	void		setHeader(std::string key, std::string value) { _header[key] = value; }
-	void		setBuiltResponse(std::string	responseComplete);
+	void	setResponseStatus(int code);
+	void	setHeader(std::string key, std::string value) { _header[key] = value; }
+	void	setBuiltResponse(std::string responseComplete);
+	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
+	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }	
 
 	Request 			&getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
@@ -49,6 +51,7 @@ private:
 	std::string			getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&		getRequestedFile() { return _requestedFile; }
 	bool				getResponseReadyToSend() { return _responseReadyToSend; }
+	ResponseBuilder*	getResponseBuilder() const { return _responseBuilder; }
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */
@@ -61,6 +64,7 @@ private:
 	void		handlePost();
 	void		handleDelete();
 	void		handleError();
+	void		buildCgiResponse();
 	int			generateDefaultErrorHtml();
 	std::string	generateAutoIndex(std::string path);
 };

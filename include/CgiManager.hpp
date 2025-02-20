@@ -14,14 +14,20 @@ class	CgiManager {
 		pid_t		_children_pid;
 		std::string	_python_path;
 		std::string _php_path;
+		std::string	_tempBuffer;
+		std::string	_cgiHeader, _cgiBody;
+		std::string	_cgiResponse;
+		int			_cgiContentLength;
+		bool		_headerDoneReading;
 
 	public:
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
-		int	getSocketsParent() {return _sockets[0];}
-		int	getSocketsChildren() {return _sockets[1];}
-		int	forkProcess();
-		int	sendToCgi();
-		int	recvFromCgi();
+		int		getSocketsParent() {return _sockets[0];}
+		int		getSocketsChildren() {return _sockets[1];}
+		int		forkProcess();
+		int		sendToCgi();
+		int		recvFromCgi();
+		void	findContentLength(std::string header);
 		pid_t	getPid() {return _children_pid;}
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();

@@ -375,9 +375,12 @@ int	Response::handleCgi() {
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
 }
 
-void	Response::setBuiltResponse(std::string	responseComplete) {
-	_builtResponse->assign(responseComplete);
+void	Response::buildCgiResponse() {
+	_responseBuilder = new ResponseBuilder(*this);
+	//parseCgiResponse();
+	setResponseStatus(200);
 	_responseReadyToSend = true;
+	_builtResponse = _responseBuilder->buildResponse("");
 }
 
 int	Response::sendResponse() {
