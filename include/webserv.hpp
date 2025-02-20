@@ -23,6 +23,7 @@
 #include <exception>
 #include <csignal>
 #include <sys/wait.h>
+#include <dirent.h>
 
 enum fd_status
 {
