@@ -1,13 +1,15 @@
 
 import json
-import cgi
 import os
 import matplotlib.pyplot as plt
+import base64
+from io import BytesIO
 
 def handle_request():
-    form = cgi.FieldStorage()
-    game_id = int(form.getvalue("game_id"))
-    file_path = os.path.realpath("record.json")
+    game_id = os.environ.get("QUERY_STRING").split("=")[1]
+    print(game_id)
+    file_path = os.path.realpath("data/record.json")
+    print(file_path)
     with open(file_path, "r") as file:
         data = json.load(file)
     game_data = data["games"][game_id - 1].get("players")
@@ -26,7 +28,27 @@ def handle_request():
     plt.ylabel('Score')
     plt.title(f'Game {game_id} scores')
     plt.xticks(x_pos, player_names) # Set label locations.
-    
+    plt.legend()
+
+    # Save the plot to a BytesIO object
+    img_buffer = BytesIO()
+    plt.savefig(img_buffer, format='png')
+    img_buffer.seek(0)
+
+    # Encode the image in base64
+    img_base64 = base64.b64encode(img_buffer.read()).decode('utf-8')
+    img_buffer.close()
+
+    # Generate the HTML response
+    print("Content-Type: text/html")
+    print()
+    print("<!DOCTYPE html>")
+    print("<html><body>")
+    print(f"<h1>Game Data for {game_id}</h1>")
+    print(f'<img src="data:image/png;base64,{img_base64}">')
+    print("</body></html>")
+    return
+
 
 if __name__ == "__main__":
     handle_request()
