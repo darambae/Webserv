@@ -42,7 +42,7 @@ std::string	ResponseBuilder::buildHeaders() {
 	_headers._connection = "Connection: keep-alive";
 	header += _headers._connection;
 	header += headerEnd;
-
+	LOG_INFO("ResponseBuiler made Headers: " + header);
 	return (header);
 }
 
