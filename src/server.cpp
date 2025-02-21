@@ -80,21 +80,28 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	if (unblockFD(new_fd) == -1)
 		return;
 	addFdToFds(new_fd);
-	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, false);
+	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, NULL, NULL, NULL);
 }
 
-void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, bool request) {
+void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, Request* request, Response* response, CgiManager* cgi) {
 	FD_DATA[fd] = new Fd_data;
 	FD_DATA[fd]->ip = ip;
 	FD_DATA[fd]->port = port;
 	FD_DATA[fd]->server = server;
 	FD_DATA[fd]->status = status;
 	FD_DATA[fd]->response = NULL;
-	if (request == true)
-		FD_DATA[fd]->request = new Request(fd);
+	if (request)
+		FD_DATA[fd]->request = request;
 	else
 		FD_DATA[fd]->request = NULL;
-	FD_DATA[fd]->CGI = NULL;
+	if (response)
+		FD_DATA[fd]->response = response;
+	else
+		FD_DATA[fd]->response = NULL;
+	if (cgi)
+		FD_DATA[fd]->CGI = cgi;
+	else
+		FD_DATA[fd]->CGI = NULL;
 }
 
 void	Server::addFdToFds(int fd_to_add) {
@@ -124,7 +131,7 @@ int	Server::createClientSocket(int fd) {
 	if (unblockFD(new_socket) == -1)
 		return -1;
 	addFdToFds(new_socket);
-	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, true);
+	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, NULL, NULL, NULL);
 	return new_socket;
 }
 

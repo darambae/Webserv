@@ -68,6 +68,8 @@ void	ServerManager::handlePollin(int FD) {
 		} else
 			FD_DATA[new_client]->just_connected = true;
 	} else if (FD_DATA[FD]->status == CLIENT) {
+		if (FD_DATA[FD]->request == NULL)
+			FD_DATA[FD]->request = new Request(FD);
 		if (FD_DATA[FD]->request->handleRequest() == -1) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
 			cleanFd(FD);
@@ -101,7 +103,9 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
+		if (FD_DATA[FD]->request->getMethod() == "GET")
+			return;
+		else if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
 			LOG_ERROR("write to send the body to CGI failed", true);
 			closeCgi(501, FD_DATA[FD]->request->getClientFD());
 		}
