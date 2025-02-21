@@ -15,6 +15,7 @@ def handle_request():
     
     player_names = []
     total_scores = []
+    #print(f"Content-Length: {???????????}")
     print("Content-Type: text/html")
     print()
     print("<!DOCTYPE html>")
@@ -43,6 +44,7 @@ def handle_request():
     # Encode the image in base64
     img_base64 = base64.b64encode(img_buffer.read()).decode('utf-8')
     img_buffer.close()
+    # Transform img to binary form
 
     # Generate the HTML response
     print(f"<h1>Game Data for {game_id}</h1>")

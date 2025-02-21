@@ -29,6 +29,7 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
+	LOG_INFO("CGI Script path : " + _cgi_env->script_name);
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
