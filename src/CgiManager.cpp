@@ -35,7 +35,6 @@ int	CgiManager::forkProcess() {
 		return -1;
 	}
 	if (pid == 0) {
-		signal(SIGPIPE, SIG_IGN);
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
@@ -46,8 +45,9 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		std::string fullpath_script = fullPath(_cgi_env->script_name);
+		std::string fullpath_script = fullPath("data" + _cgi_env->script_name);
 		char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
+		char *envp[] = {NULL};
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
 		sleep(1);
