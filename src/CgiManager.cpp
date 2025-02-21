@@ -1,6 +1,6 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response)/*, _headerDoneReading(false) */{
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -36,9 +36,6 @@ int	CgiManager::forkProcess() {
 		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
 	}
-	std::string fullpath_script = "data" + _cgi_env->script_name;
-	char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
-	std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -55,11 +52,39 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		execve(interpreter.c_str(), argv, NULL);
-		std::cout<<"just to test if the cgi coordination work"<<std::endl;
+		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
+		// char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		// char *envp[] = {NULL};
+		// std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
+
+		sleep(1);
+
+		//execve(interpreter.c_str(), argv, envp);
+		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
+
+		std::string html =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"fr\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <title>Réponse CGI</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
+        "    <p>Cette page est servie depuis un script CGI.</p>\n"
+        "</body>\n"
+        "</html>\n";
+
+    	std::cout << "HTTP/1.1 200 OK\r\n";
+    	std::cout << "Content-Type: text/html\r\n";
+    	std::cout << "Content-Length: " << html.size() << "\r\n";
+    	std::cout << "\r\n"; // Séparation entre les headers et le body
+    	std::cout << html;
+
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		// LOG_ERROR("exec failed", true);
-		exit(-1);
+		//exit(-1);
+		exit(0);
 	}
 	sleep(1);
 
@@ -148,7 +173,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 			}
 		}
 	}
-	else {
+	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
 		_response->buildCgiResponse(this);

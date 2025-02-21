@@ -368,7 +368,7 @@ int	Response::handleCgi() {
 		cgi->query_string = "";
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
-	cgi->script_name = _request.getPath();
+	cgi->script_name = _request.getPath().substr(_request.getPath().find("cgi-bin/") + 8);
 	LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();

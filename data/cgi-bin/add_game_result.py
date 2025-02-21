@@ -2,13 +2,13 @@ import json
 import os
 
 def load_data():
-    file_path = os.path.realpath("data/record.json")
+    file_path = os.path.realpath("record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     return data
 
 def save_data(data):
-    file_path = os.path.realpath("data/record.json")
+    file_path = os.path.realpath("record.json")
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 

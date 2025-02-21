@@ -28,8 +28,13 @@ volatile sig_atomic_t stopProgram = 0;
 void    signalHandler(int signal) {
     LOG_DEBUG("Interrupt signal " + to_string(signal) + " received");
     stopProgram = 1;
-    // kill(0, SIGTERM);
-    // while (waitpid(-1, NULL, WNOHANG) > 0);
+    for(std::map<int, Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
+        CgiManager* cgi = it->second->CGI;
+        if (cgi) {
+            kill(cgi->getPid(), SIGTERM);
+        }
+    }
+
 	if (FD_DATA.size() > 0) {
 		for (std::map<int, Fd_data*>::iterator it = FD_DATA.begin(); it != FD_DATA.end(); ++it) {
 			close(it->first);

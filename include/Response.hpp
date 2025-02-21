@@ -40,7 +40,7 @@ class Response {
 	}
 	void	setResponseStatus(int code);
 	void	setHeader(std::string key, std::string value) { _header[key] = value; }
-	void	setBuiltResponse(std::string responseComplete);
+	void	setBuiltResponse(std::string responseComplete) { *_builtResponse = responseComplete; };
 	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
 	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }	
 

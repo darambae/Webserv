@@ -20,6 +20,7 @@ class	CgiManager {
 		int			_cgiContentLength;
 		bool		_headerDoneReading;
 		std::string	_requestBody;
+		//bool		_headerDoneReading;
 
 	public:
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
