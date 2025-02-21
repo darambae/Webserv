@@ -24,6 +24,8 @@ class	CgiManager {
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
 		int		getSocketsParent() {return _sockets[0];}
 		int		getSocketsChildren() {return _sockets[1];}
+		std::string	getCgiHeader() const { return _cgiHeader; }
+		std::string	getCgiBody() const { return _cgiBody; }
 		int		forkProcess();
 		int		sendToCgi();
 		int		recvFromCgi();

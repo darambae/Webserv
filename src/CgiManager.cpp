@@ -131,8 +131,9 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	else {
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
+		_response->buildCgiResponse(this);
 	}
-	//_response->buildCgiResponse();
+	return 0;
 }
 
 CgiManager::~CgiManager() {

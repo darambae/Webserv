@@ -7,16 +7,16 @@ class ConfigServer;
 class ConfigLocation;
 class Request;
 class ResponseBuilder;
+class CgiManager;
 
 class Response {
 
-
-
-private:
+	private:
 	ResponseBuilder*		_responseBuilder;
 	std::string*			_builtResponse;
 	ConfigServer const&		_config;
 	ConfigLocation const*	_location;
+	CgiManager*				_cgiManager;
 	Request&				_request;
 	std::string				_codeStatus;
 	std::string				_reasonPhrase;
@@ -29,9 +29,8 @@ private:
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
-
 
 	/* setters / getters */
 	void		setRequestedFile(std::string const& filePath) {
@@ -64,7 +63,7 @@ private:
 	void		handlePost();
 	void		handleDelete();
 	void		handleError();
-	void		buildCgiResponse();
+	void		buildCgiResponse(CgiManager* cgiManager);
 	int			generateDefaultErrorHtml();
 	std::string	generateAutoIndex(std::string path);
 };
