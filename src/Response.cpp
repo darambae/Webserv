@@ -140,7 +140,6 @@ void	Response::handleError() {
 			setResponseStatus(200);
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-
 		}
 	}
 }
@@ -375,9 +374,12 @@ int	Response::handleCgi() {
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
 }
 
-void	Response::setBuiltResponse(std::string	responseComplete) {
-	_builtResponse->assign(responseComplete);
+void	Response::buildCgiResponse(CgiManager* cgiManager) {
+
+	_responseBuilder = new ResponseBuilder(*this);
+	setResponseStatus(200);
 	_responseReadyToSend = true;
+	_builtResponse = _responseBuilder->buildResponse(cgiManager->getCgiBody());
 }
 
 int	Response::sendResponse() {

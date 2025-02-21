@@ -7,16 +7,16 @@ class ConfigServer;
 class ConfigLocation;
 class Request;
 class ResponseBuilder;
+class CgiManager;
 
 class Response {
 
-
-
-private:
+	private:
 	ResponseBuilder*		_responseBuilder;
 	std::string*			_builtResponse;
 	ConfigServer const&		_config;
 	ConfigLocation const*	_location;
+	CgiManager*				_cgiManager;
 	Request&				_request;
 	std::string				_codeStatus;
 	std::string				_reasonPhrase;
@@ -29,9 +29,8 @@ private:
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
-
 
 	/* setters / getters */
 	void		setRequestedFile(std::string const& filePath) {
@@ -39,9 +38,11 @@ private:
 		_requestedFile.open(filePath.c_str(), std::ios::binary);
 
 	}
-	void		setResponseStatus(int code);
-	void		setHeader(std::string key, std::string value) { _header[key] = value; }
-	void		setBuiltResponse(std::string	responseComplete);
+	void	setResponseStatus(int code);
+	void	setHeader(std::string key, std::string value) { _header[key] = value; }
+	void	setBuiltResponse(std::string responseComplete);
+	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
+	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }	
 
 	Request 			&getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
@@ -49,6 +50,7 @@ private:
 	std::string			getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&		getRequestedFile() { return _requestedFile; }
 	bool				getResponseReadyToSend() { return _responseReadyToSend; }
+	ResponseBuilder*	getResponseBuilder() const { return _responseBuilder; }
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */
@@ -61,6 +63,7 @@ private:
 	void		handlePost();
 	void		handleDelete();
 	void		handleError();
+	void		buildCgiResponse(CgiManager* cgiManager);
 	int			generateDefaultErrorHtml();
 	std::string	generateAutoIndex(std::string path);
 };

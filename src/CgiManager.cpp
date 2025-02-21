@@ -1,6 +1,6 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response) {
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -38,7 +38,6 @@ int	CgiManager::forkProcess() {
 		return -1;
 	}
 	if (pid == 0) {
-		signal(SIGPIPE, SIG_IGN);
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
@@ -49,7 +48,6 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-
 		execve(interpreter.c_str(), argv, NULL);
 		std::cout<<"just tot test if the cgi coordination work"<<std::endl;
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
@@ -77,6 +75,21 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 	return returnValue;
 }
 
+void	CgiManager::findContentLength(std::string header) {
+
+	std::istringstream stream(header);
+	std::string	line;
+	while (std::getline(stream, line) && !line.empty()) {
+		size_t pos = line.find(": ");
+		if (pos != std::string::npos) {
+			std::string key = line.substr(0, pos);
+			std::string	value = line.substr(pos + 2);
+			if (key == "Content-Length")
+				_cgiContentLength = std::atoi(value.c_str());
+		}
+	}
+}
+
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read");
 	int	status;
@@ -97,16 +110,34 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	}
 	char	buffer[1024];
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
-	if (bytes > 0) {
-		buffer[bytes] = '\0';
-		LOG_INFO("parent socket read this :\n"+std::string(buffer));
-		//_response->setBuiltResponse(buffer);
-		return bytes;
-	}
-	else {
-		LOG_ERROR("read from CGI failed", true);
+	if (bytes < 0) {
+		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
 		return -1;
 	}
+	else if (bytes > 0) {
+		_tempBuffer.append(buffer);
+
+		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
+			size_t pos = _tempBuffer.find("\r\n\r\n");
+			_cgiHeader = _tempBuffer.substr(0, pos + 4);
+			_tempBuffer.erase(0, pos);
+			findContentLength(_cgiHeader);
+			_headerDoneReading = true;
+		}
+
+		if (_cgiContentLength > 0) {
+			if (_tempBuffer.size() >= static_cast<size_t>(_cgiContentLength)) {
+				_cgiBody = _tempBuffer.substr(0, _cgiContentLength);
+				_tempBuffer.erase(0, _cgiContentLength);
+			}
+		}
+	}
+	else {
+		LOG_INFO("CGI response done reading");
+		_cgiResponse = _cgiHeader + _cgiBody;
+		_response->buildCgiResponse(this);
+	}
+	return 0;
 }
 
 CgiManager::~CgiManager() {

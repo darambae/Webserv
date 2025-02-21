@@ -7,8 +7,11 @@ from io import BytesIO
 
 def handle_request():
     player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
-    print(player_id)
     file_path = os.path.realpath("data/record.json")
+    print("Content-Type: text/html")
+    print()
+    print("<!DOCTYPE html>")
+    print("<html><body>")
     with open(file_path, "r") as file:
         data = json.load(file)
     player_data = data["players"].get(str(player_id))
@@ -16,9 +19,7 @@ def handle_request():
         player_scores = [game["total_score"] for game in player_data["game_history"]]
         game_ids = [game["game_id"] for game in player_data["game_history"]]
     else:
-        print("Content-Type: text/html")
-        print()
-        print(f"<html><body><h1>No player with ID {player_id} found</h1><a href='/'>Go back</a></body></html>")
+        print(f"<h1>No player with ID {player_id} found</h1><a href='/'>Go back</a></body></html>")
         return
 
     average_scores = []
@@ -53,10 +54,6 @@ def handle_request():
     img_buffer.close()
 
     # Generate the HTML response
-    print("Content-Type: text/html")
-    print()
-    print("<!DOCTYPE html>")
-    print("<html><body>")
     print(f"<h1>Player Data for {player_id}</h1>")
     print(f"<p>Player Name: {player_data['player_name']}</p>")
     print(f"<p>Game History: {player_data['game_history']}</p>")
