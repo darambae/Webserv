@@ -84,18 +84,20 @@ void	ServerManager::handlePollout(int FD) {
 				LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
 				cleanFd(FD);
 			}
-			// if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
-			// 	delete FD_DATA[FD]->response;
-			// 	FD_DATA[FD]->response = NULL;
-			// 	delete FD_DATA[FD]->request;
-			// 	FD_DATA[FD]->request = NULL;
-			// 	FD_DATA[FD]->request = new Request(FD);
-			// 	LOG_INFO("response send and delete");
-			// }
+			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
+				delete FD_DATA[FD]->response;
+				FD_DATA[FD]->response = NULL;
+				delete FD_DATA[FD]->request;
+				FD_DATA[FD]->request = NULL;
+				FD_DATA[FD]->request = new Request(FD);
+				LOG_INFO("response send and delete");
+			}
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
+		if (FD_DATA[FD]->request->getMethod() == "GET")
+			return;
+		else if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
 			LOG_ERROR("write to send the body to CGI failed", true);
 			closeCgi(501, FD_DATA[FD]->request->getClientFD());
 		}
