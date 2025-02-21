@@ -12,6 +12,9 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 		LOG_ERROR("The file that has php path can't be opened", 1);
 	std::getline(php_path, _php_path);
 	php_path.close();
+	_requestBody = "";
+	if (_cgi_env->request_method == "POST")
+		_requestBody = _request->getBody();
 }
 
 int	CgiManager::forkProcess() {
@@ -26,9 +29,13 @@ int	CgiManager::forkProcess() {
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
-	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
-	server_cgi->addFdToFds(_sockets[1]);
+	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
+	// server_cgi->addFdToFds(_sockets[1]);
+	if (_cgi_env->request_method == "POST") {
+		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
+		server_cgi->addFdToFds(_sockets[1]);
+	}
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -45,20 +52,48 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
-		char *envp[] = {NULL};
-		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
+		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
+		// char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		// char *envp[] = {NULL};
+		// std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
 		sleep(1);
 
-		execve(interpreter.c_str(), argv, envp);
+		//execve(interpreter.c_str(), argv, envp);
+		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
-		exit(-1);
+		std::string html =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"fr\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <title>Réponse CGI</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
+        "    <p>Cette page est servie depuis un script CGI.</p>\n"
+        "</body>\n"
+        "</html>\n";
+
+    	std::cout << "HTTP/1.1 200 OK\r\n";
+    	std::cout << "Content-Type: text/html\r\n";
+    	std::cout << "Content-Length: " << html.size() << "\r\n";
+    	std::cout << "\r\n"; // Séparation entre les headers et le body
+    	std::cout << html;
+
+		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
+		// LOG_ERROR("exec failed", true);
+		//exit(-1);
+		exit(0);
 	}
 	sleep(1);
 
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
+	if (_cgi_env->request_method == "GET") {
+		close(_sockets[1]);
+		_sockets[1] = -1;
+	}
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -68,9 +103,14 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 	LOG_INFO("POLLOUT flag on the children socket, waiting to recv something");
 	int	returnValue = 0;
 	if (_cgi_env->request_method == "POST") {
-		std::string body = _request->getBody();
-		const void* buffer = static_cast<const void*>(body.data());//converti std::string en const void* data
-		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
+		if (_requestBody.size() > 0) {
+			const void* buffer = static_cast<const void*>(_requestBody.data());//converti std::string en const void* data
+			returnValue = write(_sockets[0], buffer, _requestBody.size());
+			if (returnValue > 0 && static_cast<size_t>(returnValue) < _requestBody.size())
+				_requestBody = _requestBody.substr(returnValue, _requestBody.size() - returnValue);
+			else
+				_requestBody = "";
+		}
 		LOG_DEBUG("returnValue : " + to_string(returnValue));
 	}
 	return returnValue;
@@ -131,7 +171,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 			}
 		}
 	}
-	else {
+	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
 		_response->buildCgiResponse(this);
