@@ -97,9 +97,14 @@ void	ServerManager::handlePollout(int FD) {
 	else if (FD_DATA[FD]->status == CGI_children) {
 		if (FD_DATA[FD]->request->getMethod() == "GET")
 			return;
-		else if (FD_DATA[FD]->CGI->sendToCgi() == -1) {
-			LOG_ERROR("write to send the body to CGI failed", true);
-			closeCgi(501, FD_DATA[FD]->request->getClientFD());
+		else {
+			int bodysend = FD_DATA[FD]->CGI->sendToCgi();
+			if (bodysend == -1) {
+				LOG_ERROR("write to send the body to CGI failed", true);
+				closeCgi(501, FD_DATA[FD]->request->getClientFD());
+			}
+			else if (bodysend == 0)
+				cleanFd(FD);
 		}
 	}
 }

@@ -29,10 +29,13 @@ int	CgiManager::forkProcess() {
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
-	if (_cgi_env->request_method == "POST")
-		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
-	server_cgi->addFdToFds(_sockets[1]);
+	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
+	// server_cgi->addFdToFds(_sockets[1]);
+	if (_cgi_env->request_method == "POST") {
+		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
+		server_cgi->addFdToFds(_sockets[1]);
+	}
 	std::string fullpath_script = "data" + _cgi_env->script_name;
 	char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
 	std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
@@ -53,7 +56,7 @@ int	CgiManager::forkProcess() {
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		execve(interpreter.c_str(), argv, NULL);
-		std::cout<<"just tot test if the cgi coordination work"<<std::endl;
+		std::cout<<"just to test if the cgi coordination work"<<std::endl;
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		// LOG_ERROR("exec failed", true);
 		exit(-1);
@@ -80,6 +83,8 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 			returnValue = write(_sockets[0], buffer, _requestBody.size());
 			if (returnValue > 0 && static_cast<size_t>(returnValue) < _requestBody.size())
 				_requestBody = _requestBody.substr(returnValue, _requestBody.size() - returnValue);
+			else
+				_requestBody = "";
 		}
 		LOG_DEBUG("returnValue : " + to_string(returnValue));
 	}
