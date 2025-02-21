@@ -2,7 +2,7 @@ import os
 import json
 
 def load_data():
-    file_path = os.path.realpath("data/record.json")
+    file_path = os.path.realpath("record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     return data

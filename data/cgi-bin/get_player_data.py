@@ -6,8 +6,9 @@ import base64
 from io import BytesIO
 
 def handle_request():
-    player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
-    file_path = os.path.realpath("data/record.json")
+    # player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
+    player_id = 1
+    file_path = os.path.realpath("record.json")
     print("Content-Type: text/html")
     print()
     print("<!DOCTYPE html>")
