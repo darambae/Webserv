@@ -125,7 +125,8 @@ void	ServerManager::print_all_FD_DATA() {
 
 void	ServerManager::cleanFd(int FD) {
 	//clean fd in _all_fds; _mapFd_data;
-	close(FD);
+	if (FD != -1)
+		close(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
 		FD_DATA[FD]->server->decreaseClientCount();
 		if (FD_DATA[FD]->request != NULL)
