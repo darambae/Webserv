@@ -35,6 +35,14 @@ void	ServerManager::launchServers() {
 				LOG_ERROR("POLLNVAL flag, socket unvalid : "+to_string(ALL_FDS[i].fd), true);
 				cleanFd(ALL_FDS[i].fd);
             }
+			else if (ALL_FDS[i].revents & POLLERR) {
+				LOG_ERROR("POLLERR flag, error on socket : "+to_string(ALL_FDS[i].fd), true);
+				cleanFd(ALL_FDS[i].fd);
+            }
+			else if (ALL_FDS[i].revents & POLLNVAL) {
+				LOG_ERROR("POLLNVAL flag, socket unvalid : "+to_string(ALL_FDS[i].fd), true);
+				cleanFd(ALL_FDS[i].fd);
+            }
 		}
     }
 }
