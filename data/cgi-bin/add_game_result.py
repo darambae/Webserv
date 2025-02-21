@@ -12,11 +12,16 @@ def save_data(data):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
+
+
 def handle_request():
+    content_len = 0;
     form = os.environ.get("QUERY_STRING")
     print("Content-Type: text/html")
     print()
+    print("<!DOCTYPE html>")
     print("<html><body>")
+    
     if not form:
         print("<h1>Invalid request</h1>")
         print("<a href='/'>Go back</a>")

@@ -29,14 +29,6 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
-	// std::string fullpath_script = _cgi_env->script_name.substr(_cgi_env->script_name.find("cgi-bin/") + 8);
-	// LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
-	// LOG_ERROR("PYTHONHOME : "+ std::string(getenv("PYTHONHOME")), 1);
-	// LOG_ERROR("PYTHONPATH : "+ std::string(getenv("PYTHONPATH")), 1);
-	// std::string fullpath_script = fullPath("data" + _cgi_env->script_name);
-	// LOG_ERROR("FULLPATH for SCRIPT : "+fullpath_script, 1);
-	// char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
-	// std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -53,7 +45,6 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
 		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
 		char *envp[] = {NULL};
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
@@ -62,8 +53,6 @@ int	CgiManager::forkProcess() {
 
 		execve(interpreter.c_str(), argv, envp);
 
-		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
-		// LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
 	sleep(1);
