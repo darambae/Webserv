@@ -25,10 +25,13 @@ int	CgiManager::forkProcess() {
 		return -1;
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
-	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, false);
-	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, false);
+	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
+	server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
 	server_cgi->addFdToFds(_sockets[1]);
+	std::string fullpath_script = "data" + _cgi_env->script_name;
+	char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
+	std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -46,53 +49,17 @@ int	CgiManager::forkProcess() {
 		setenv("CONTENT_TYPE", _cgi_env->content_type.c_str(), 1);
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
-		std::string fullpath_script = fullPath(_cgi_env->script_name);
-		char *argv[] = {const_cast<char *>(fullpath_script.c_str()), NULL};
-		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
-
-		sleep(1);
 
 		execve(interpreter.c_str(), argv, NULL);
-
+		std::cout<<"just tot test if the cgi coordination work"<<std::endl;
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
-		LOG_ERROR("exec failed", true);
+		// LOG_ERROR("exec failed", true);
 		exit(-1);
 	}
+	sleep(1);
+
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
-	// close(_sockets[1]);
-	if (_cgi_env->request_method == "GET")
-		close(_sockets[1]);
-	// //close(_sockets[0]);
-	// int	status;
-	// pid_t	result = waitpid(_children_pid, &status, WNOHANG);
-	// if (result == 0)
-	// 	return LOG_INFO("result of waitpid = 0, means children don't finish"), 0;//children don't finish
-	// if (result == -1) {//children doesn't exist anymore
-	// 	LOG_ERROR("CGI failed, children doesn't exist anymore", false);
-	// 	return -1;
-	// }
-	// if (result == _children_pid) {
-	// 	if (WIFEXITED(status))//if true children finish normally with exit
-	// 		if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
-	// 			LOG_ERROR("CGI failed, execl failed", false);
-	// 			return -1;
-	// 		}
-	// }
-
-	// char	buffer[1024];
-	// int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
-	// if (bytes > 0) {
-	// 	buffer[bytes] = '\0';
-	// 	LOG_INFO("parent socket read this :\n"+std::string(buffer));
-	// 	_response->setBuiltResponse(buffer);
-	// 	return bytes;
-	// }
-	// else {
-	// 	LOG_ERROR("read from CGI failed", true);
-	// 	return -1;
-	// }
-	// close(_sockets[0]);
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -106,8 +73,6 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 		const void* buffer = static_cast<const void*>(body.data());//converti std::string en const void* data
 		returnValue = write(_sockets[0], buffer, sizeof(buffer) - 1);
 		LOG_DEBUG("returnValue : " + to_string(returnValue));
-		//close(_sockets[0]);
-		close(_sockets[1]);
 	}
 	return returnValue;
 }
@@ -115,11 +80,12 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read");
 	int	status;
+	LOG_INFO("_pid_children = "+to_string(_children_pid));
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
 	if (result == -1) {//children doesn't exist anymore
-		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
+		LOG_ERROR("CGI failed, children doesn't exist anymore", true);
 		return -1;
 	}
 	if (result == _children_pid) {
@@ -134,7 +100,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (bytes > 0) {
 		buffer[bytes] = '\0';
 		LOG_INFO("parent socket read this :\n"+std::string(buffer));
-		_response->setBuiltResponse(buffer);
+		//_response->setBuiltResponse(buffer);
 		return bytes;
 	}
 	else {

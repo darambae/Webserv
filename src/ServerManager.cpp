@@ -60,6 +60,8 @@ void	ServerManager::handlePollin(int FD) {
 		} else
 			FD_DATA[new_client]->just_connected = true;
 	} else if (FD_DATA[FD]->status == CLIENT) {
+		if (FD_DATA[FD]->request == NULL)
+			FD_DATA[FD]->request = new Request(FD);
 		if (FD_DATA[FD]->request->handleRequest() == -1) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
 			cleanFd(FD);
@@ -82,14 +84,14 @@ void	ServerManager::handlePollout(int FD) {
 				LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
 				cleanFd(FD);
 			}
-			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
-				delete FD_DATA[FD]->response;
-				FD_DATA[FD]->response = NULL;
-				delete FD_DATA[FD]->request;
-				FD_DATA[FD]->request = NULL;
-				FD_DATA[FD]->request = new Request(FD);
-				LOG_INFO("response send and delete");
-			}
+			// if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
+			// 	delete FD_DATA[FD]->response;
+			// 	FD_DATA[FD]->response = NULL;
+			// 	delete FD_DATA[FD]->request;
+			// 	FD_DATA[FD]->request = NULL;
+			// 	FD_DATA[FD]->request = new Request(FD);
+			// 	LOG_INFO("response send and delete");
+			// }
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
