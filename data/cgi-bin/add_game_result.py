@@ -12,21 +12,22 @@ def save_data(data):
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
-
-
 def handle_request():
-    content_len = 0;
     form = os.environ.get("QUERY_STRING")
-    print("Content-Type: text/html")
-    print()
-    print("<!DOCTYPE html>")
-    print("<html><body>")
+    response_body = []
+
+    response_body.append("<!DOCTYPE html>")
+    response_body.append("<html><body>")
     
     if not form:
-        print("<h1>Invalid request</h1>")
-        print("<a href='/'>Go back</a>")
-        print("</body></html>")
+        response_body.append("<h1>Invalid request</h1>")
+        response_body.append("<a href='/'>Go back</a>")
+        response_body.append("</body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print(response)
         return
+
     form_data = dict(qc.split("=") for qc in form.split("&"))
     game_id = int(form_data.get("game_id"))
     player_id = int(form_data.get("player_id"))
@@ -52,11 +53,15 @@ def handle_request():
         data["games"].append(game)
 
     # Find the player or create a new one
-    if game["players"].size() >= 6:
-        print("<h4>This game has already enough players</h1>")
-        print("<a href='/'>Go back</a>")
-        print("</body></html>")
+    if len(game["players"]) >= 6:
+        response_body.append("<h4>This game has already enough players</h4>")
+        response_body.append("<a href='/'>Go back</a>")
+        response_body.append("</body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print(response)
         return
+
     player = next((p for p in game["players"] if p["player_id"] == player_id), None)
     if not player:
         player = {"player_id": player_id}
@@ -92,10 +97,13 @@ def handle_request():
 
     save_data(data)
 
-    print("<h1>Game result added successfully!</h1>")
-    print("<a href='/'>Go back</a>")
-    print("</body></html>")
-    return
+    response_body.append("<h1>Game result added successfully!</h1>")
+    response_body.append("<a href='/'>Go back</a>")
+    response_body.append("</body></html>")
+    response_body = "\n".join(response_body)
+
+    response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    print(response)
 
 if __name__ == "__main__":
     handle_request()

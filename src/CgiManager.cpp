@@ -1,6 +1,6 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response)/*, _headerDoneReading(false) */{
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -90,16 +90,14 @@ void	CgiManager::findContentLength(std::string header) {
 		}
 	}
 }
-
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read");
 	int	status;
-	LOG_INFO("_pid_children = "+to_string(_children_pid));
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
 	if (result == -1) {//children doesn't exist anymore
-		LOG_ERROR("CGI failed, children doesn't exist anymore", true);
+		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
 		return -1;
 	}
 	if (result == _children_pid) {
@@ -111,10 +109,27 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	}
 	char	buffer[1024];
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
-	if (bytes > 0) {
-		buffer[bytes] = '\0';
-		_response->setBuiltResponse(buffer);
-		return bytes;
+	if (bytes < 0) {
+		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
+		return -1;
+	}
+	else if (bytes > 0) {
+		_tempBuffer.append(buffer);
+
+		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
+			size_t pos = _tempBuffer.find("\r\n\r\n");
+			_cgiHeader = _tempBuffer.substr(0, pos + 4);
+			_tempBuffer.erase(0, pos);
+			findContentLength(_cgiHeader);
+			_headerDoneReading = true;
+		}
+
+		if (_cgiContentLength > 0) {
+			if (_tempBuffer.size() >= static_cast<size_t>(_cgiContentLength)) {
+				_cgiBody = _tempBuffer.substr(0, _cgiContentLength);
+				_tempBuffer.erase(0, _cgiContentLength);
+			}
+		}
 	}
 	else {
 		LOG_INFO("CGI response done reading");

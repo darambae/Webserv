@@ -1,4 +1,3 @@
-
 import json
 import os
 import matplotlib.pyplot as plt
@@ -6,13 +5,12 @@ import base64
 from io import BytesIO
 
 def handle_request():
-    # player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
-    player_id = 1
+    player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
     file_path = os.path.realpath("record.json")
-    print("Content-Type: text/html")
-    print()
-    print("<!DOCTYPE html>")
-    print("<html><body>")
+    response_body = []
+
+    response_body.append("<!DOCTYPE html>")
+    response_body.append("<html><body>")
     with open(file_path, "r") as file:
         data = json.load(file)
     player_data = data["players"].get(str(player_id))
@@ -20,7 +18,10 @@ def handle_request():
         player_scores = [game["total_score"] for game in player_data["game_history"]]
         game_ids = [game["game_id"] for game in player_data["game_history"]]
     else:
-        print(f"<h1>No player with ID {player_id} found</h1><a href='/'>Go back</a></body></html>")
+        response_body.append(f"<h1>No player with ID {player_id} found</h1><a href='/'>Go back</a></body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print(response)
         return
 
     average_scores = []
@@ -55,13 +56,16 @@ def handle_request():
     img_buffer.close()
 
     # Generate the HTML response
-    print(f"<h1>Player Data for {player_id}</h1>")
-    print(f"<p>Player Name: {player_data['player_name']}</p>")
-    print(f"<p>Game History: {player_data['game_history']}</p>")
-    print(f'<img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/>')
-    print("<a href='/'>Go back</a>")
-    print("</body></html>")
-    return
+    response_body.append(f"<h1>Player Data for {player_id}</h1>")
+    response_body.append(f"<p>Player Name: {player_data['player_name']}</p>")
+    response_body.append(f"<p>Game History: {player_data['game_history']}</p>")
+    response_body.append(f'<img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/>')
+    response_body.append("<a href='/'>Go back</a>")
+    response_body.append("</body></html>")
+    response_body = "\n".join(response_body)
+
+    response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    print(response)
 
 if __name__ == "__main__":
     handle_request()
