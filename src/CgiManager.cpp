@@ -51,7 +51,6 @@ int	CgiManager::forkProcess() {
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
 		sleep(1);
-
 		execve(interpreter.c_str(), argv, NULL);
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
