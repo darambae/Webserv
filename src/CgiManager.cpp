@@ -53,33 +53,33 @@ int	CgiManager::forkProcess() {
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
-		// char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
-		// char *envp[] = {NULL};
-		// std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
+		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		char *envp[] = {NULL};
+		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
 		sleep(1);
 
-		//execve(interpreter.c_str(), argv, envp);
-		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
+		execve(interpreter.c_str(), argv, envp);
+		//std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
-		std::string html =
-        "<!DOCTYPE html>\n"
-        "<html lang=\"fr\">\n"
-        "<head>\n"
-        "    <meta charset=\"UTF-8\">\n"
-        "    <title>Réponse CGI</title>\n"
-        "</head>\n"
-        "<body>\n"
-        "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
-        "    <p>Cette page est servie depuis un script CGI.</p>\n"
-        "</body>\n"
-        "</html>\n";
+		// std::string html =
+        // "<!DOCTYPE html>\n"
+        // "<html lang=\"fr\">\n"
+        // "<head>\n"
+        // "    <meta charset=\"UTF-8\">\n"
+        // "    <title>Réponse CGI</title>\n"
+        // "</head>\n"
+        // "<body>\n"
+        // "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
+        // "    <p>Cette page est servie depuis un script CGI.</p>\n"
+        // "</body>\n"
+        // "</html>\n";
 
-    	std::cout << "HTTP/1.1 200 OK\r\n";
-    	std::cout << "Content-Type: text/html\r\n";
-    	std::cout << "Content-Length: " << html.size() << "\r\n";
-    	std::cout << "\r\n"; // Séparation entre les headers et le body
-    	std::cout << html;
+    	// std::cout << "HTTP/1.1 200 OK\r\n";
+    	// std::cout << "Content-Type: text/html\r\n";
+    	// std::cout << "Content-Length: " << html.size() << "\r\n";
+    	// std::cout << "\r\n"; // Séparation entre les headers et le body
+    	// std::cout << html;
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		// LOG_ERROR("exec failed", true);
@@ -131,7 +131,7 @@ void	CgiManager::findContentLength(std::string header) {
 	}
 }
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
-	LOG_INFO("POLLIN flag on the parent socket, something to read");
+	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
 	int	status;
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)

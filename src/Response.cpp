@@ -319,7 +319,7 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	LOG_INFO("requestPath: " + requestPath);
+	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
