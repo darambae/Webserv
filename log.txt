@@ -1,0 +1,89 @@
+[2025-02-21 14:13:07] [DEBUG] Valid root
+[2025-02-21 14:13:07] [DEBUG] Valid error page
+[2025-02-21 14:13:07] [DEBUG] Valid error page
+[2025-02-21 14:13:07] [DEBUG] Valid error page
+[2025-02-21 14:13:07] [DEBUG] Valid body size
+[2025-02-21 14:13:07] [DEBUG] Valid path
+[2025-02-21 14:13:07] [DEBUG] Valid root
+[2025-02-21 14:13:07] [DEBUG] Valid autoindex
+[2025-02-21 14:13:07] [DEBUG] Valid methods
+[2025-02-21 14:13:07] [DEBUG] Valid path
+[2025-02-21 14:13:07] [DEBUG] Valid root
+[2025-02-21 14:13:07] [DEBUG] Valid methods
+[2025-02-21 14:13:07] [DEBUG] Valid autoindex
+[2025-02-21 14:13:07] [DEBUG] Valid path
+[2025-02-21 14:13:07] [DEBUG] Valid CGI path
+[2025-02-21 14:13:07] [DEBUG] Valid CGI extension
+[2025-02-21 14:13:07] [DEBUG] Valid methods
+[2025-02-21 14:13:07] [DEBUG] Valid root
+[2025-02-21 14:13:07] [DEBUG] Valid path
+[2025-02-21 14:13:07] [DEBUG] Valid root
+[2025-02-21 14:13:17] [DEBUG] CGI script name: get_player_data.py
+[2025-02-21 14:14:54] [DEBUG] Interrupt signal 15 received
+[2025-02-21 14:14:40] [DEBUG] Valid root
+[2025-02-21 14:14:40] [DEBUG] Valid error page
+[2025-02-21 14:14:40] [DEBUG] Valid error page
+[2025-02-21 14:14:40] [DEBUG] Valid error page
+[2025-02-21 14:14:40] [DEBUG] Valid body size
+[2025-02-21 14:14:40] [DEBUG] Valid path
+[2025-02-21 14:14:40] [DEBUG] Valid root
+[2025-02-21 14:14:40] [DEBUG] Valid autoindex
+[2025-02-21 14:14:40] [DEBUG] Valid methods
+[2025-02-21 14:14:40] [DEBUG] Valid path
+[2025-02-21 14:14:40] [DEBUG] Valid root
+[2025-02-21 14:14:40] [DEBUG] Valid methods
+[2025-02-21 14:14:40] [DEBUG] Valid autoindex
+[2025-02-21 14:14:40] [DEBUG] Valid path
+[2025-02-21 14:14:40] [DEBUG] Valid CGI path
+[2025-02-21 14:14:40] [DEBUG] Valid CGI extension
+[2025-02-21 14:14:40] [DEBUG] Valid methods
+[2025-02-21 14:14:40] [DEBUG] Valid root
+[2025-02-21 14:14:40] [DEBUG] Valid path
+[2025-02-21 14:14:40] [DEBUG] Valid root
+[2025-02-21 14:15:02] [DEBUG] Interrupt signal 2 received
+[2025-02-21 14:15:04] [DEBUG] Valid root
+[2025-02-21 14:15:04] [DEBUG] Valid error page
+[2025-02-21 14:15:04] [DEBUG] Valid error page
+[2025-02-21 14:15:04] [DEBUG] Valid error page
+[2025-02-21 14:15:04] [DEBUG] Valid body size
+[2025-02-21 14:15:04] [DEBUG] Valid path
+[2025-02-21 14:15:04] [DEBUG] Valid root
+[2025-02-21 14:15:04] [DEBUG] Valid autoindex
+[2025-02-21 14:15:04] [DEBUG] Valid methods
+[2025-02-21 14:15:04] [DEBUG] Valid path
+[2025-02-21 14:15:04] [DEBUG] Valid root
+[2025-02-21 14:15:04] [DEBUG] Valid methods
+[2025-02-21 14:15:04] [DEBUG] Valid autoindex
+[2025-02-21 14:15:04] [DEBUG] Valid path
+[2025-02-21 14:15:04] [DEBUG] Valid CGI path
+[2025-02-21 14:15:04] [DEBUG] Valid CGI extension
+[2025-02-21 14:15:04] [DEBUG] Valid methods
+[2025-02-21 14:15:04] [DEBUG] Valid root
+[2025-02-21 14:15:04] [DEBUG] Valid path
+[2025-02-21 14:15:04] [DEBUG] Valid root
+[2025-02-21 14:15:36] [DEBUG] CGI script name: add_game_result.py
+[2025-02-21 14:15:37] [DEBUG] returnValue : 7
+[2025-02-21 14:15:37] [DEBUG] returnValue : 7
+[2025-02-21 14:15:37] [DEBUG] returnValue : 7
+[2025-02-21 14:17:15] [DEBUG] Interrupt signal 2 received
+[2025-02-21 14:17:18] [DEBUG] Valid root
+[2025-02-21 14:17:18] [DEBUG] Valid error page
+[2025-02-21 14:17:18] [DEBUG] Valid error page
+[2025-02-21 14:17:18] [DEBUG] Valid error page
+[2025-02-21 14:17:18] [DEBUG] Valid body size
+[2025-02-21 14:17:18] [DEBUG] Valid path
+[2025-02-21 14:17:18] [DEBUG] Valid root
+[2025-02-21 14:17:18] [DEBUG] Valid autoindex
+[2025-02-21 14:17:18] [DEBUG] Valid methods
+[2025-02-21 14:17:18] [DEBUG] Valid path
+[2025-02-21 14:17:18] [DEBUG] Valid root
+[2025-02-21 14:17:18] [DEBUG] Valid methods
+[2025-02-21 14:17:18] [DEBUG] Valid autoindex
+[2025-02-21 14:17:18] [DEBUG] Valid path
+[2025-02-21 14:17:18] [DEBUG] Valid CGI path
+[2025-02-21 14:17:18] [DEBUG] Valid CGI extension
+[2025-02-21 14:17:18] [DEBUG] Valid methods
+[2025-02-21 14:17:18] [DEBUG] Valid root
+[2025-02-21 14:17:18] [DEBUG] Valid path
+[2025-02-21 14:17:18] [DEBUG] Valid root
+[2025-02-24 08:12:09] [DEBUG] Interrupt signal 2 received
