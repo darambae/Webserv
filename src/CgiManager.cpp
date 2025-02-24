@@ -28,6 +28,7 @@ int	CgiManager::forkProcess() {
 		return -1;
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
+	
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
 	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
@@ -45,17 +46,7 @@ int	CgiManager::forkProcess() {
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
-		dup2(_sockets[1], STDERR_FILENO);
 		close(_sockets[1]);
-		int fd = open("cgi_log.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) {
-            LOG_ERROR("Failed to open log file", true);
-            exit(-1);
-        }
-        dup2(fd, STDOUT_FILENO);
-        dup2(fd, STDERR_FILENO);
-        close(fd);
-		setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
 		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
 		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
 		setenv("CONTENT_LENGTH", _cgi_env->content_length.c_str(), 1);
@@ -96,14 +87,14 @@ int	CgiManager::forkProcess() {
 		//exit(-1);
 		exit(0);
 	}
-	sleep(1);
-
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
+
 	_children_pid = pid;
-	if (_cgi_env->request_method == "GET") {
-		close(_sockets[1]);
-		_sockets[1] = -1;
-	}
+	// if (_cgi_env->request_method == "GET") {
+	// 	close(_sockets[1]);
+	// 	_sockets[1] = -1;
+	// }
+	
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -153,7 +144,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (result == _children_pid) {
 		if (WIFEXITED(status))//if true children finish normally with exit
 			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execve failed", false);
+				LOG_ERROR("CGI failed, execl failed", false);
 				return -1;
 			}
 	}
@@ -164,12 +155,13 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		return -1;
 	}
 	else if (bytes > 0) {
+		buffer[bytes] = '\0';
 		_tempBuffer.append(buffer);
 
 		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
 			size_t pos = _tempBuffer.find("\r\n\r\n");
 			_cgiHeader = _tempBuffer.substr(0, pos + 4);
-			_tempBuffer.erase(0, pos);
+			_tempBuffer.erase(0, pos +4);
 			findContentLength(_cgiHeader);
 			_headerDoneReading = true;
 		}
@@ -185,6 +177,8 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
 		_response->buildCgiResponse(this);
+		_response->setResponseReadyToSend(true);
+		return 1;
 	}
 	return 0;
 }

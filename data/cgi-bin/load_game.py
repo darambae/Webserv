@@ -30,5 +30,4 @@ def handle_request():
     return
 
 if __name__ == "__main__":
-    
     handle_request()

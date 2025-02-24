@@ -53,8 +53,15 @@ void	ServerManager::handlePollhup(int FD) {
 	// Ignore POLLHUP for newly connected clients
     FD_DATA[FD]->just_connected = false;
     }
+	if (FD_DATA[FD]->status == CGI_parent) {
+        LOG_INFO("POLLHUP for CGI parent, cleaning up CGI resources");
+        closeCgi(0, FD_DATA[FD]->request->getClientFD());
+    } else {
+        LOG_ERROR("The client with FD : " + to_string(FD) + " is disconnected", 0);
+        cleanFd(FD);
+    }
 	//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
-	cleanFd(FD);
+	//cleanFd(FD);
 }
 
 void	ServerManager::handlePollin(int FD) {
