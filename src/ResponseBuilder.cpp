@@ -1,8 +1,8 @@
 #include "../include/ResponseBuilder.hpp"
 
 std::string*	ResponseBuilder::buildResponse(std::string body) {
-
-	if (_response.getRequestedFile()) {
+	std::ifstream& file = _response.getRequestedFile();
+	if (file.is_open()) {
 		std::stringstream buffer;
 		buffer << _response.getRequestedFile().rdbuf();
 		_body = buffer.str();

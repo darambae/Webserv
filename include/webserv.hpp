@@ -1,4 +1,8 @@
 #pragma once
+#define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
+#define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
+#define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
+#define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 
 #include <iostream>
 #include <csignal>
@@ -32,24 +36,21 @@ enum fd_status
 	CGI_parent,
 	CGI_children,
 };
-
+#include "Logger.hpp"
+#include "ResponseBuilder.hpp"
 #include "ServerManager.hpp"
 #include "CgiManager.hpp"
 #include "ConfigServer.hpp"
-#include "Response.hpp"
 #include "Exception.hpp"
-#include "Logger.hpp"
 #include "Request.hpp"
 #include "Server.hpp"
 #include "ConfigParser.hpp"
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"
+#include "Response.hpp"
+
 #include <fcntl.h>
 
-#define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
-#define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
-#define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
-#define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 
 class	Server;
 class	Request;

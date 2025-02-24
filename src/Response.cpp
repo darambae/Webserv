@@ -228,7 +228,7 @@ void	Response::handleGet() {
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-			LOG_INFO("Response built:\n" + *_builtResponse);
+			//LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
 			setResponseStatus(404);
@@ -242,7 +242,7 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
-		setResponseStatus(400); // <-------Need to handle error page
+		setResponseStatus(400); 
 		handleError();
 		return ;
 	}
@@ -284,7 +284,8 @@ void	Response::handlePost() {
 		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
 		responseBody << "</body>\n";
         responseBody << "</html>\n";
-		//LOG_INFO("Response body set : " + _responseBuilder->getBody());
+		//LOG_INFO("Response body stream : " + responseBody.str());
+		//_responseBuilder->setBody(responseBody.str());
 		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
 		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
