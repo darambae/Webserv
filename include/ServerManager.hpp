@@ -27,4 +27,5 @@ class	ServerManager {
 		void	cleanFd(int	FD);
 		void	closeCgi(int errorNumber, int FdCGI);
 		void	print_all_FD_DATA();
+		void	print_FD_status(int FD);
 };

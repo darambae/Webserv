@@ -33,7 +33,7 @@ int	CgiManager::forkProcess() {
 	server_cgi->addFdToFds(_sockets[0]);
 	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	// server_cgi->addFdToFds(_sockets[1]);
-	if (_cgi_env->request_method == "POST") {
+	if (_cgi_env->request_method == "POST") {//to follow children CGI only if we need to send something
 		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
 	}
@@ -54,33 +54,33 @@ int	CgiManager::forkProcess() {
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
-		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
-		char *envp[] = {NULL};
-		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
+		// char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		// char *envp[] = {NULL};
+		// std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
-		sleep(1);
+		// sleep(1);
 
-		execve(interpreter.c_str(), argv, envp);
-		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
+		// execve(interpreter.c_str(), argv, envp);
+		std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
-		// std::string html =
-        // "<!DOCTYPE html>\n"
-        // "<html lang=\"fr\">\n"
-        // "<head>\n"
-        // "    <meta charset=\"UTF-8\">\n"
-        // "    <title>Réponse CGI</title>\n"
-        // "</head>\n"
-        // "<body>\n"
-        // "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
-        // "    <p>Cette page est servie depuis un script CGI.</p>\n"
-        // "</body>\n"
-        // "</html>\n";
+		std::string html =
+        "<!DOCTYPE html>\n"
+        "<html lang=\"fr\">\n"
+        "<head>\n"
+        "    <meta charset=\"UTF-8\">\n"
+        "    <title>Réponse CGI</title>\n"
+        "</head>\n"
+        "<body>\n"
+        "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
+        "    <p>Cette page est servie depuis un script CGI.</p>\n"
+        "</body>\n"
+        "</html>\n";
 
-    	// std::cout << "HTTP/1.1 200 OK\r\n";
-    	// std::cout << "Content-Type: text/html\r\n";
-    	// std::cout << "Content-Length: " << html.size() << "\r\n";
-    	// std::cout << "\r\n"; // Séparation entre les headers et le body
-    	// std::cout << html;
+    	std::cout << "HTTP/1.1 200 OK\r\n";
+    	std::cout << "Content-Type: text/html\r\n";
+    	std::cout << "Content-Length: " << html.size() << "\r\n";
+    	std::cout << "\r\n"; // Séparation entre les headers et le body
+    	std::cout << html;
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		// LOG_ERROR("exec failed", true);
@@ -90,11 +90,6 @@ int	CgiManager::forkProcess() {
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 
 	_children_pid = pid;
-	// if (_cgi_env->request_method == "GET") {
-	// 	close(_sockets[1]);
-	// 	_sockets[1] = -1;
-	// }
-	
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -144,7 +139,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (result == _children_pid) {
 		if (WIFEXITED(status))//if true children finish normally with exit
 			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execl failed", false);
+				LOG_ERROR("CGI failed, execve failed", false);
 				return -1;
 			}
 	}
