@@ -60,7 +60,7 @@ int	CgiManager::forkProcess() {
 		sleep(1);
 
 		execve(interpreter.c_str(), argv, envp);
-		//std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
+		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
 		// std::string html =
         // "<!DOCTYPE html>\n"
