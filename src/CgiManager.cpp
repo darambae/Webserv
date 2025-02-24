@@ -90,6 +90,10 @@ int	CgiManager::forkProcess() {
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 
 	_children_pid = pid;
+	int	status;
+	waitpid(pid, &status, 0);
+	LOG_INFO("EXIT STATUS : "+to_string(WEXITSTATUS(status))); // Check if the children process has been executed correctly
+
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -129,6 +133,7 @@ void	CgiManager::findContentLength(std::string header) {
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
 	int	status;
+	
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
@@ -172,8 +177,6 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
 		_response->buildCgiResponse(this);
-		// _response->setResponseReadyToSend(true);
-		// return 1;
 	}
 	return 0;
 }
