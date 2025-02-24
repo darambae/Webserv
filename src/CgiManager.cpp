@@ -45,7 +45,17 @@ int	CgiManager::forkProcess() {
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
+		dup2(_sockets[1], STDERR_FILENO);
 		close(_sockets[1]);
+		int fd = open("cgi_log.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        if (fd == -1) {
+            LOG_ERROR("Failed to open log file", true);
+            exit(-1);
+        }
+        dup2(fd, STDOUT_FILENO);
+        dup2(fd, STDERR_FILENO);
+        close(fd);
+		setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
 		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
 		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
 		setenv("CONTENT_LENGTH", _cgi_env->content_length.c_str(), 1);
@@ -143,7 +153,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (result == _children_pid) {
 		if (WIFEXITED(status))//if true children finish normally with exit
 			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execl failed", false);
+				LOG_ERROR("CGI failed, execve failed", false);
 				return -1;
 			}
 	}
