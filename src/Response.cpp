@@ -186,8 +186,15 @@ void	Response::handleGet() {
 
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
-	//LOG_INFO("Request path: " + _request.getPath());
-	if (stat((_request.getPath()).c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+	std::string	requestPath = _request.getPath();
+	LOG_INFO("Request path: " + _request.getPath());
+	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
+	std::string path = rootPath + requestPath;
+	LOG_INFO("rootPath: " + rootPath);
+	LOG_INFO("request path before concatenation: " + requestPath);
+	LOG_INFO("path: " + path);
+
+	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 		if (findIndex() == 1) {
 			setResponseStatus(200);
 			LOG_INFO("Index found");
@@ -197,9 +204,10 @@ void	Response::handleGet() {
 			//LOG_INFO("Response built:\n" + *_builtResponse);
 		}
 		else {
+			LOG_INFO("No index file found, checking if auto-index enable");
 			if (_location->getAutoindex()) {
 				LOG_INFO("Autoindex enabled, generating directory listing...");
-				std::string autoIndexPage = generateAutoIndex(_request.getPath());
+				std::string autoIndexPage = generateAutoIndex(path);
 				setResponseStatus(200);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);
@@ -213,14 +221,7 @@ void	Response::handleGet() {
 	}
 	else {
 	// request path is a file
-		std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
-		std::string path = rootPath + _request.getPath();
-		// const char*	rootPathChar = rootPath.c_str();
-		// const char*	pathChar = path.c_str();
-		// std::cout << rootPathChar << " " << pathChar << std::endl;
-		LOG_INFO("rootPath: " + rootPath);
-		LOG_INFO("request path before concatenation: " + _request.getPath());
-		LOG_INFO("path: " + path);
+		LOG_INFO("Path is not a directory, treating as a file");
 		setRequestedFile(path.c_str());
 
 		if (_requestedFile) {
