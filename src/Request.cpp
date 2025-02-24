@@ -20,7 +20,7 @@ int	Request::parseRequest() {
 		LOG_INFO("0 bytes read, Client disconnected");
 		return -1;
 	}
-	LOG_INFO("request received : \n"+std::string(buffer)+"\n");
+	//LOG_INFO("request received : \n"+std::string(buffer)+"\n");
 	_tempBuffer.append(buffer, bytes);
 	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
@@ -49,7 +49,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			LOG_INFO("Body received : " + _body);
+			//LOG_INFO("Body received : " + _body);
 		}
 	}
 
