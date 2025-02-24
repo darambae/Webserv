@@ -9,9 +9,12 @@ ConfigParser::ConfigParser(const std::string& file) {
 }
 
 void    ConfigParser::setFilePath(const std::string& file) {
-    std::ifstream   test(file.c_str());
+    std::ifstream   test;
+
+	
+	test.open(file.c_str());
     if (!test.is_open())
-        THROW("Configuration file cannot be opened.");
+        THROW("Configuration file " + file + " cannot be opened.");
     this->_filePath = file;
 }
 
