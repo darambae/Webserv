@@ -79,8 +79,8 @@ void	ServerManager::handlePollin(int FD) {
 		int result = FD_DATA[FD]->CGI->recvFromCgi();
 		if (result == -1)
 			closeCgi(501, FD_DATA[FD]->request->getClientFD());
-		else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
-			closeCgi(0, FD_DATA[FD]->request->getClientFD());
+		// else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
+		// 	closeCgi(0, FD_DATA[FD]->request->getClientFD());
 	}
 }
 
@@ -95,6 +95,8 @@ void	ServerManager::handlePollout(int FD) {
 				cleanFd(FD);
 			}
 			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
+				if (FD_DATA[FD]->CGI != NULL)
+					closeCgi(0, FD);
 				delete FD_DATA[FD]->response;
 				FD_DATA[FD]->response = NULL;
 				delete FD_DATA[FD]->request;
@@ -128,10 +130,15 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	}
 	pid_t parentPid = FD_DATA[FdClient]->CGI->getPid();
 	kill(-parentPid, SIGKILL);  // Tue tous les enfants du processus parent
-	cleanFd(FD_DATA[FdClient]->CGI->getSocketsChildren());
+	int FD_children = FD_DATA[FdClient]->CGI->getSocketsChildren();
+	if (FD_DATA[FdClient]->request->getMethod() == "POST")
+		cleanFd(FD_children);
+	else
+		close(FD_children);
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
 	delete FD_DATA[FdClient]->CGI;
 	FD_DATA[FdClient]->CGI = NULL;
+	LOG_INFO("CGI is close");
 }
 
 void	ServerManager::print_all_FD_DATA() {
