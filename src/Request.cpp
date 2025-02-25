@@ -40,7 +40,7 @@ int	Request::parseRequest() {
 		_tempBuffer.erase(0, pos + 4);
 		parseHeader(headerPart);
 		isHeaderRead = true;
-		LOG_INFO("Header received");
+		LOG_INFO("Header received: " + headerPart);
 	}
 
 	//read body if present
