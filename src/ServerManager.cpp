@@ -60,8 +60,8 @@ void	ServerManager::handlePollhup(int FD) {
 }
 
 void	ServerManager::handlePollin(int FD) {
-	print_FD_status(FD);
-	LOG_INFO("POLLIN signal");
+	//print_FD_status(FD);
+	//LOG_INFO("POLLIN signal");
 	if (FD_DATA[FD]->status == SERVER) {
 		int new_client = FD_DATA[FD]->server->createClientSocket(FD);
 		if (new_client == -1) {
@@ -113,8 +113,8 @@ void	ServerManager::handlePollout(int FD) {
 		if (FD_DATA[FD]->request->getMethod() == "GET")
 			return;
 		else {
-			print_FD_status(FD);
-			LOG_INFO("POLLOUT signal");
+			//print_FD_status(FD);
+			//LOG_INFO("POLLOUT signal");
 			int bodysend = FD_DATA[FD]->CGI->sendToCgi();
 			if (bodysend == -1) {
 				LOG_ERROR("write to send the body to CGI failed", true);

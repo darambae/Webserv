@@ -54,13 +54,17 @@ int	CgiManager::forkProcess() {
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
-		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		//char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		char *argv[] = {const_cast<char *>(fullPath("data/cgi-bin/" + _cgi_env->script_name).c_str()), NULL};
 		char *envp[] = {NULL};
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
 		sleep(1);
 
-		execve(interpreter.c_str(), argv, envp);
+		if (execve(interpreter.c_str(), argv, envp) == -1) {
+			LOG_ERROR("execve failed", true);
+			exit(-1);
+		}
 		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
 		// std::string html =
@@ -83,17 +87,29 @@ int	CgiManager::forkProcess() {
     	// std::cout << html;
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
-		// LOG_ERROR("exec failed", true);
-		//exit(-1);
-		exit(0);
+		//exit(0);
 	}
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
-
+	sleep(10);
 	_children_pid = pid;
-	int	status;
-	waitpid(pid, &status, 0);
-	LOG_INFO("EXIT STATUS : "+to_string(WEXITSTATUS(status))); // Check if the children process has been executed correctly
-
+	// int	status;
+	// pid_t result = waitpid(pid, &status, WNOHANG);
+	// if (result == 0) {
+	// 	// Child process has not finished yet
+	// 	LOG_INFO("Child process is still running");
+	// 	return 0; // Indicate that the child process is still running
+	// }
+	// if (result == -1) {
+	// 	LOG_ERROR("waitpid failed", true);
+	// 	return -1;
+	// }
+	// LOG_ERROR("EXIT STATUS CODE : " + to_string(status), 1);
+	// if (WIFEXITED(status)) {
+	// 	int exit_code = WEXITSTATUS(status);
+	// 	LOG_INFO("EXIT STATUS : " + to_string(exit_code));
+	// } else {
+	// 	LOG_ERROR("Child process did not exit normally", true);
+	// }
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
