@@ -31,3 +31,4 @@ def handle_request():
 
 if __name__ == "__main__":
     handle_request()
+    exit(1)

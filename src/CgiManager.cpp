@@ -29,6 +29,7 @@ int	CgiManager::forkProcess() {
 		return -1;
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
+
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
 	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
@@ -60,13 +61,19 @@ int	CgiManager::forkProcess() {
 		extern char **environ;  // Déclaration de l'environnement global
 
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
-		// char *argv[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
-		char script_path[] = "/home/kbrener-/42/WEBSERV/git_webserv_daram/data/cgi-bin/get_player_data.py";
-		char *argv[] = {const_cast<char *>(interpreter.c_str()), script_path, NULL};
+		char *argv[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(fullPath("data/cgi-bin/" + _cgi_env->script_name).c_str()), NULL};
+
+		sleep(1);
+
+		if (execve(interpreter.c_str(), argv, environ) == -1) {
+			LOG_ERROR("execve failed", true);
+			exit(-1);
+		}
 
 		sleep(1);
 
 		execve(argv[0], argv, environ);
+
 		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
 
 		// std::string html =
@@ -89,14 +96,29 @@ int	CgiManager::forkProcess() {
     	// std::cout << html;
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
-		// LOG_ERROR("exec failed", true);
-		exit(-1);
-		// exit(0);
+		//exit(0);
 	}
-	sleep(1);
-
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
+	sleep(10);
 	_children_pid = pid;
+	// int	status;
+	// pid_t result = waitpid(pid, &status, WNOHANG);
+	// if (result == 0) {
+	// 	// Child process has not finished yet
+	// 	LOG_INFO("Child process is still running");
+	// 	return 0; // Indicate that the child process is still running
+	// }
+	// if (result == -1) {
+	// 	LOG_ERROR("waitpid failed", true);
+	// 	return -1;
+	// }
+	// LOG_ERROR("EXIT STATUS CODE : " + to_string(status), 1);
+	// if (WIFEXITED(status)) {
+	// 	int exit_code = WEXITSTATUS(status);
+	// 	LOG_INFO("EXIT STATUS : " + to_string(exit_code));
+	// } else {
+	// 	LOG_ERROR("Child process did not exit normally", true);
+	// }
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -136,6 +158,7 @@ void	CgiManager::findContentLength(std::string header) {
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
 	int	status;
+
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
@@ -157,6 +180,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		return -1;
 	}
 	else if (bytes > 0) {
+		buffer[bytes] = '\0';
 		_tempBuffer.append(buffer);
 
 		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
