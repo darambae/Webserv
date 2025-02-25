@@ -38,7 +38,7 @@ int	CgiManager::forkProcess() {
 		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
 	}
-
+	
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -59,66 +59,20 @@ int	CgiManager::forkProcess() {
 		// char *envp[] = {NULL};
 
 		extern char **environ;  // Déclaration de l'environnement global
-
+		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
-		char *argv[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(fullPath("data/cgi-bin/" + _cgi_env->script_name).c_str()), NULL};
+
+		char *argv[] = {const_cast<char *>(interpreter.c_str()), const_cast<char *>(script_path.c_str()), NULL};
 
 		sleep(1);
 
-		if (execve(interpreter.c_str(), argv, environ) == -1) {
+		if (execve(argv[0], argv, environ) == -1) {
 			LOG_ERROR("execve failed", true);
 			exit(-1);
 		}
-
-		sleep(1);
-
-		execve(argv[0], argv, environ);
-
-		// std::cout<<"children try and succeed to communicate with parent process"<<std::endl;
-
-		// std::string html =
-        // "<!DOCTYPE html>\n"
-        // "<html lang=\"fr\">\n"
-        // "<head>\n"
-        // "    <meta charset=\"UTF-8\">\n"
-        // "    <title>Réponse CGI</title>\n"
-        // "</head>\n"
-        // "<body>\n"
-        // "    <h1>Bienvenue sur mon serveur CGI !</h1>\n"
-        // "    <p>Cette page est servie depuis un script CGI.</p>\n"
-        // "</body>\n"
-        // "</html>\n";
-
-    	// std::cout << "HTTP/1.1 200 OK\r\n";
-    	// std::cout << "Content-Type: text/html\r\n";
-    	// std::cout << "Content-Length: " << html.size() << "\r\n";
-    	// std::cout << "\r\n"; // Séparation entre les headers et le body
-    	// std::cout << html;
-
-		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
-		//exit(0);
 	}
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
-	//sleep(5);
 	_children_pid = pid;
-	// int	status;
-	// pid_t result = waitpid(pid, &status, WNOHANG);
-	// if (result == 0) {
-	// 	// Child process has not finished yet
-	// 	LOG_INFO("Child process is still running");
-	// 	return 0; // Indicate that the child process is still running
-	// }
-	// if (result == -1) {
-	// 	LOG_ERROR("waitpid failed", true);
-	// 	return -1;
-	// }
-	// LOG_ERROR("EXIT STATUS CODE : " + to_string(status), 1);
-	// if (WIFEXITED(status)) {
-	// 	int exit_code = WEXITSTATUS(status);
-	// 	LOG_INFO("EXIT STATUS : " + to_string(exit_code));
-	// } else {
-	// 	LOG_ERROR("Child process did not exit normally", true);
-	// }
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
