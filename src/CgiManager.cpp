@@ -90,7 +90,7 @@ int	CgiManager::forkProcess() {
 		//exit(0);
 	}
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
-	sleep(10);
+	//sleep(5);
 	_children_pid = pid;
 	// int	status;
 	// pid_t result = waitpid(pid, &status, WNOHANG);
@@ -164,7 +164,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 				return -1;
 			}
 	}
-	char	buffer[1024] = {0};
+	char	buffer[100000] = {0};
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	if (bytes < 0) {
 		LOG_ERROR("reading CGI answer from parent's socket failed", 1);

@@ -6,7 +6,8 @@ from io import BytesIO
 
 def handle_request():
     player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
+    print(file_path)
     response_body = []
 
     response_body.append("<!DOCTYPE html>")

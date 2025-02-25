@@ -9,7 +9,7 @@ def load_data():
     return data
 
 def save_data(data):
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     with open(file_path, "w") as file:
         json.dump(data, file, indent=4)
 
