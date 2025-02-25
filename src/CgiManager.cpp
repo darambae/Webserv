@@ -45,17 +45,16 @@ int	CgiManager::forkProcess() {
 		close(_sockets[0]);//will be use by parent
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
-		dup2(_sockets[1], STDERR_FILENO);
+		//dup2(_sockets[1], STDERR_FILENO);
 		close(_sockets[1]);
-		int fd = open("cgi_log.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
-        if (fd == -1) {
-            LOG_ERROR("Failed to open log file", true);
-            exit(-1);
-        }
-        dup2(fd, STDOUT_FILENO);
-        dup2(fd, STDERR_FILENO);
-        close(fd);
-		setenv("GATEWAY_INTERFACE", "CGI/1.1", 1);
+		// int fd = open("cgi_log.txt", O_WRONLY | O_CREAT | O_TRUNC, 0644);
+        // if (fd == -1) {
+        //     LOG_ERROR("Failed to open log file", true);
+        //     exit(-1);
+        // }
+        // dup2(fd, STDOUT_FILENO);
+        // dup2(fd, STDERR_FILENO);
+        //close(fd);
 		setenv("REQUEST_METHOD", _cgi_env->request_method.c_str(), 1);
 		setenv("QUERY_STRING", _cgi_env->query_string.c_str(), 1);
 		setenv("CONTENT_LENGTH", _cgi_env->content_length.c_str(), 1);
@@ -63,7 +62,7 @@ int	CgiManager::forkProcess() {
 		setenv("SCRIPT_NAME", _cgi_env->script_name.c_str(), 1);
 		setenv("REMOTE_ADDR", _cgi_env->remote_addr.c_str(), 1);
 		//LOG_INFO("FULLPATH for SCRIPT : "+fullpath_script);
-		char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
+		//char *argv[] = {const_cast<char *>(_cgi_env->script_name.c_str()), NULL};
 		char *envp[] = {NULL};
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
 
