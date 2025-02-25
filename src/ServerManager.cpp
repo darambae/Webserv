@@ -18,46 +18,49 @@ void	ServerManager::launchServers() {
             THROW("Poll failed");
 		//if new connection on one port of one server
 		//print_all_FD_DATA();
-		for (size_t i = 0; i < ALL_FDS.size(); ++i) {
-			if (ALL_FDS[i].revents == 0)
-				continue;
-			else if (ALL_FDS[i].revents & POLLHUP)
-				handlePollhup(ALL_FDS[i].fd);
-			else if (ALL_FDS[i].revents & POLLIN)
-				handlePollin(ALL_FDS[i].fd);
-			else if (ALL_FDS[i].revents & POLLOUT)
-				handlePollout(ALL_FDS[i].fd);
-			else if (ALL_FDS[i].revents & POLLERR) {
-				LOG_ERROR("POLLERR flag, error on socket : "+to_string(ALL_FDS[i].fd), true);
-				cleanFd(ALL_FDS[i].fd);
+        for (size_t i = 0; i < ALL_FDS.size(); ++i) {
+            if (ALL_FDS[i].revents == 0)
+                continue;
+            if (ALL_FDS[i].revents & POLLHUP) {
+                handlePollhup(ALL_FDS[i].fd);
+                continue;
             }
-			else if (ALL_FDS[i].revents & POLLNVAL) { //Invalid socket
-				LOG_ERROR("POLLNVAL flag, socket unvalid : "+to_string(ALL_FDS[i].fd), true);
-				cleanFd(ALL_FDS[i].fd);
+            if (ALL_FDS[i].revents & POLLIN) {
+                handlePollin(ALL_FDS[i].fd);
+                continue;
             }
-			else if (ALL_FDS[i].revents & POLLERR) {
-				LOG_ERROR("POLLERR flag, error on socket : "+to_string(ALL_FDS[i].fd), true);
-				cleanFd(ALL_FDS[i].fd);
+            if (ALL_FDS[i].revents & POLLOUT) {
+                handlePollout(ALL_FDS[i].fd);
+                continue;
             }
-			else if (ALL_FDS[i].revents & POLLNVAL) {
-				LOG_ERROR("POLLNVAL flag, socket unvalid : "+to_string(ALL_FDS[i].fd), true);
-				cleanFd(ALL_FDS[i].fd);
+            if (ALL_FDS[i].revents & POLLERR) {
+                LOG_ERROR("POLLERR flag, error on socket : " + to_string(ALL_FDS[i].fd), true);
+                cleanFd(ALL_FDS[i].fd);
+                continue;
+            }
+            if (ALL_FDS[i].revents & POLLNVAL) { // Invalid socket
+                LOG_ERROR("POLLNVAL flag, socket invalid : " + to_string(ALL_FDS[i].fd), true);
+                cleanFd(ALL_FDS[i].fd);
+                continue;
             }
 		}
     }
 }
 
 void	ServerManager::handlePollhup(int FD) {
+	print_FD_status(FD);
 	LOG_INFO("POLLHUP signal");
 	if (FD_DATA[FD]->status == CLIENT && FD_DATA[FD]->just_connected) {
-	// Ignore POLLHUP for newly connected clients
-    FD_DATA[FD]->just_connected = false;
+		// Ignore POLLHUP for newly connected clients
+    	FD_DATA[FD]->just_connected = false;
     }
+
 	//LOG_ERROR("the client with FD : "+to_string(ALL_FDS[i].fd)+" is disconnected", 0);
 	cleanFd(FD);
 }
 
 void	ServerManager::handlePollin(int FD) {
+	//print_FD_status(FD);
 	//LOG_INFO("POLLIN signal");
 	if (FD_DATA[FD]->status == SERVER) {
 		int new_client = FD_DATA[FD]->server->createClientSocket(FD);
@@ -74,25 +77,29 @@ void	ServerManager::handlePollin(int FD) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
 			cleanFd(FD);
 		}
-	} else if (FD_DATA[FD]->status == CGI_parent) {
+	} else if (FD_DATA[FD]->status == CGI_parent) { //read from CGI
 		int result = FD_DATA[FD]->CGI->recvFromCgi();
 		if (result == -1)
 			closeCgi(501, FD_DATA[FD]->request->getClientFD());
-		else if (result > 0)//children finish and send the response to the response class
+		else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
 			closeCgi(0, FD_DATA[FD]->request->getClientFD());
 	}
 }
 
 void	ServerManager::handlePollout(int FD) {
-	//LOG_INFO("POLLOUT signal");
+	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
 		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
+			//print_FD_status(FD);
+			LOG_INFO("POLLOUT signal");
 			LOG_INFO("response ready to be sent");
 			if (FD_DATA[FD]->response->sendResponse() == -1) {
 				LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
 				cleanFd(FD);
 			}
 			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
+				if (FD_DATA[FD]->CGI != NULL)
+					closeCgi(0, FD);
 				delete FD_DATA[FD]->response;
 				FD_DATA[FD]->response = NULL;
 				delete FD_DATA[FD]->request;
@@ -106,6 +113,8 @@ void	ServerManager::handlePollout(int FD) {
 		if (FD_DATA[FD]->request->getMethod() == "GET")
 			return;
 		else {
+			//print_FD_status(FD);
+			//LOG_INFO("POLLOUT signal");
 			int bodysend = FD_DATA[FD]->CGI->sendToCgi();
 			if (bodysend == -1) {
 				LOG_ERROR("write to send the body to CGI failed", true);
@@ -124,10 +133,15 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	}
 	pid_t parentPid = FD_DATA[FdClient]->CGI->getPid();
 	kill(-parentPid, SIGKILL);  // Tue tous les enfants du processus parent
-	cleanFd(FD_DATA[FdClient]->CGI->getSocketsChildren());
+	int FD_children = FD_DATA[FdClient]->CGI->getSocketsChildren();
+	if (FD_DATA[FdClient]->request->getMethod() == "POST")
+		cleanFd(FD_children);
+	else
+		close(FD_children);
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
 	delete FD_DATA[FdClient]->CGI;
 	FD_DATA[FdClient]->CGI = NULL;
+	LOG_INFO("CGI is close");
 }
 
 void	ServerManager::print_all_FD_DATA() {
@@ -136,6 +150,19 @@ void	ServerManager::print_all_FD_DATA() {
 		<<"\nPORT : "<<FD_DATA[ALL_FDS[i].fd]->port\
 		<<"\n status: "<<FD_DATA[ALL_FDS[i].fd]->status<<std::endl;
 	}
+}
+
+void	ServerManager::print_FD_status(int FD) {
+	std::string	status = "";
+	if (FD_DATA[FD]->status == CLIENT)
+		status = "CLIENT";
+	else if (FD_DATA[FD]->status == SERVER)
+		status = "SERVER";
+	else if (FD_DATA[FD]->status == CGI_parent)
+		status = "CGI_PARENT";
+	else if (FD_DATA[FD]->status == CGI_children)
+		status = "CGI_CHILDREN";
+	std::cout<<"The FD "<<FD<<" with the status "<<status<<std::endl;
 }
 
 void	ServerManager::cleanFd(int FD) {

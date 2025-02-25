@@ -2,7 +2,8 @@ import os
 import json
 
 def load_data():
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
+    print(file_path)
     with open(file_path, "r") as file:
         data = json.load(file)
     return data
@@ -32,4 +33,3 @@ def handle_request():
 if __name__ == "__main__":
 
     handle_request()
-    exit(1)
