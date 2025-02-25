@@ -19,6 +19,7 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 
 int	CgiManager::forkProcess() {
 	LOG_INFO("Query = "+_cgi_env->query_string);
+	LOG_INFO("scriptname = "+_cgi_env->script_name);
 	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
@@ -128,18 +129,18 @@ int CgiManager::check_pid() {
 				LOG_ERROR("CGI failed, execve failed", false);
 				return -1;
 			}
-		} else if (WIFSIGNALED(status)) {//true if children was killed by a signal
+		}
+		else if (WIFSIGNALED(status)) {//true if children was killed by a signal
 			int signal = WTERMSIG(status);
 			LOG_INFO("children was terminated by signal : "+to_string(signal));
 			return -1;
-		} else {
+		}
+		else {
 			LOG_INFO("children exited abnormally");
 			return -1;
 		}
 	}
-<<<<<<< HEAD
-	char	buffer[100000] = {0};
-=======
+	return 0;
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
