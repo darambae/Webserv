@@ -19,6 +19,7 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 
 int	CgiManager::forkProcess() {
 	LOG_INFO("Query = "+_cgi_env->query_string);
+	LOG_INFO("scriptname = "+_cgi_env->script_name);
 	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
@@ -97,28 +98,11 @@ int	CgiManager::forkProcess() {
 
 		//execl(_interpreter.c_str(), _interpreter.c_str(), fullPath(_cgi_env->script_name).c_str(), NULL);
 		//exit(0);
+		exit(1);
 	}
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	sleep(10);
 	_children_pid = pid;
-	// int	status;
-	// pid_t result = waitpid(pid, &status, WNOHANG);
-	// if (result == 0) {
-	// 	// Child process has not finished yet
-	// 	LOG_INFO("Child process is still running");
-	// 	return 0; // Indicate that the child process is still running
-	// }
-	// if (result == -1) {
-	// 	LOG_ERROR("waitpid failed", true);
-	// 	return -1;
-	// }
-	// LOG_ERROR("EXIT STATUS CODE : " + to_string(status), 1);
-	// if (WIFEXITED(status)) {
-	// 	int exit_code = WEXITSTATUS(status);
-	// 	LOG_INFO("EXIT STATUS : " + to_string(exit_code));
-	// } else {
-	// 	LOG_ERROR("Child process did not exit normally", true);
-	// }
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -174,15 +158,18 @@ int CgiManager::check_pid() {
 				LOG_ERROR("CGI failed, execve failed", false);
 				return -1;
 			}
-		} else if (WIFSIGNALED(status)) {//true if children was killed by a signal
+		}
+		else if (WIFSIGNALED(status)) {//true if children was killed by a signal
 			int signal = WTERMSIG(status);
 			LOG_INFO("children was terminated by signal : "+to_string(signal));
 			return -1;
-		} else {
+		}
+		else {
 			LOG_INFO("children exited abnormally");
 			return -1;
 		}
 	}
+	return 0;
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
