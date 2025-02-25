@@ -130,7 +130,8 @@ std::string	Request::parseQueryString() {
 	std::string	queryString;
 	if (_path.find("?") != std::string::npos) {
 		size_t	pos = _path.find("?");
-		queryString = _path.substr(pos, _path.size() - pos);
+		queryString = _path.substr(pos + 1, _path.size() - pos);
+		// LOG_INFO("Query = "+queryString);
 		return queryString;
 	}
 	return "";
