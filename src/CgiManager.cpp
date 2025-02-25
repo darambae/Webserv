@@ -109,25 +109,45 @@ void	CgiManager::findContentLength(std::string header) {
 		}
 	}
 }
-int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
-	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
+
+int CgiManager::check_pid() {
 	int	status;
 
 	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
 	if (result == 0)
 		return 0;//children don't finish
-	if (result == -1) {//children doesn't exist anymore
+	else if (result == -1) {//children doesn't exist anymore
 		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
 		return -1;
 	}
-	if (result == _children_pid) {
-		if (WIFEXITED(status))//if true children finish normally with exit
-			if (WEXITSTATUS(status) == -1) {//extract in status the exit status code of children
+	else {
+		if (WIFEXITED(status)) {//if true children finish normally with exit
+			int exit_code = WEXITSTATUS(status);
+			LOG_INFO("children exited with code : "+to_string(exit_code));
+			if (exit_code == -1) {//extract in status the exit status code of children
 				LOG_ERROR("CGI failed, execve failed", false);
 				return -1;
 			}
+		} else if (WIFSIGNALED(status)) {//true if children was killed by a signal
+			int signal = WTERMSIG(status);
+			LOG_INFO("children was terminated by signal : "+to_string(signal));
+			return -1;
+		} else {
+			LOG_INFO("children exited abnormally");
+			return -1;
+		}
 	}
+<<<<<<< HEAD
 	char	buffer[100000] = {0};
+=======
+}
+
+int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
+	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
+	if (check_pid() == -1)
+		return -1;
+	char	buffer[1024] = {0};
+>>>>>>> 1300463 (check pid)
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	if (bytes < 0) {
 		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
