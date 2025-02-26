@@ -150,6 +150,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		return -1;
 	char	buffer[1024] = {0};
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
+	LOG_INFO("buffer read from children : "+std::string(buffer));
 	if (bytes < 0) {
 		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
 		return -1;

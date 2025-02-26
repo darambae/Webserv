@@ -1,28 +1,42 @@
 <?php
+
 // Vérification que le formulaire a été soumis
 if ($_SERVER['REQUEST_METHOD'] == 'POST') {
     // Récupérer les données envoyées par le formulaire pour chaque joueur
-    $player1 = $_POST['player1'] ?? [];
-    $player2 = $_POST['player2'] ?? [];
-    $player3 = $_POST['player3'] ?? [];
-    $player4 = $_POST['player4'] ?? [];
-    $player5 = $_POST['player5'] ?? [];
-
-    // Afficher les scores pour chaque joueur (vous pouvez remplacer cette partie par des calculs)
-    echo "<h2>Scores</h2>";
-    echo "<h3>Player 1</h3>";
-    echo "<ul>";
-    foreach ($player1 as $score) {
-        echo "<li>" . htmlspecialchars($score) . "</li>";
+	$names = $_POST['name'] ?? [];
+	$players = [
+		$_POST['player1'] ?? [],
+		$_POST['player2'] ?? [],
+		$_POST['player3'] ?? [],
+		$_POST['player4'] ?? [],
+		$_POST['player5'] ?? []
+	];
+	$content = "<!DOCTYPE html>
+	<html>
+	<body>
+		<h2>Scores</h2>";
+    // Affichage des scores
+    for ($i = 0; $i < count($players); $i++) {
+		$content .= "$names[$i]";
+        if (!empty($players[$i]) && !empty($names[$i])) {
+            $content .= "<h2>" . htmlspecialchars($names[$i]) . "</h2><ul>";
+            foreach ($players[$i] as $score) {
+                $content .= "<li>" . htmlspecialchars($score) . "</li>";
+            }
+            $content .= "</ul>";
+        }
     }
-    echo "</ul>";
 
-    echo "<h3>Player 2</h3>";
-    echo "<ul>";
-    foreach ($player2 as $score) {
-        echo "<li>" . htmlspecialchars($score) . "</li>";
-    }
-    echo "</ul>";
-    // Faites de même pour les autres joueurs si nécessaire
+	$content .= "</body></html>";
+	$length = strlen($content);
+	echo "Content-Type: text/html\r\n";
+	echo "Content-Length: $length\r\n\r\n";
+	echo $content;
+} else {
+    // Si l'utilisateur tente d'accéder directement à la page sans soumettre le formulaire
+    header("HTTP/1.1 405 Method Not Allowed");
+    // echo "Méthode non autorisée. Veuillez soumettre un formulaire.";
+    exit;
 }
 ?>
+
