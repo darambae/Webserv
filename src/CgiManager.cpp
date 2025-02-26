@@ -39,7 +39,7 @@ int	CgiManager::forkProcess() {
 		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
 	}
-	
+
 	pid_t	pid = fork();
 	if (pid == -1) {
 		LOG_ERROR("fork failed", true);
@@ -83,6 +83,7 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 	LOG_INFO("POLLOUT flag on the children socket, waiting to recv something");
 	int	returnValue = 0;
 	if (_cgi_env->request_method == "POST") {
+		LOG_INFO("request Body = "+_requestBody);
 		if (_requestBody.size() > 0) {
 			const void* buffer = static_cast<const void*>(_requestBody.data());//converti std::string en const void* data
 			returnValue = write(_sockets[0], buffer, _requestBody.size());

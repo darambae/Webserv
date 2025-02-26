@@ -120,8 +120,8 @@ void	ServerManager::handlePollout(int FD) {
 				LOG_ERROR("write to send the body to CGI failed", true);
 				closeCgi(501, FD_DATA[FD]->request->getClientFD());
 			}
-			else if (bodysend == 0)
-				cleanFd(FD);
+			// else if (bodysend == 0)
+			// 	cleanFd(FD);
 		}
 	}
 }
