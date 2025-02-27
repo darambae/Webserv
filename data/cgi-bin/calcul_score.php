@@ -64,19 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 				}
 				$content .= '<span>' . htmlspecialchars($total) . '</span></div>';
 				if ($total >= $total_max) {
-					if ($total === $total_max && sizeof($winner) > 0) {
-						$winnerS[0] = $winner;
-						$winnerS[1] = $names[$i];
+					if ($total === $total_max && strlen($winnerS[0]) > 0) {
+						$winnerS[] = $names[$i];
 					}
-					$total_max = $total;
-					$winner = $names[$i];
+					else {
+						$total_max = $total;
+						$winner = $names[$i];
+						$winnerS[0] = $winner;
+					}
 				}
 			}
 		}
-		if (sizeof($winnerS[0]) > 0) {
+		if (count($winnerS) > 1) {
 			$content .= '<div class="winner">🥇 ';
-			foreach ($winnerS[$i] as $name) {
-				$content .= ' / ' . htmlspecialchars(($winnerS[$i]));
+			foreach ($winnerS as $name) {
+				$content .= ' / ' . htmlspecialchars(($name));
 			}
 			$content .= ' are the winners with a score of ' . '<span>' . htmlspecialchars($total_max) . '</span> <img src="/cgi-bin/trophee.png" alt="Trophée" width="40" class="trophy"></div>';
 		} else {
