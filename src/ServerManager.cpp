@@ -95,7 +95,6 @@ void	ServerManager::handlePollin(int FD) {
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
-		LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
 		if (FD_DATA[FD]->request && get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			FD_DATA[FD]->response->setResponseStatus(408);
 			FD_DATA[FD]->response->handleError();
@@ -146,8 +145,11 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 		FD_DATA[FdClient]->response->setResponseStatus(errorNumber);
 		FD_DATA[FdClient]->response->handleError();
 	}
-	pid_t parentPid = FD_DATA[FdClient]->CGI->getPid();
-	kill(-parentPid, SIGKILL);  // Tue tous les enfants du processus parent
+	pid_t childPid = FD_DATA[FdClient]->CGI->getPid();
+	kill(childPid, SIGKILL);
+	usleep(100000);
+	int status;
+    while (waitpid(childPid, &status, 0) > 0) {};
 	int FD_children = FD_DATA[FdClient]->CGI->getSocketsChildren();
 	if (FD_DATA[FdClient]->request->getMethod() == "POST")
 		cleanFd(FD_children);
@@ -205,16 +207,6 @@ void	ServerManager::cleanFd(int FD) {
 	LOG_INFO("The FD : "+to_string(FD)+" was cleaned");
 }
 
-bool	ServerManager::check_time_out(int FD) {
-	if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
-		LOG_INFO("TIME OUT");
-		FD_DATA[FD]->response->setResponseStatus(408);
-		FD_DATA[FD]->response->handleError();
-		cleanFd(FD);
-		return true;
-	}
-	return false;
-}
 
 ServerManager::~ServerManager() {
 	for (size_t i = 0; i < _servers.size(); ++i)

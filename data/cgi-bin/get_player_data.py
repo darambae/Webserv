@@ -3,6 +3,11 @@ import os
 import matplotlib.pyplot as plt
 import base64
 from io import BytesIO
+import signal
+import sys
+
+def signal_handler(sig, frame):
+    sys.exit(0)
 
 def handle_request():
     response_body = []
@@ -77,4 +82,6 @@ def handle_request():
     print(response)
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     handle_request()

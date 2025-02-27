@@ -1,5 +1,10 @@
 import os
 import json
+import signal
+import sys
+
+def signal_handler(sig, frame):
+    sys.exit(0)
 
 def load_data():
     file_path = os.path.realpath("data/cgi-bin/record.json")
@@ -37,4 +42,6 @@ def handle_request():
     return
 
 if __name__ == "__main__":
+    signal.signal(signal.SIGINT, signal_handler)
+    signal.signal(signal.SIGTERM, signal_handler)
     handle_request()
