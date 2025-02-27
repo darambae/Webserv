@@ -83,8 +83,6 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         THROW("Server block must have a root and at least one location block");
     if (!validBracket(line, '}', '{'))
         THROW("Server block bracket isn't closed properly");
-/*     if (server.getErrorPages().empty())
-        server.setDefaultErrorPages(); */
     if (server.getListen().empty())
         server.setDefaultListen();
 }
@@ -126,8 +124,6 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
         THROW("Location block must have at least one directive");
     if (!validBracket(line, '}', '{'))
         THROW("Location block bracket isn't closed properly");
-/*     if (location.getErrorPages().empty())
-        location.setDefaultErrorPages(); */
 }
 
 void    ConfigParser::validMethods(const std::string& methods) {
@@ -202,8 +198,6 @@ void    ConfigParser::validReturn(const std::string& line) {
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
             THROW("Invalid return status code");
         validRoot(path);
-        // if (path.find("https://") == std::string::npos && path.find("http://") == std::string::npos)
-        //     THROW("Invalid return path");
         return;
     }   
     THROW("Invalid return");

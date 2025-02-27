@@ -61,13 +61,6 @@ void    ConfigServer::setLocations(const ConfigLocation& location) {
     this->_locations.push_back(location);
 }
 
-/* void    ConfigServer::setDefaultErrorPages() {
-    ErrorPage error_page;
-    error_page.error_codes.insert(404);
-    error_page.error_path = "/errors/404.html";
-    this->_error_pages.push_back(error_page);
-} */
-
 void    ConfigServer::setDefaultListen() {
     this->_listen.push_back(std::make_pair("0.0.0.0", 8080));
 }
