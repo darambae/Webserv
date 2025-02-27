@@ -46,7 +46,7 @@
             ]
         },
         "2": {
-            "player_name": "Gauthier",
+            "player_name": "Gautier",
             "profile_pic" : "",
             "game_history": [
                 { "game_id": 1, "total_score": 123 },

@@ -5,13 +5,23 @@ import base64
 from io import BytesIO
 
 def handle_request():
-    player_id = int(os.environ.get("QUERY_STRING").split("=")[1])
-    file_path = os.path.realpath("data/cgi-bin/record.json")
-    print(file_path)
     response_body = []
 
     response_body.append("<!DOCTYPE html>")
     response_body.append("<html><body>")
+    response_body.append("<link rel='stylesheet' href='style.css'/>")
+    query_string = os.environ.get("QUERY_STRING")
+    if query_string:
+        player_id = int(query_string.split("=")[1])
+    else:
+        response_body.append(f"<h1>Player id is not given in the query</h1><a href='/' class=\"button\">Go back</a></body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print(response)
+        return
+    
+    file_path = os.path.realpath("data/cgi-bin/record.json")
+    
     with open(file_path, "r") as file:
         data = json.load(file)
     player_data = data["players"].get(str(player_id))
@@ -19,7 +29,7 @@ def handle_request():
         player_scores = [game["total_score"] for game in player_data["game_history"]]
         game_ids = [game["game_id"] for game in player_data["game_history"]]
     else:
-        response_body.append(f"<h1>No player with ID {player_id} found</h1><a href='/'>Go back</a></body></html>")
+        response_body.append(f"<h1>No player with ID {player_id} found</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
         print(response)
@@ -57,11 +67,9 @@ def handle_request():
     img_buffer.close()
 
     # Generate the HTML response
-    response_body.append(f"<h1>Player Data for {player_id}</h1>")
-    response_body.append(f"<p>Player Name: {player_data['player_name']}</p>")
-    response_body.append(f"<p>Game History: {player_data['game_history']}</p>")
-    response_body.append(f'<img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/>')
-    response_body.append("<a href='/'>Go back</a>")
+    response_body.append(f"<h1>{player_data['player_name']}'s game history</h1>")
+    response_body.append(f'<div><img src="data:image/png;base64,{img_base64}" alt="Player Scores Graph"/></div>')
+    response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
 

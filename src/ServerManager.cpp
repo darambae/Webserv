@@ -71,24 +71,39 @@ void	ServerManager::handlePollin(int FD) {
 		} else
 			FD_DATA[new_client]->just_connected = true;
 	} else if (FD_DATA[FD]->status == CLIENT) {
-		if (FD_DATA[FD]->request == NULL)
+		if (FD_DATA[FD]->request == NULL) {
 			FD_DATA[FD]->request = new Request(FD);
+			FD_DATA[FD]->request->setTimeStamp(get_time());
+		}
 		if (FD_DATA[FD]->request->handleRequest() == -1) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
 			cleanFd(FD);
 		}
 	} else if (FD_DATA[FD]->status == CGI_parent) { //read from CGI
-		int result = FD_DATA[FD]->CGI->recvFromCgi();
-		if (result == -1)
-			closeCgi(501, FD_DATA[FD]->request->getClientFD());
-		else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
-			closeCgi(0, FD_DATA[FD]->request->getClientFD());
+		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+			closeCgi(408, FD_DATA[FD]->request->getClientFD());
+		}
+		else {
+			int result = FD_DATA[FD]->CGI->recvFromCgi();
+			if (result == -1)
+				closeCgi(501, FD_DATA[FD]->request->getClientFD());
+			else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
+				closeCgi(0, FD_DATA[FD]->request->getClientFD());
+		}
 	}
 }
 
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
+		LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
+		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+			FD_DATA[FD]->response->setResponseStatus(408);
+			FD_DATA[FD]->response->handleError();
+			FD_DATA[FD]->response->sendResponse();
+			cleanFd(FD);
+			return;
+		}
 		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
 			//print_FD_status(FD);
 			LOG_INFO("POLLOUT signal");
@@ -110,6 +125,7 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
+		FD_DATA[FD]->request->setTimeStamp(get_time());
 		if (FD_DATA[FD]->request->getMethod() == "GET")
 			return;
 		else {
@@ -188,6 +204,17 @@ void	ServerManager::cleanFd(int FD) {
 		}
 	}
 	LOG_INFO("The FD : "+to_string(FD)+" was cleaned");
+}
+
+bool	ServerManager::check_time_out(int FD) {
+	if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+		LOG_INFO("TIME OUT");
+		FD_DATA[FD]->response->setResponseStatus(408);
+		FD_DATA[FD]->response->handleError();
+		cleanFd(FD);
+		return true;
+	}
+	return false;
 }
 
 ServerManager::~ServerManager() {

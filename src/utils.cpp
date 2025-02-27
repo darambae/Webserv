@@ -45,3 +45,9 @@ bool    validBracket(const std::string& str, char a, char b) {
     return str.find(a) != std::string::npos && str.find(b) == std::string::npos &&
             str.find_first_of(a) == str.find_last_of(a);
 }
+
+uint64_t	get_time(void){
+	struct timeval	time;
+	gettimeofday(&time, NULL);
+	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
+}
