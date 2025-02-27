@@ -81,8 +81,8 @@ void	ServerManager::handlePollin(int FD) {
 		int result = FD_DATA[FD]->CGI->recvFromCgi();
 		if (result == -1)
 			closeCgi(501, FD_DATA[FD]->request->getClientFD());
-		else if (result >= 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
-			closeCgi(0, FD_DATA[FD]->request->getClientFD());
+		// else if (result >= 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
+		// 	closeCgi(0, FD_DATA[FD]->request->getClientFD());
 	}
 }
 
