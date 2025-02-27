@@ -3,7 +3,7 @@ import os
 import sys
 
 def load_data():
-    file_path = os.path.realpath("record.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     return data
@@ -14,9 +14,9 @@ def save_data(data):
         json.dump(data, file, indent=4)
 
 def handle_request():
-    # form = os.environ.get("QUERY_STRING")
-    content_len = int(os.environ.get("CONTENT_LENGTH", 0))
-    form = sys.stdin.read(content_len)
+    form = os.environ.get("QUERY_STRING")
+    #content_len = int(os.environ.get("CONTENT_LENGTH", 0))
+    #form = sys.stdin.read(content_len)
     response_body = []
 
     response_body.append("<!DOCTYPE html>")

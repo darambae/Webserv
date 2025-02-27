@@ -37,13 +37,13 @@
             </form>
             <h4>Choose a player id</h4>
             <form action="/cgi-bin/get_player_data.py" method="get">
-                <input type="text" name="player_id" id="player_id">
+                <input type="text" name="player_id" id="player_id" required>
                 <button type="submit">Send</button>
             </form>
             <br>
             <h4>Choose a game id</h4>
             <form action="/cgi-bin/get_game_data.py" method="get">
-                <input type="text" name="game_id" id="game_id">
+                <input type="text" name="game_id" id="game_id" required>
                 <button type="submit">Send</button>
             </form>
         </section>
