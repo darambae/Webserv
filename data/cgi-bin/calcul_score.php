@@ -36,28 +36,50 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		$parsed_postData['player4'] ?? [],
 		$parsed_postData['player5'] ?? []
 	];
-	$content = "<!DOCTYPE html>
-	<html>
+	$content = '<!DOCTYPE html>
+	<html lang="fr">
+	<head>
+		<meta charset="UTF-8">
+		<meta name="viewport" content="width=device-width, initial-scale=1.0">
+		<title>Scores</title>
+		<link rel="stylesheet" href="css/style.css">
+	</head>
 	<body>
-		<h2>Scores</h2>";
+
+		<header>
+			<h1>Scores</h1>
+		</header>
+
+		<main>
+		<section>';
+		$total_max = 0;
+		$winner = "";
+		for ($i = 0; $i < count($players); $i++) {
+			if (!empty($players[$i]) && !empty($names[$i])) {
+				$content .= '<div class="player">' . htmlspecialchars($names[$i]);
+				$total = 0;
+				foreach ($players[$i] as $score) {
+					$total = $total + $score;
+				}
+				$content .= '<span>' . htmlspecialchars($total) . '</span></div>';
+				if ($total > $total_max) {
+					$total_max = $total;
+					$winner = $names[$i];
+				}
+			}
+		}
+		$content .= '<div class="player winner">🥇 ' . htmlspecialchars(($winner)) . '<span>' . htmlspecialchars($total_max) . '</span> <img src="/cgi-bin/trophee.png" alt="Trophée" width="40"></div>
+			</section>
+		</main>
+
+	</body>
+	</html>';
+
 	// echo "data after parse_str : ";
 	// print_r($names);
 	// print_r($players);
     //Affichage des scores
-    for ($i = 0; $i < count($players); $i++) {
-        if (!empty($players[$i]) && !empty($names[$i])) {
 
-            $content .= "<h2>" . htmlspecialchars($names[$i]) . "</h2><ul>";
-            $total = 0;
-			foreach ($players[$i] as $score) {
-				$total = $total + $score;
-            }
-			$content .= "<h3>" . htmlspecialchars($total) . "</h3><ul>";
-            $content .= "</ul>";
-        }
-    }
-
-	$content .= "</body></html>";
 	$length = strlen($content);
 	echo "Content-Type: text/html\r\n";
 	echo "Content-Length: $length\r\n\r\n";

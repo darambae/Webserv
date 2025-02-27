@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Scores</title>
+    <style>
+        /* Reset some default styles */
+        body, h1, h2, p, ul, li {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            line-height: 1.6;
+            background-color: #f4f4f4;
+            color: #333;
+            text-align: center;
+        }
+
+        header {
+            background: #333;
+            color: #fff;
+            padding: 1rem 0;
+        }
+
+        nav ul {
+            list-style: none;
+            padding: 0;
+        }
+
+        nav ul li {
+            display: inline;
+            margin: 0 15px;
+        }
+
+        nav ul li a {
+            color: #fff;
+            text-decoration: none;
+        }
+
+        main {
+            padding: 20px;
+        }
+
+        section {
+            margin: 20px auto;
+            max-width: 800px;
+            background: #fff;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .player {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 10px;
+            margin: 10px 0;
+            font-size: 1.2rem;
+            background: #e0e0e0;
+            border-radius: 5px;
+        }
+
+        .winner {
+            background: linear-gradient(90deg, #ffcc00, #ff9900);
+            color: white;
+            font-weight: bold;
+            padding: 12px;
+            box-shadow: 0 5px 15px rgba(255, 204, 0, 0.5);
+        }
+
+        .trophy {
+            width: 40px;
+            height: 40px;
+        }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>Scores</h1>
+    </header>
+
+    <main>
+        <section>
+            <div class="player">Kelly <span>120</span></div>
+            <div class="player winner">🥇 Daram <span>128</span> <img src="https://upload.wikimedia.org/wikipedia/commons/5/5a/Golden_trophy.svg" alt="Trophée" class="trophy"></div>
+        </section>
+    </main>
+
+</body>
+</html>
