@@ -71,8 +71,10 @@ void	ServerManager::handlePollin(int FD) {
 		} else
 			FD_DATA[new_client]->just_connected = true;
 	} else if (FD_DATA[FD]->status == CLIENT) {
-		if (FD_DATA[FD]->request == NULL)
+		if (FD_DATA[FD]->request == NULL) {
 			FD_DATA[FD]->request = new Request(FD);
+			FD_DATA[FD]->request->setTimeStamp(get_time());
+		}
 		if (FD_DATA[FD]->request->handleRequest() == -1) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
 			cleanFd(FD);

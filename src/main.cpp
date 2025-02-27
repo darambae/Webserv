@@ -1,21 +1,4 @@
 
-// #include "../include/ConfigParser.hpp"
-// #include "../include/Server.hpp"
-
-// int	main(int argc, char **argv) {
-// 	if (argc > 2)
-// 		return 1;
-// 	std::string	configFile;
-// 	if (argc == 2)
-// 		configFile = argv[1];
-// 	ConfigParser	config(configFile);
-// 	Server	server(config.getServers())
-// }
-// #include "../include/Server.hpp"
-// #include "../include/ConfigParser.hpp"
-// #include "../include/ConfigServer.hpp"
-// #include "../include/ConfigLocation.hpp"
-// #include "../include/ServerManager.hpp"
 #include "../include/webserv.hpp"
 
 int MAX_CLIENT = 1024;
@@ -67,7 +50,6 @@ int main(int ac, char **av)
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
         LOG_INFO("Configuration file parsed successfully");
-        //printContainer(servers);
 		ServerManager	manager(servers);
 		manager.launchServers();
 

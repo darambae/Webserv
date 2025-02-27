@@ -323,8 +323,7 @@ void	Response::handleResponse() {
 
 	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
-		
-		if (requestPath.find("/cgi-bin") != std::string::npos) {
+		if (requestPath.find("/cgi-bin") != std::string::npos && (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos)) {
 			LOG_INFO("Handling GET request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);

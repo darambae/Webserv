@@ -27,6 +27,7 @@ class Request {
 	bool			isRequestPathDirectory;
 	int				_clientFd;
 	int				_contentLength;
+	uint64_t		_time_stamp;
 	std::string		_savedErrorCode;
 	// CGI data struct to be implemented
 	// std::string _content_type;
@@ -42,7 +43,7 @@ class Request {
 public:
 
 	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
-					_clientFd(fd), _contentLength(0) {}
+					_clientFd(fd), _contentLength(0), _time_stamp(0) {}
 	~Request() {}
 
 	struct uploadData	uploadData;
@@ -57,6 +58,7 @@ public:
 	std::string getQuery() const { return _query; }
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
+	void	setTimeStamp(uint64_t time) { _time_stamp = time; }
 	std::string	getBody() const { return _body; }
 
 	/* methods */

@@ -55,7 +55,7 @@ int	Request::parseRequest() {
 
 	else if (isHeaderRead && _contentLength == 0) {
 		isRequestComplete = true;
-		LOG_INFO("Request complete");
+		LOG_INFO("Request parsing complete");
 	}
 
 	return 0;

@@ -34,3 +34,4 @@ void    removeWhitespaces(std::string &str); // Remove whitespaces from a string
 bool    endingSemicolon(const std::string& line);
 bool    onlyDigits(const std::string& str); //Check if a string contains only digits
 bool    validBracket(const std::string& line, char a, char b); //Check if a string contains a valid bracket(a), not b
+uint64_t    get_time(void); //Get the current time in milliseconds

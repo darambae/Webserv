@@ -3,7 +3,7 @@
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
 #define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
-
+#define TIME_OUT 20000 //20s
 #include <iostream>
 #include <csignal>
 #include <fstream>
@@ -28,6 +28,7 @@
 #include <csignal>
 #include <sys/wait.h>
 #include <dirent.h>
+#include <sys/time.h>
 
 enum fd_status
 {
