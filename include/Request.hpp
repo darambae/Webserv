@@ -56,6 +56,8 @@ public:
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
 	std::string	getValueFromHeader(const std::string& key) const;
 	std::string getQuery() const { return _query; }
+	uint64_t	getTimeStamp() const { return _time_stamp; }
+	
 	/* setters */
 	void	setPath(std::string path) { _path = path; }
 	void	setTimeStamp(uint64_t time) { _time_stamp = time; }
