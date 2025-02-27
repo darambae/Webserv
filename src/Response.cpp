@@ -11,6 +11,7 @@ void	Response::setResponseStatus(int code) {
 		case 403: _reasonPhrase = "Forbidden"; break;
 		case 404: _reasonPhrase = "Not Found"; break;
 		case 405: _reasonPhrase = "Method Not Allowed"; break;
+		case 408: _reasonPhrase = "Request Timeout"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
 	}

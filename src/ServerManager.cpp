@@ -73,7 +73,6 @@ void	ServerManager::handlePollin(int FD) {
 	} else if (FD_DATA[FD]->status == CLIENT) {
 		if (FD_DATA[FD]->request == NULL) {
 			FD_DATA[FD]->request = new Request(FD);
-			FD_DATA[FD]->request->setTimeStamp(get_time());
 		}
 		if (FD_DATA[FD]->request->handleRequest() == -1) {
 			LOG_INFO("The status of FD_DATA[" + to_string(FD) +"] : CLIENT");
@@ -97,7 +96,7 @@ void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
 		LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
-		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+		if (FD_DATA[FD]->request && get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			FD_DATA[FD]->response->setResponseStatus(408);
 			FD_DATA[FD]->response->handleError();
 			FD_DATA[FD]->response->sendResponse();
@@ -119,7 +118,7 @@ void	ServerManager::handlePollout(int FD) {
 				FD_DATA[FD]->response = NULL;
 				delete FD_DATA[FD]->request;
 				FD_DATA[FD]->request = NULL;
-				FD_DATA[FD]->request = new Request(FD);
+				//FD_DATA[FD]->request = new Request(FD);
 				LOG_INFO("response send and delete");
 			}
 		}
