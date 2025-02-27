@@ -63,6 +63,31 @@ img {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
+
+.player {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 1.2rem;
+    background: #e0e0e0;
+    border-radius: 5px;
+}
+
+.winner {
+    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    color: white;
+    font-weight: bold;
+    padding: 12px;
+    box-shadow: 0 5px 15px rgba(255, 204, 0, 0.5);
+}
+
+.trophy {
+    width: 40px;
+    height: 40px;
+}
+
 .button {
     display: inline-block;
     padding: 5px 10px;

@@ -96,13 +96,15 @@ void	ServerManager::handlePollin(int FD) {
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
-		LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
-		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
-			FD_DATA[FD]->response->setResponseStatus(408);
-			FD_DATA[FD]->response->handleError();
-			FD_DATA[FD]->response->sendResponse();
-			cleanFd(FD);
-			return;
+		//LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
+		if (FD_DATA[FD]->request && (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT)) {
+			if (FD_DATA[FD]->response) {
+				FD_DATA[FD]->response->setResponseStatus(408);
+				FD_DATA[FD]->response->handleError();
+				FD_DATA[FD]->response->sendResponse();
+				cleanFd(FD);
+				return;
+			}
 		}
 		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
 			//print_FD_status(FD);
@@ -115,11 +117,15 @@ void	ServerManager::handlePollout(int FD) {
 			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
 				if (FD_DATA[FD]->CGI != NULL)
 					closeCgi(0, FD);
-				delete FD_DATA[FD]->response;
-				FD_DATA[FD]->response = NULL;
-				delete FD_DATA[FD]->request;
-				FD_DATA[FD]->request = NULL;
-				FD_DATA[FD]->request = new Request(FD);
+				if (FD_DATA[FD]->response) {
+					delete FD_DATA[FD]->response;
+					FD_DATA[FD]->response = NULL;
+				}
+				if (FD_DATA[FD]->request) {
+					delete FD_DATA[FD]->request;
+					FD_DATA[FD]->request = NULL;
+				}
+				//FD_DATA[FD]->request = new Request(FD);
 				LOG_INFO("response send and delete");
 			}
 		}

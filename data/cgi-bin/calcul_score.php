@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		<meta charset="UTF-8">
 		<meta name="viewport" content="width=device-width, initial-scale=1.0">
 		<title>Scores</title>
-		<link rel="stylesheet" href="css/style.css">
+		<link rel="stylesheet" href="/cgi-bin/style.css">
 	</head>
 	<body>
 
@@ -53,6 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		<main>
 		<section>';
 		$total_max = 0;
+		$winnerS[0] = "";
 		$winner = "";
 		for ($i = 0; $i < count($players); $i++) {
 			if (!empty($players[$i]) && !empty($names[$i])) {
@@ -62,14 +63,26 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 					$total = $total + $score;
 				}
 				$content .= '<span>' . htmlspecialchars($total) . '</span></div>';
-				if ($total > $total_max) {
+				if ($total >= $total_max) {
+					if ($total === $total_max && sizeof($winner) > 0) {
+						$winnerS[0] = $winner;
+						$winnerS[1] = $names[$i];
+					}
 					$total_max = $total;
 					$winner = $names[$i];
 				}
 			}
 		}
-		$content .= '<div class="player winner">🥇 ' . htmlspecialchars(($winner)) . '<span>' . htmlspecialchars($total_max) . '</span> <img src="/cgi-bin/trophee.png" alt="Trophée" width="40"></div>
-			</section>
+		if (sizeof($winnerS[0]) > 0) {
+			$content .= '<div class="winner">🥇 ';
+			foreach ($winnerS[$i] as $name) {
+				$content .= ' / ' . htmlspecialchars(($winnerS[$i]));
+			}
+			$content .= ' are the winners with a score of ' . '<span>' . htmlspecialchars($total_max) . '</span> <img src="/cgi-bin/trophee.png" alt="Trophée" width="40" class="trophy"></div>';
+		} else {
+			$content .= '<div class="winner">🥇 ' . htmlspecialchars(($winner)) . ' is the winner with a score of ' . '<span>' . htmlspecialchars($total_max) . '</span> <img src="/cgi-bin/trophee.png" alt="Trophée" width="40" class="trophy"></div>';
+		}
+			$content .= '</section>
 		</main>
 
 	</body>

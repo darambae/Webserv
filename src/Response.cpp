@@ -167,11 +167,11 @@ std::string	Response::generateAutoIndex(std::string path) {
 		if (fileName == "..")
 			html << "<li><a href=\"../\">../ (Parent Directory)</a></li>\n";
 		else
-			html << "<li><a href=\"" << fileName << "\">" << fileName << "</a></li>\n";		
+			html << "<li><a href=\"" << fileName << "\">" << fileName << "</a></li>\n";
 	}
 	closedir(dir);
 	html << "</ul>\n</body>\n</html>\n";
-	
+
 	return html.str();
 }
 
@@ -243,7 +243,7 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
-		setResponseStatus(400); 
+		setResponseStatus(400);
 		handleError();
 		return ;
 	}
@@ -387,7 +387,6 @@ int	Response::sendResponse() {
 
 	size_t	responseSize = _builtResponse->size();
 	const size_t	BUFFER_SIZE = 4096;
-
 	LOG_INFO("sending response");
 	if (_totalBytesSent < responseSize) {
 		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
