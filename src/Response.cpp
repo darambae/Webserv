@@ -241,6 +241,7 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
+	LOG_ERROR("Handling POST request", 0);
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {

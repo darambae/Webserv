@@ -1,0 +1,4 @@
+1. POST request to upload an img file
+    curl -v -F "avatar=@408.jpg" http://localhost:8080/upload
+2. GET request to load game history
+    curl -v "http://localhost:8080/cgi-bin/load_game.py?dummy=1"

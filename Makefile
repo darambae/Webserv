@@ -16,7 +16,7 @@ setup:
 	@which php > php_path.txt
 	@chmod +x data/cgi-bin/*.py
 	@chmod 777 data/cgi-bin/record.json
-	@chmod +x data/cgi-bin/*.php
+	#@chmod +x data/cgi-bin/*.php
 
 $(OBJ_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
