@@ -50,10 +50,6 @@ int main(int ac, char **av)
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
         LOG_INFO("Configuration file parsed successfully");
-        std::vector<ConfigServer>::const_iterator it = servers.begin();
-        for (; it != servers.end(); ++it) {
-            std::cout << *it << std::endl;
-        }
         ServerManager	manager(servers);
 		manager.launchServers();
 
