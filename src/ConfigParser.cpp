@@ -88,6 +88,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         THROW("Server block must have a root and at least one location block");
     if (!validBracket(line, '}', '{'))
         THROW("Server block bracket isn't closed properly");
+    if (server.getListen().empty())
+        server.setDefaultListen();
 }
 
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
