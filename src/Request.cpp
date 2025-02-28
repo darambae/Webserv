@@ -5,6 +5,10 @@
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (to a file or a directory) ; protocol_version (HTTP/1.1)
 // - Header containing extra data
 // - Body (the content if needed)
+
+Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false), _clientFd(fd), _contentLength(0) {
+	_time_stamp = get_time();
+}
 int	Request::parseRequest() {
 
 	char	buffer[1024];

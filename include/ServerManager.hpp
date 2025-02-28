@@ -28,5 +28,4 @@ class	ServerManager {
 		void	closeCgi(int errorNumber, int FdCGI);
 		void	print_all_FD_DATA();
 		void	print_FD_status(int FD);
-		bool	check_time_out(int FD);
 };

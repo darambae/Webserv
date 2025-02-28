@@ -42,8 +42,7 @@ class Request {
 
 public:
 
-	Request(int fd): isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false),
-					_clientFd(fd), _contentLength(0), _time_stamp(0) {}
+	Request(int fd);
 	~Request() {}
 
 	struct uploadData	uploadData;
