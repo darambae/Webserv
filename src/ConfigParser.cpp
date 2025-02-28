@@ -23,7 +23,6 @@ void    ConfigParser::setServers(const ConfigServer& server) {
 }
 
 void    ConfigParser::parseFile() {
-    ConfigServer server;
     std::string line;
     std::ifstream file(this->getFilePath().c_str());
 
@@ -32,10 +31,12 @@ void    ConfigParser::parseFile() {
 
     while (getline(file, line)) {
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("server") != std::string::npos && validBracket(line, '{', '}')) {
+        if (line.find("server") != std::string::npos) {
+            ConfigServer server;
             parseDirectives(file, server);
             setServers(server);
         }
+        
     }
     if (file.is_open())
         file.close();
@@ -43,7 +44,7 @@ void    ConfigParser::parseFile() {
 
 void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server) {
     std::string line;
-    while (getline(file, line) && line.find("}") == std::string::npos) {
+    while (getline(file, line)) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
@@ -76,21 +77,23 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             if (location.getRoot().empty() && !server.getRoot().empty())
                 location.setRoot(server.getRoot());
             server.setLocations(location);
+        } else if (line.find("}") != std::string::npos) {
+            break;
         }
+
+
     }
     //Checking if server block has minimum required directives
     if (server.getRoot().empty() || server.getLocations().empty())
         THROW("Server block must have a root and at least one location block");
     if (!validBracket(line, '}', '{'))
         THROW("Server block bracket isn't closed properly");
-    if (server.getListen().empty())
-        server.setDefaultListen();
 }
 
 void    ConfigParser::parseLocation(std::ifstream &file, std::string line, ConfigLocation &location) {
     std::string path = line.substr(line.find(" ") + 1, line.find(" {") - line.find(" ") - 1);
     location.setPath(path);
-    while (getline(file, line) && line.find("}") == std::string::npos) {
+    while (getline(file, line)) {
         removeWhitespaces(line);
         size_t start_pos = line.find(" ") + 1;
         size_t end_pos = line.find(";");
@@ -115,6 +118,9 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setCgiExtension(line.substr(start_pos, len));
         else if (line.find("cgi_pass ") != std::string::npos && endingSemicolon(line))
             location.setCgiPass(line.substr(start_pos, len));
+        else if (line.find("}") != std::string::npos) {
+            break;
+        }
     }
     //Checking if cgi location block has cgi_extension and cgi_pass
     if (location.getPath() == "/cgi-bin" && (location.getCgiExtension().empty() || location.getCgiPass().empty()))
