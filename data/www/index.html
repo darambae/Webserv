@@ -5,6 +5,37 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Webserv Project</title>
     <link rel="stylesheet" type="text/css" href="css/style.css">
+    <style>
+        /* Styles pour la pop-up */
+        .cookie-popup {
+            position: fixed;
+            bottom: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: white;
+            padding: 15px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.2);
+            border-radius: 5px;
+            display: none;
+            text-align: center;
+            z-index: 1000;
+        }
+        .cookie-popup button {
+            margin: 5px;
+            padding: 8px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 3px;
+        }
+        .accept-btn {
+            background-color: green;
+            color: white;
+        }
+        .decline-btn {
+            background-color: red;
+            color: white;
+        }
+    </style>
 </head>
 <body>
     <header>
@@ -102,5 +133,21 @@
     <footer>
         <p>&copy; 2023 Webserv Project. All rights reserved.</p>
     </footer>
+    <!--cookie pop-up window -->
+    <div class="cookie-popup" id="cookiePopup">
+        <p>Do you want a cookie ? Take a cookie. Cookies are good. Accept my cookie</p>
+        <button class="accept-btn" onclick="closeCookiePopup()">Accept</button>
+        <button class="decline-btn" onclick="closeCookiePopup()">Decline</button>
+    </div>
+    
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            document.getElementById("cookiePopup").style.display = "block";
+        });
+
+        function closeCookiePopup() {
+            document.getElementById("cookiePopup").style.display = "none";
+        }
+    </script>
 </body>
 </html>
