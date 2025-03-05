@@ -76,7 +76,7 @@ std::string	ResponseBuilder::buildContentType() {
 
 	if (requestedFilePath.find(".php") != std::string::npos || requestedFilePath.find(".py") != std::string::npos) {
 		contentType = "text/html";
-		LOG_INFO("Content-Type: " + contentType);
+		//LOG_INFO("Content-Type: " + contentType);
 		return contentType;
 	}
 	size_t	pos = requestedFilePath.find_last_of('.');
@@ -86,7 +86,7 @@ std::string	ResponseBuilder::buildContentType() {
 		for (; it != _mimeTypes.end(); ++it) {
 			if (it->first == fileExtension) {
 				contentType = it->second;
-				LOG_INFO("Content-Type: " + contentType);
+				//LOG_INFO("Content-Type: " + contentType);
 				break ;
 			}
 		}
