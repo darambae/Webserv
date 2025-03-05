@@ -74,6 +74,7 @@ int	CgiManager::forkProcess() {
 			exit(-1);
 		}
 	}
+	sleep(1);
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
 	return 0;

@@ -1,0 +1,25 @@
+[2025-03-05 10:46:45] [DEBUG] Valid root
+[2025-03-05 10:46:45] [DEBUG] Valid error page
+[2025-03-05 10:46:45] [DEBUG] Valid error page
+[2025-03-05 10:46:45] [DEBUG] Valid error page
+[2025-03-05 10:46:45] [DEBUG] Valid error page
+[2025-03-05 10:46:45] [DEBUG] Valid error page
+[2025-03-05 10:46:45] [DEBUG] Valid body size
+[2025-03-05 10:46:45] [DEBUG] Valid path
+[2025-03-05 10:46:45] [DEBUG] Valid root
+[2025-03-05 10:46:45] [DEBUG] Valid autoindex
+[2025-03-05 10:46:45] [DEBUG] Valid methods
+[2025-03-05 10:46:45] [DEBUG] Valid path
+[2025-03-05 10:46:45] [DEBUG] Valid root
+[2025-03-05 10:46:45] [DEBUG] Valid methods
+[2025-03-05 10:46:45] [DEBUG] Valid autoindex
+[2025-03-05 10:46:45] [DEBUG] Valid path
+[2025-03-05 10:46:45] [DEBUG] Valid CGI path
+[2025-03-05 10:46:45] [DEBUG] Valid CGI extension
+[2025-03-05 10:46:45] [DEBUG] Valid methods
+[2025-03-05 10:46:45] [DEBUG] Valid autoindex
+[2025-03-05 10:46:45] [DEBUG] Valid root
+[2025-03-05 10:46:45] [DEBUG] Valid path
+[2025-03-05 10:46:45] [DEBUG] Valid root
+[2025-03-05 10:46:47] [DEBUG] CGI script name: get_player_data.py
+[2025-03-05 10:51:41] [DEBUG] Interrupt signal 2 received
