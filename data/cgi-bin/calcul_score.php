@@ -14,7 +14,8 @@ echo $prénom . $nom; pour des string, '.' au lieu de +
 */
 
 function addDataToJson(array $names, array $players) {
-	$json = file_get_contents("record_copy.json");//récupère les data de JSON
+	$file = realpath("data/cgi-bin/record_copy.json");
+	$json = file_get_contents($file);//récupère les data de JSON
 	$data = json_decode($json, true);//true pour json objet = associative array, transforme les data.json en objets php utilisables
 	$game_id = (string) ((int) array_key_last($data["games"]) + 1);
 	$i = 0;
@@ -64,7 +65,10 @@ function addDataToJson(array $names, array $players) {
 	}
 //	print_r($data);
 	$new_json = json_encode($data, JSON_PRETTY_PRINT);
-	file_put_contents("record_copy.json",$new_json);
+	/*if (*/file_put_contents($file,$new_json);/* === false) {
+		$errorMessage = "an error occurs updating datas";
+		echo "<p style='color: red; font-weight: bold;'>$errorMessage</p>";
+	}*/
 }
 function extractDataFromBody($body) {
 	parse_str($body, $parsed_postData);
@@ -155,17 +159,17 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 	// print_r($post_data);
 	if (strlen($post_data) > 0) {
 		$data = extractDataFromBody($post_data);
-		//print_r($data);
 		$names = $data[0];
 		$scores = $data[1];
-		// $content = "";
-		// fillReturnHead($content);
-		// fillReturnBody($content, $scores, $names);
-		// $length = strlen($content);
-		// echo "Content-Type: text/html\r\n";
-		// echo "Content-Length: $length\r\n\r\n";
-		// echo $content;
-		addDataToJson($names, $scores);
+		$content = "";
+		fillReturnHead($content);
+		fillReturnBody($content, $scores, $names);
+		$length = strlen($content);
+		echo "Content-Type: text/html\r\n";
+		echo "Content-Length: $length\r\n\r\n";
+		addDataToJson($names, players: $scores);
+		echo $content;
+		exit;
 	}
 } else {
     // Si l'utilisateur tente d'accéder directement à la page sans soumettre le formulaire
