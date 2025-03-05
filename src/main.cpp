@@ -50,7 +50,7 @@ int main(int ac, char **av)
         parser.parseFile();
         const std::vector<ConfigServer>& servers = parser.getServers();
         LOG_INFO("Configuration file parsed successfully");
-		ServerManager	manager(servers);
+        ServerManager	manager(servers);
 		manager.launchServers();
 
     } catch (std::exception & e) {

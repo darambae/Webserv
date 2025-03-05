@@ -47,6 +47,10 @@ int	Request::parseRequest() {
 		LOG_INFO("Header received: " + headerPart);
 	}
 
+	//if body size is bigger than client max buffer size, we send error 413
+	if (_contentLength > 0 && _contentLength > FD_DATA[_clientFd]->server->getConfigServer()->getLimitClientBodySize())
+		return 1;
+
 	//read body if present
 	if (isHeaderRead && _contentLength > 0) {
 		if (_tempBuffer.size() >= static_cast<size_t>(_contentLength)) {
@@ -56,7 +60,6 @@ int	Request::parseRequest() {
 			//LOG_INFO("Body received : " + _body);
 		}
 	}
-
 	else if (isHeaderRead && _contentLength == 0) {
 		isRequestComplete = true;
 		LOG_INFO("Request parsing complete");
@@ -110,8 +113,9 @@ void	Request::parseHeader(std::string headerPart) {
 			std::string	value = line.substr(pos + 2);
 			//LOG_INFO("Header key: " + key + " value: " + value);
 			_header[key] = value;
-			if (key == "Content-Length")
+			if (key == "Content-Length") {
 				_contentLength = std::atoi(value.c_str());
+			}
 		}
 	}
 }
@@ -119,10 +123,10 @@ void	Request::parseHeader(std::string headerPart) {
 uploadData Request::parseBody() {
 	struct uploadData data;
 	std::string content;
-	//LOG_INFO("Body to parse: " + _body);
+	LOG_INFO("Body to parse: " + _body);
 	std::string filename = _body.substr(_body.find("filename=") + 10, _body.find("\"\r\n") - (_body.find("filename=") + 10));
 	size_t start_pos = _body.find("\r\n\r\n");
-	size_t end_pos = _body.find("\r\n------");
+	size_t end_pos = _body.find("\r\n----");
 	if (start_pos != std::string::npos)
 		content = _body.substr(start_pos + 4, end_pos - start_pos - 4);
 	data.fileName = filename;
@@ -144,9 +148,16 @@ std::string	Request::parseQueryString() {
 int	Request::handleRequest() {
 	LOG_INFO("FD "+to_string(_clientFd)+" received a request");
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
-	if (parseRequest() == -1) {
+	int result_parseRequest = parseRequest();
+	if (result_parseRequest == -1) {
 		LOG_INFO("Request parsing failed");
 		return -1;
+	} else if (result_parseRequest == 1) {
+		LOG_INFO("Request body too big");
+		FD_DATA[_clientFd]->response = new Response(*this, *config);
+		FD_DATA[_clientFd]->response->setResponseStatus(413);
+		FD_DATA[_clientFd]->response->handleError();
+		return 0;
 	}
 
 	if (isRequestComplete) {

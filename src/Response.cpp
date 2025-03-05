@@ -12,8 +12,11 @@ void	Response::setResponseStatus(int code) {
 		case 404: _reasonPhrase = "Not Found"; break;
 		case 405: _reasonPhrase = "Method Not Allowed"; break;
 		case 408: _reasonPhrase = "Request Timeout"; break;
+		case 413: _reasonPhrase = "Payload Too Large"; break;
+		case 418: _reasonPhrase = "Unsupported Media Type"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
+		
 	}
 
 }
@@ -138,7 +141,6 @@ void	Response::handleError() {
 			path = fullPath("/defaultError/defaultError.html");
 			setRequestedFile(path);
 			_responseReadyToSend = true;
-			setResponseStatus(200);
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
 		}
@@ -188,7 +190,6 @@ void	Response::handleGet() {
 	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
 	std::string	requestPath = _request.getPath();
-	LOG_INFO("Request path: " + _request.getPath());
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
 	LOG_INFO("rootPath: " + rootPath);
@@ -203,8 +204,7 @@ void	Response::handleGet() {
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
 			//LOG_INFO("Response built:\n" + *_builtResponse);
-		}
-		else {
+		} else {
 			LOG_INFO("No index file found, checking if auto-index enable");
 			if (_location->getAutoindex()) {
 				LOG_INFO("Autoindex enabled, generating directory listing...");
@@ -222,17 +222,26 @@ void	Response::handleGet() {
 	}
 	else {
 	// request path is a file
-		LOG_INFO("Path is not a directory, treating as a file");
-		setRequestedFile(path.c_str());
+		LOG_INFO("Path is not a directory, treating as a file : " + requestPath);
+		//If the file exists, set and serve it
 
+		if (!rootPath.empty() && requestPath.find(".json") == std::string::npos)
+			setRequestedFile(path.c_str());
 		if (_requestedFile) {
-			setResponseStatus(200);
-			_responseReadyToSend = true;
-			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse("");
-			//LOG_INFO("Response built:\n" + *_builtResponse);
-		}
-		else {
+			if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
+				LOG_INFO("Handling GET request with CGI");
+				if (handleCgi() == -1) {
+					setResponseStatus(415);
+					handleError();
+				}
+			} else {
+					setResponseStatus(200);
+					_responseReadyToSend = true;
+					_responseBuilder = new ResponseBuilder(*this);
+					_builtResponse = _responseBuilder->buildResponse("");
+					//LOG_INFO("Response built:\n" + *_builtResponse);
+			}
+		} else {
 			setResponseStatus(404);
 			handleError();
 		}
@@ -241,6 +250,7 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
+	LOG_ERROR("Handling POST request", 0);
 	struct uploadData fileData = _request.parseBody();
 	//Accept only a file with .jpg, .jpeg or .png extension
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
@@ -283,11 +293,15 @@ void	Response::handlePost() {
         responseBody << "<p>Your file has been uploaded successfully.</p>\n";
         responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
 		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";
+		responseBody << "<form action=\"" << _request.getPath() << "/" << fileData.fileName << "\" method=\"delete\">\n";
+		responseBody << "<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n";
+		responseBody << "<input type=\"hidden\" name=\"fileName\" value=\"" << fileData.fileName << "\">\n";
+		responseBody << "<button type=\"submit\" class=\"delete-button\">x</button>\n";
+		responseBody << "</form>\n";
 		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
 		responseBody << "</body>\n";
         responseBody << "</html>\n";
 		//LOG_INFO("Response body stream : " + responseBody.str());
-		//_responseBuilder->setBody(responseBody.str());
 		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
 		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 	}
@@ -297,6 +311,38 @@ void	Response::handlePost() {
 		handleError();
 	}
 
+}
+
+void	Response::handleDelete() {
+	LOG_INFO("Handling DELETE request");
+	std::string path = fullPath(_location->getRoot());
+	path += _request.getPath();
+	LOG_INFO("Path to delete: " + path);
+	if (remove(path.c_str()) != 0) {
+		LOG_INFO("Failed to delete the requested file");
+		setResponseStatus(400);
+		handleError();
+		return ;
+	}
+	setResponseStatus(200);
+	LOG_INFO("File deleted successfully");
+	_responseReadyToSend = true;
+	_responseBuilder = new ResponseBuilder(*this);
+	std::ostringstream responseBody;
+	responseBody << "<!DOCTYPE html>\n";
+	responseBody << "<html lang=\"en\">\n";
+	responseBody << "<head>\n";
+	responseBody << "<meta charset=\"UTF-8\">\n";
+	responseBody << "<title>File Delete Success</title>\n";
+	responseBody << "</head>\n";
+	responseBody << "<body>\n";
+	responseBody << "<h1>File Delete Successful</h1>\n";
+	responseBody << "<p>Your file has been deleted successfully.</p>\n";
+	responseBody << "<p>File Name: <strong>" << _request.getPath().substr(_request.getPath().find_last_of("/") + 1) << "</strong></p>\n";
+	responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
+	responseBody << "</body>\n";
+	responseBody << "</html>\n";
+	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
 }
 
 void	Response::handleResponse() {
@@ -324,16 +370,7 @@ void	Response::handleResponse() {
 
 	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
-		if (requestPath.find("/cgi-bin") != std::string::npos && (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos)) {
-			LOG_INFO("Handling GET request with CGI");
-			if (handleCgi() == -1) {
-				setResponseStatus(666);
-				handleError();
-				return ;
-			}
-		}
-		else
-			handleGet();
+		handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
 			LOG_INFO("Handling POST request with CGI");
@@ -343,11 +380,10 @@ void	Response::handleResponse() {
 				return ;
 			}
 		}
-		else if (requestPath == "/upload") {
+		else if (requestPath == "/upload")
 			handlePost();
-		}
-	} else if (requestMethod == "DELETE") {}
-		//handleDelete();
+	} else if (requestMethod == "DELETE")
+		handleDelete();
 	else {
 		LOG_INFO("Method not implemented");
 		setResponseStatus(501);
@@ -370,7 +406,7 @@ int	Response::handleCgi() {
 		cgi->query_string = "";
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
-	cgi->script_name = _request.getPath().substr(_request.getPath().find("cgi-bin/") + 8);
+	cgi->script_name = _request.getPath().substr(_request.getPath().find_last_of("/") + 1);
 	LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();

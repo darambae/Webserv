@@ -1,0 +1,4 @@
+http://localhost:8080/
+http://localhost:8080/cgi-bin/load_game.py?dummy=1
+http://localhost:8080/cgi-bin/get_player_data.py?player_id=4
+http://localhost:8080/cgi-bin/get_game_data.py?game_id=3

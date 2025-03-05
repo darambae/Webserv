@@ -2,7 +2,7 @@
 
 std::string*	ResponseBuilder::buildResponse(std::string body) {
 	std::ifstream& file = _response.getRequestedFile();
-	if (file.is_open()) {
+	if (file.is_open() && _response.getRequestedFilePath().find(".php") == std::string::npos && _response.getRequestedFilePath().find(".py") == std::string::npos) {
 		std::stringstream buffer;
 		buffer << _response.getRequestedFile().rdbuf();
 		_body = buffer.str();
@@ -74,6 +74,11 @@ std::string	ResponseBuilder::buildContentType() {
 	std::string	requestedFilePath = _response.getRequestedFilePath();
 	std::string	contentType;
 
+	if (requestedFilePath.find(".php") != std::string::npos || requestedFilePath.find(".py") != std::string::npos) {
+		contentType = "text/html";
+		LOG_INFO("Content-Type: " + contentType);
+		return contentType;
+	}
 	size_t	pos = requestedFilePath.find_last_of('.');
 	if (pos != std::string::npos) {
 		std::string fileExtension = requestedFilePath.substr(pos + 1);

@@ -15,7 +15,7 @@ void	ServerManager::launchServers() {
     while (stopProgram != 1) {
         int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
-            THROW("Poll failed");
+			LOG_ERROR("Poll failed", true);
 		//if new connection on one port of one server
 		//print_all_FD_DATA();
         for (size_t i = 0; i < ALL_FDS.size(); ++i) {
