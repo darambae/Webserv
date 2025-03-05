@@ -147,7 +147,7 @@ int CgiManager::check_pid() {
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
-	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
+	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	if (check_pid() == -1)
 		return -1;
 	char	buffer[1024] = {0};

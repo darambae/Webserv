@@ -193,11 +193,12 @@ void	Response::handleGet() {
 	LOG_INFO("Request path: " + _request.getPath());
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
-	LOG_INFO("rootPath: " + rootPath);
-	LOG_INFO("request path before concatenation: " + requestPath);
-	LOG_INFO("path: " + path);
+	// LOG_INFO("rootPath: " + rootPath);
+	// LOG_INFO("request path before concatenation: " + requestPath);
+	// LOG_INFO("path: " + path);
 
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+	// request path is a directory
 		if (findIndex() == 1) {
 			setResponseStatus(200);
 			LOG_INFO("Index found");
@@ -327,7 +328,7 @@ void	Response::handleResponse() {
 
 	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
-		if (requestPath.find("/cgi-bin") != std::string::npos && (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos)) {
+		if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
 			LOG_INFO("Handling GET request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);

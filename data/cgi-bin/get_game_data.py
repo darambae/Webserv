@@ -72,6 +72,7 @@ def handle_request():
 
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print(response)
+    return
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
