@@ -135,7 +135,6 @@ void	Response::handleError() {
 			}
 		}
 	}
-
 	if (!errorPageFound) {
 		if (generateDefaultErrorHtml() == 0) {
 			path = fullPath("/defaultError/defaultError.html");
