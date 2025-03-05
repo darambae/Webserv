@@ -1,0 +1,582 @@
+{
+    "games": {
+        "1": [
+            {
+                "player_id": "1",
+                "sq_1": 15,
+                "sq_2": 20,
+                "sq_3": 18,
+                "sq_4": 17,
+                "sq_5": 15,
+                "sq_6": 15,
+                "sq_7": 10,
+                "sq_8": 12,
+                "sq_9": 13,
+                "keys": 5,
+                "total_score": 140
+            },
+            {
+                "player_id": "2",
+                "sq_1": 14,
+                "sq_2": 18,
+                "sq_3": 16,
+                "sq_4": 12,
+                "sq_5": 14,
+                "sq_6": 12,
+                "sq_7": 11,
+                "sq_8": 13,
+                "sq_9": 10,
+                "keys": 3,
+                "total_score": 123
+            },
+            {
+                "player_id": "3",
+                "sq_1": 17,
+                "sq_2": 15,
+                "sq_3": 18,
+                "sq_4": 20,
+                "sq_5": 10,
+                "sq_6": 10,
+                "sq_7": 14,
+                "sq_8": 12,
+                "sq_9": 13,
+                "keys": 2,
+                "total_score": 131
+            },
+            {
+                "player_id": "4",
+                "sq_1": 20,
+                "sq_2": 17,
+                "sq_3": 15,
+                "sq_4": 18,
+                "sq_5": 10,
+                "sq_6": 15,
+                "sq_7": 12,
+                "sq_8": 14,
+                "sq_9": 13,
+                "keys": 1,
+                "total_score": 135
+            },
+            {
+                "player_id": "5",
+                "sq_1": 15,
+                "sq_2": 12,
+                "sq_3": 14,
+                "sq_4": 18,
+                "sq_5": 11,
+                "sq_6": 10,
+                "sq_7": 13,
+                "sq_8": 12,
+                "sq_9": 14,
+                "keys": 4,
+                "total_score": 123
+            }
+        ],
+        "2": [
+            {
+                "player_id": "2",
+                "sq_1": 18,
+                "sq_2": 20,
+                "sq_3": 15,
+                "sq_4": 22,
+                "sq_5": 10,
+                "sq_6": 10,
+                "sq_7": 14,
+                "sq_8": 13,
+                "sq_9": 12,
+                "keys": 2,
+                "total_score": 136
+            },
+            {
+                "player_id": "3",
+                "sq_1": 12,
+                "sq_2": 10,
+                "sq_3": 18,
+                "sq_4": 14,
+                "sq_5": 15,
+                "sq_6": 13,
+                "sq_7": 11,
+                "sq_8": 12,
+                "sq_9": 10,
+                "keys": 1,
+                "total_score": 116
+            },
+            {
+                "player_id": "6",
+                "sq_1": 14,
+                "sq_2": 16,
+                "sq_3": 20,
+                "sq_4": 18,
+                "sq_5": 10,
+                "sq_6": 15,
+                "sq_7": 12,
+                "sq_8": 13,
+                "sq_9": 14,
+                "keys": 3,
+                "total_score": 135
+            }
+        ],
+        "3": [
+            {
+                "player_id": "1",
+                "sq_1": 14,
+                "sq_2": 18,
+                "sq_3": 15,
+                "sq_4": 20,
+                "sq_5": 13,
+                "sq_6": 10,
+                "sq_7": 12,
+                "sq_8": 14,
+                "sq_9": 11,
+                "keys": 4,
+                "total_score": 131
+            },
+            {
+                "player_id": "5",
+                "sq_1": 10,
+                "sq_2": 14,
+                "sq_3": 16,
+                "sq_4": 15,
+                "sq_5": 12,
+                "sq_6": 13,
+                "sq_7": 11,
+                "sq_8": 10,
+                "sq_9": 12,
+                "keys": 2,
+                "total_score": 115
+            },
+            {
+                "player_id": "7",
+                "sq_1": 12,
+                "sq_2": 18,
+                "sq_3": 20,
+                "sq_4": 15,
+                "sq_5": 12,
+                "sq_6": 13,
+                "sq_7": 14,
+                "sq_8": 11,
+                "sq_9": 10,
+                "keys": 3,
+                "total_score": 135
+            }
+        ],
+        "4": [
+            {
+                "player_id": "1",
+                "sq_1": 15,
+                "sq_2": 20,
+                "sq_3": 18,
+                "sq_4": 17,
+                "sq_5": 15,
+                "sq_6": 15,
+                "sq_7": 12,
+                "sq_8": 14,
+                "sq_9": 13,
+                "keys": 5,
+                "total_score": 144
+            },
+            {
+                "player_id": "2",
+                "sq_1": 14,
+                "sq_2": 18,
+                "sq_3": 16,
+                "sq_4": 12,
+                "sq_5": 14,
+                "sq_6": 12,
+                "sq_7": 11,
+                "sq_8": 13,
+                "sq_9": 10,
+                "keys": 4,
+                "total_score": 124
+            },
+            {
+                "player_id": "5",
+                "sq_1": 15,
+                "sq_2": 12,
+                "sq_3": 14,
+                "sq_4": 18,
+                "sq_5": 11,
+                "sq_6": 10,
+                "sq_7": 13,
+                "sq_8": 12,
+                "sq_9": 14,
+                "keys": 3,
+                "total_score": 122
+            }
+        ],
+        "5": [
+            {
+                "player_id": "1",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 21,
+                "keys": 12,
+                "total_score": 129
+            },
+            {
+                "player_id": "2",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 20,
+                "total_score": 128
+            }
+        ],
+        "6": [
+            {
+                "player_id": "1",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 21,
+                "keys": 12,
+                "total_score": 129
+            },
+            {
+                "player_id": "2",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 20,
+                "total_score": 128
+            }
+        ],
+        "7": [
+            {
+                "player_id": "1",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 21,
+                "keys": 12,
+                "total_score": 129
+            },
+            {
+                "player_id": "2",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 20,
+                "total_score": 128
+            }
+        ],
+        "8": [
+            {
+                "player_id": "7",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            },
+            {
+                "player_id": "3",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            }
+        ],
+        "9": [
+            {
+                "player_id": "7",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            },
+            {
+                "player_id": "3",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            }
+        ],
+        "10": [
+            {
+                "player_id": "8",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            },
+            {
+                "player_id": "9",
+                "sq_1": 12,
+                "sq_2": 12,
+                "sq_3": 12,
+                "sq_4": 12,
+                "sq_5": 12,
+                "sq_6": 12,
+                "sq_7": 12,
+                "sq_8": 12,
+                "sq_9": 12,
+                "keys": 12,
+                "total_score": 120
+            }
+        ],
+        "11": [
+            {
+                "player_id": "2",
+                "sq_1": 1,
+                "sq_2": 3,
+                "sq_3": 5,
+                "sq_4": 7,
+                "sq_5": 9,
+                "sq_6": 11,
+                "sq_7": 13,
+                "sq_8": 15,
+                "sq_9": 17,
+                "keys": 19,
+                "total_score": 100
+            },
+            {
+                "player_id": "3",
+                "sq_1": 2,
+                "sq_2": 4,
+                "sq_3": 6,
+                "sq_4": 8,
+                "sq_5": 10,
+                "sq_6": 12,
+                "sq_7": 14,
+                "sq_8": 16,
+                "sq_9": 18,
+                "keys": 20,
+                "total_score": 110
+            }
+        ]
+    },
+    "players": {
+        "1": {
+            "player_name": "Kelly",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "1",
+                    "total_score": 140
+                },
+                {
+                    "game_id": "3",
+                    "total_score": 131
+                },
+                {
+                    "game_id": "4",
+                    "total_score": 144
+                },
+                {
+                    "game_id": "5",
+                    "total_score": 129
+                },
+                {
+                    "game_id": "6",
+                    "total_score": 129
+                },
+                {
+                    "game_id": "7",
+                    "total_score": 129
+                }
+            ]
+        },
+        "2": {
+            "player_name": "Gautier",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "1",
+                    "total_score": 123
+                },
+                {
+                    "game_id": "2",
+                    "total_score": 136
+                },
+                {
+                    "game_id": "4",
+                    "total_score": 124
+                },
+                {
+                    "game_id": "5",
+                    "total_score": 128
+                },
+                {
+                    "game_id": "6",
+                    "total_score": 128
+                },
+                {
+                    "game_id": "7",
+                    "total_score": 128
+                },
+                {
+                    "game_id": "11",
+                    "total_score": 100
+                }
+            ]
+        },
+        "3": {
+            "player_name": "Daram",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "1",
+                    "total_score": 131
+                },
+                {
+                    "game_id": "2",
+                    "total_score": 116
+                },
+                {
+                    "game_id": "8",
+                    "total_score": 120
+                },
+                {
+                    "game_id": "9",
+                    "total_score": 120
+                },
+                {
+                    "game_id": "11",
+                    "total_score": 110
+                }
+            ]
+        },
+        "4": {
+            "player_name": "Thomas",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "1",
+                    "total_score": 135
+                }
+            ]
+        },
+        "5": {
+            "player_name": "Louna",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "1",
+                    "total_score": 123
+                },
+                {
+                    "game_id": "3",
+                    "total_score": 115
+                },
+                {
+                    "game_id": "4",
+                    "total_score": 122
+                }
+            ]
+        },
+        "6": {
+            "player_name": "Agnes",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "2",
+                    "total_score": 135
+                }
+            ]
+        },
+        "7": {
+            "player_name": "Oceane",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "3",
+                    "total_score": 135
+                },
+                {
+                    "game_id": "8",
+                    "total_score": 120
+                },
+                {
+                    "game_id": "9",
+                    "total_score": 120
+                }
+            ]
+        },
+        "8": {
+            "player_name": "k",
+            "profile_pic": "",
+            "game_history": {
+                "game_id": "10",
+                "total_score": 120
+            }
+        },
+        "9": {
+            "player_name": "l",
+            "profile_pic": "",
+            "game_history": {
+                "game_id": "10",
+                "total_score": 120
+            }
+        }
+    }
+}
