@@ -8,7 +8,6 @@ def signal_handler(sig, frame):
 
 def load_data():
     file_path = os.path.realpath("data/cgi-bin/record.json")
-    print(file_path)
     with open(file_path, "r") as file:
         data = json.load(file)
     return data

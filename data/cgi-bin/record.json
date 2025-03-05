@@ -36,7 +36,7 @@
         }
     ],
     "players": {
-        "1": {
+        "1" : {
             "player_name": "Kelly",
             "profile_pic" : "",
             "game_history": [

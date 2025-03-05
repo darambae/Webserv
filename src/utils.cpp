@@ -6,16 +6,10 @@ std::string   fullPath(const std::string& name) {
     //LOG_INFO("Given path name: " + name);
     std::string path = name[0] == '/' ? name.substr(1) : name;
     if (realpath(path.c_str(), resolved_path) == NULL)
-        THROW("Realpath failed");
+        return "";
     //LOG_INFO("Resolved path : " + std::string(resolved_path));
     if (stat(resolved_path, &buffer) == -1) 
-        THROW("Invalid path");
-    if (S_ISDIR(buffer.st_mode)) //if its a directory
-        ;
-    else if (S_ISREG(buffer.st_mode)) //if its a file
-        ;
-    else
-        THROW("Invalid path");
+        return "";
     return resolved_path;
 }
 bool    onlyDigits(const std::string& str) {
