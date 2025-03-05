@@ -73,91 +73,91 @@
             <tbody>
                 <tr>
 					<td class="icon-cell"><img src="images/players.png" alt="Icon player" class="iconplayer"></td>
-                    <td><input type="text" name="name[]" placeholder="Player 1" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required></td>
-					<td><input type="text" name="name[]" placeholder="Player 2" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required></td>
-					<td class="player-col-3" style="display: none;"><input type="text" name="name[]" placeholder="Player 3"></td>
-					<td class="player-col-4" style="display: none;"><input type="text" name="name[]" placeholder="Player 4"></td>
-					<td class="player-col-5" style="display: none;"><input type="text" name="name[]" placeholder="Player 5"></td>
+                    <td><input type="text" name="name[]" placeholder="Player 1" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td><input type="text" name="name[]" placeholder="Player 2" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td class="player-col-3" style="display: none;"><input type="text" name="name[]" placeholder="Player 3" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td class="player-col-4" style="display: none;"><input type="text" name="name[]" placeholder="Player 4" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td class="player-col-5" style="display: none;"><input type="text" name="name[]" placeholder="Player 5" required pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card1.png" alt="Icon card1" class="iconcard"></td>
                     <td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card2.png" alt="Icon card2" class="iconcard"></td>
                     <td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                	<td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                	<td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card3.png" alt="Icon card3" class="iconcard">
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card4.png" alt="Icon card4" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card5.png" alt="Icon card5" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card6.png" alt="Icon card6" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card7.png" alt="Icon card7" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card8.png" alt="Icon card8" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/card9.png" alt="Icon card9" class="iconcard"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
                 <tr>
 					<td class="icon-cell"><img src="images/keys.png" alt="Icon key" class="iconkey"></td>
 					<td><input type="number" name="player1[]" min="0" required></td>
                     <td><input type="number" name="player2[]" min="0" required></td>
-                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
-				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
-    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0" required></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0" required></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0" required></td>
 				</tr>
 			</tbody>
         </table>
@@ -187,6 +187,29 @@ function removePlayer() {
         playerCount--; // Décrémente le nombre de joueurs visibles
     }
 }
+
+function validateUniqueNames() {
+    let nameInputs = document.querySelectorAll('input[name="name[]"]');
+    let names = [];
+
+    nameInputs.forEach(input => {
+        let name = input.value.trim();
+        if (name !== "") {
+            if (names.includes(name)) {
+                alert("Ce nom est déjà utilisé par un autre joueur. Veuillez en choisir un autre.");
+                input.value = ""; // Efface la saisie du joueur
+            } else {
+                names.push(name);
+            }
+        }
+    });
+}
+
+// Ajoute l'événement de vérification sur chaque champ de nom
+document.querySelectorAll('input[name="name[]"]').forEach(input => {
+    input.addEventListener("change", validateUniqueNames);
+});
+
 
     </script>
 </body>
