@@ -56,7 +56,7 @@ int	CgiManager::forkProcess() {
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
-		std::string content_type_env = "CONTENT_TYPE=" + _cgi_env->content_type;
+		std::string content_type_env = "CONTENT_TYPE" + _cgi_env->content_type;
 		std::string script_name_env = "SCRIPT_NAME=" + _cgi_env->script_name;
 		std::string remote_addr_env = "REMOTE_ADDR=" + _cgi_env->remote_addr;
 
@@ -166,6 +166,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 			_cgiHeader = _tempBuffer.substr(0, pos + 4);
 			_tempBuffer.erase(0, pos);
 			findContentLength(_cgiHeader);
+			LOG_INFO("CONTENT LENGTH : "+to_string(_cgiContentLength));
 			_headerDoneReading = true;
 		}
 
@@ -179,6 +180,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
 		_cgiResponse = _cgiHeader + _cgiBody;
+		LOG_ERROR("CGI response : "+_cgiResponse, 0);
 		_response->buildCgiResponse(this);
 	}
 	return 0;

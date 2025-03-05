@@ -2,3 +2,5 @@
     curl -v -F "avatar=@408.jpg" http://localhost:8080/upload
 2. GET request to load game history
     curl -v "http://localhost:8080/cgi-bin/load_game.py?dummy=1"
+3. DELETE request to uploaded file
+    curl -X DELETE http://localhost:8080/upload/coton.jpg -d "fileName=coton.jpg"

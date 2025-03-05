@@ -19,6 +19,7 @@ class	CgiManager {
 		std::string	_cgiResponse;
 		int			_cgiContentLength;
 		bool		_headerDoneReading;
+		std::string _cgiContentType;
 		std::string	_requestBody;
 
 	public:
@@ -35,4 +36,7 @@ class	CgiManager {
 		int	check_pid();
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();
+
+		void setCgiContentType(std::string contentType) { _cgiContentType = contentType; }
+		void setCgiContentLength(int contentLength) { _cgiContentLength = contentLength; }
 };
