@@ -16,14 +16,15 @@ def handle_request():
     response_body.append("<html><body>")
     response_body.append("<link rel='stylesheet' href='style.css'/>")
     query_string = os.environ.get("QUERY_STRING")
-    if query_string:
+    if query_string and query_string.split("=")[1].isdigit():
         player_id = int(query_string.split("=")[1])
     else:
-        response_body.append(f"<h1>Player id is not given in the query</h1><a href='/' class=\"button\">Go back</a></body></html>")
+        response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
         print(response)
         return
+    
     
     file_path = os.path.realpath("data/cgi-bin/record.json")
     
@@ -80,6 +81,7 @@ def handle_request():
 
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print(response)
+    return
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)

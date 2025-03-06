@@ -79,13 +79,14 @@ img {
     background: linear-gradient(90deg, #ffcc00, #ff9900);
     color: white;
     font-weight: bold;
-    padding: 12px;
+    padding: 20px;
     box-shadow: 0 5px 15px rgba(255, 204, 0, 0.5);
+	font-size: 24px;
 }
 
 .trophy {
-    width: 40px;
-    height: 40px;
+    width: 200px;
+    height: 200px;
 }
 
 .button {

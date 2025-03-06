@@ -130,7 +130,10 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		FD_DATA[FD]->request->setTimeStamp(get_time());
+		if (FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+			closeCgi(408, FD_DATA[FD]->request->getClientFD());
+			return;
+		}
 		if (FD_DATA[FD]->request->getMethod() == "GET")
 			return;
 		else {
