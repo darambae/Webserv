@@ -12,6 +12,8 @@ class	CgiManager {
 		Response*	_response;
 		int			_sockets[2];
 		pid_t		_children_pid;
+		bool		_children_done;
+		int			_children_status;
 		std::string	_python_path;
 		std::string _php_path;
 		std::string	_tempBuffer;

@@ -83,10 +83,9 @@ void	ServerManager::handlePollin(int FD) {
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());
 		}
 		else {
-			int result = FD_DATA[FD]->CGI->recvFromCgi();
-			if (result == -1)
+			if (FD_DATA[FD]->CGI->recvFromCgi() == -1)
 				closeCgi(501, FD_DATA[FD]->request->getClientFD());
-			else if (result > 0 && FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
+			else if (FD_DATA[FD]->response->getResponseReadyToSend())//children finish and send the response to the response class
 				closeCgi(0, FD_DATA[FD]->request->getClientFD());
 		}
 	}
@@ -97,6 +96,7 @@ void	ServerManager::handlePollout(int FD) {
 	if (FD_DATA[FD]->status == CLIENT) {
 		//LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
 		if (FD_DATA[FD]->request && (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT)) {
+			LOG_INFO("This request is timeout");
 			if (FD_DATA[FD]->response) {
 				FD_DATA[FD]->response->setResponseStatus(408);
 				FD_DATA[FD]->response->handleError();
@@ -130,7 +130,8 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		if (FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+			LOG_INFO("This CGI children is timeout");
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());
 			return;
 		}

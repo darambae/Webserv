@@ -1,6 +1,9 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
+	 _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
+	_children_done = false;
+	_children_status = 0;
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -116,35 +119,39 @@ void	CgiManager::findContentLength(std::string header) {
 }
 
 int CgiManager::check_pid() {
-	int	status;
+	if (_children_done)
+		return _children_status;
+    int status;
+    pid_t result = waitpid(_children_pid, &status, WNOHANG);
 
-	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
-	if (result == 0)
-		return 0;//children don't finish
-	else if (result == -1) {//children doesn't exist anymore
-		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
+    if (result == 0) {
+        return 0; // Child process has not finished
+    } else if (result == -1) {
+        LOG_ERROR("CGI failed, child process does not exist", false);
+        _children_done = true;
+		_children_status = -1;
 		return -1;
-	}
-	else {
-		if (WIFEXITED(status)) {//if true children finish normally with exit
-			int exit_code = WEXITSTATUS(status);
-			LOG_INFO("children exited with code : "+to_string(exit_code));
-			if (exit_code == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execve failed", false);
-				return -1;
-			}
-		}
-		else if (WIFSIGNALED(status)) {//true if children was killed by a signal
-			int signal = WTERMSIG(status);
-			LOG_INFO("children was terminated by signal : "+to_string(signal));
-			return -1;
-		}
-		else {
-			LOG_INFO("children exited abnormally");
-			return -1;
-		}
-	}
-	return 0;
+    } else {
+        if (WIFEXITED(status)) {
+            int exit_code = WEXITSTATUS(status);
+            LOG_INFO("Child exited with code: " + to_string(exit_code));
+            if (exit_code != 0) {
+                LOG_ERROR("CGI failed, child process exited with error", false);
+                _children_status = -1;
+            }
+			else
+				_children_status = 0;
+        } else if (WIFSIGNALED(status)) {
+            int signal = WTERMSIG(status);
+            LOG_INFO("Child was terminated by signal: " + to_string(signal));
+            _children_status = -1;
+        } else {
+            LOG_INFO("Child exited abnormally");
+            _children_status = -1;
+        }
+		_children_done = true;
+    }
+    return _children_status;
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
