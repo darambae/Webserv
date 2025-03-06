@@ -96,7 +96,7 @@ int	Response::generateDefaultErrorHtml() {
 			<< "</head>\n"
 			<< "<body>\n"
 			<< "    <h1>Erreur " << _codeStatus << " - " << _reasonPhrase << "</h1>\n"
-			<< "    <p>La page demandée a rencontré un problème.</p>\n"
+			<< "    <p>Requested page has encountered a problem</p>\n"
 			<< "</body>\n"
 			<< "</html>\n";
 
