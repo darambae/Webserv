@@ -79,6 +79,11 @@ void	ServerManager::handlePollin(int FD) {
 			cleanFd(FD);
 		}
 	} else if (FD_DATA[FD]->status == CGI_parent) { //read from CGI
+		if (FD_DATA[FD]->CGI->getStatus() > 0) {
+			closeCgi(500, FD_DATA[FD]->request->getClientFD());
+			//cleanFd(FD);
+			return;
+		}
 		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());
 		}
@@ -94,6 +99,11 @@ void	ServerManager::handlePollin(int FD) {
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
+		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) {
+			closeCgi(500, FD_DATA[FD]->request->getClientFD());
+			//cleanFd(FD);
+			return;
+		}
 		//LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
 		if (FD_DATA[FD]->request && (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT)) {
 			LOG_INFO("This request is timeout");
@@ -130,6 +140,7 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
+		LOG_INFO("Child process with Pollout");
 		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			LOG_INFO("This CGI children is timeout");
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());

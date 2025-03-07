@@ -35,6 +35,7 @@ class	CgiManager {
 		int		recvFromCgi();
 		void	findContentLength(std::string header);
 		pid_t	getPid() {return _children_pid;}
+		int		getStatus() {return _children_status;}
 		int	check_pid();
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();

@@ -60,6 +60,7 @@ int	Response::findIndex() {
 		if (access(path.c_str(), F_OK) != -1) {
 			LOG_INFO("access to " + path + " success");
 			setRequestedFile(path);
+			_requestedFile.open(path.c_str(), std::ios::binary);
 			return 1 ;
 		}
 	}
@@ -139,6 +140,7 @@ void	Response::handleError() {
 		if (generateDefaultErrorHtml() == 0) {
 			path = fullPath("/defaultError/defaultError.html");
 			setRequestedFile(path);
+			_requestedFile.open(path.c_str(), std::ios::binary);
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
@@ -224,24 +226,28 @@ void	Response::handleGet() {
 	// request path is a file
 		LOG_INFO("Path is not a directory, treating as a file : " + requestPath);
 		//If the file exists, set and serve it
-
-		if (!rootPath.empty() && requestPath.find(".json") == std::string::npos)
+		if (!rootPath.empty() && stat(path.c_str(), &pathStat) == 0 && S_ISREG(pathStat.st_mode)) {
+			LOG_INFO("File found");
 			setRequestedFile(path.c_str());
-		if (_requestedFile) {
-			if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
-				LOG_INFO("Handling GET request with CGI");
+			//If the file is not a .json file, serve it
+			if (requestPath.find(".json") != std::string::npos) {
+				setResponseStatus(403);
+				handleError();
+			} else if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
 				}
 			} else {
-					setResponseStatus(200);
-					_responseReadyToSend = true;
-					_responseBuilder = new ResponseBuilder(*this);
-					_builtResponse = _responseBuilder->buildResponse("");
-					//LOG_INFO("Response built:\n" + *_builtResponse);
+				LOG_INFO("path for the requested file : " + path);
+				_requestedFile.open(path.c_str(), std::ios::binary);
+				setResponseStatus(200);
+				_responseReadyToSend = true;
+				_responseBuilder = new ResponseBuilder(*this);
+				_builtResponse = _responseBuilder->buildResponse("");
 			}
 		} else {
+			LOG_INFO("File not found");
 			setResponseStatus(404);
 			handleError();
 		}

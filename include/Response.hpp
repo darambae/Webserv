@@ -35,8 +35,7 @@ class Response {
 	/* setters / getters */
 	void		setRequestedFile(std::string const& filePath) {
 		_requestedFilePath = filePath;
-		//if (filePath.find(".py") == std::string::npos && filePath.find(".php") == std::string::npos)
-			_requestedFile.open(filePath.c_str(), std::ios::binary);
+		// _requestedFile.open(filePath.c_str(), std::ios::binary);
 	}
 	void	setResponseStatus(int code);
 	void	setHeader(std::string key, std::string value) { _header[key] = value; }

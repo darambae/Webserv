@@ -25,7 +25,7 @@ def handle_request():
         print(response)
         return
     
-    file_path = os.path.realpath("data/cgi-bin/record_copy.json")
+    file_path = os.path.realpath("data/record_copy.json")
     with open(file_path, "r") as file:
         data = json.load(file)
 
@@ -77,7 +77,7 @@ def handle_request():
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
-
+    response = "status: 200\r"
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print(response)
     exit(0)
