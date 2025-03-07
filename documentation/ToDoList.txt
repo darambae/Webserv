@@ -2,6 +2,19 @@ KELLY:
 - make a fonction which stop everything, if it's not allready done.
 - cgi handling
 - who have to handle the response building, webserv or cgi ? what are the normes of CGI
+- sur mon ordi, pour puvoir faire tourner webserv accessible de l'extérieur,
+faire la commande suivante dans powershell :
+pour récupérer l'ip de wsl :
+	ipconfig
+l'ip est dans "carte réseau sans fil wifi" en face de ipv4
+puis cette commande :
+	netsh interface portproxy add v4tov4 listenaddress=0.0.0.0 listenport=8080 connectaddress=127.0.0.1 connectport=8080
+et celle là :
+	netsh advfirewall firewall add rule name="WSL Server" dir=in action=allow protocol=TCP localport=8080
+à la fin, pour tout refermer, faire :
+	netsh interface portproxy show all
+	netsh interface portproxy delete v4tov4 listenaddress=0.0.0.0 listenport=8080
+	netsh advfirewall firewall delete rule name="WSL Web Server"
 
 GAUTIER:
 chill and watch other (way smarter) team mates work;
