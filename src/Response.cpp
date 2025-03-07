@@ -135,7 +135,6 @@ void	Response::handleError() {
 			}
 		}
 	}
-
 	if (!errorPageFound) {
 		if (generateDefaultErrorHtml() == 0) {
 			path = fullPath("/defaultError/defaultError.html");
@@ -192,11 +191,12 @@ void	Response::handleGet() {
 	std::string	requestPath = _request.getPath();
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
-	LOG_INFO("rootPath: " + rootPath);
-	LOG_INFO("request path before concatenation: " + requestPath);
-	LOG_INFO("path: " + path);
+	// LOG_INFO("rootPath: " + rootPath);
+	// LOG_INFO("request path before concatenation: " + requestPath);
+	// LOG_INFO("path: " + path);
 
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
+	// request path is a directory
 		if (findIndex() == 1) {
 			setResponseStatus(200);
 			LOG_INFO("Index found");

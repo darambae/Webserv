@@ -25,28 +25,29 @@ def handle_request():
         print(response)
         return
     
-    file_path = os.path.realpath("data/cgi-bin/record.json")
+    file_path = os.path.realpath("data/cgi-bin/record_copy.json")
     with open(file_path, "r") as file:
         data = json.load(file)
-    if (game_id > len(data["games"]) or game_id < 1):
-        response_body.append(f"<h1>The biggest id you can give is {len(data['games'])}</h1><a href='/' class=\"button\">Go back</a></body></html>")
-        response_body = "\n".join(response_body)
-        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
-        print(response)
-        return
-    game_data = data["games"][game_id - 1]
-    player_data = data["players"]
-    
-    player_names = []
-    total_scores = []
+    if data:
+        if (game_id > len(data.get("games", [])) or game_id < 1):
+            response_body.append(f"<h1>The biggest id you can give is {len(data.get("games", []))}</h1><a href='/' class=\"button\">Go back</a></body></html>")
+            response_body = "\n".join(response_body)
+            response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+            print(response)
+            return
+        game_data = data.get("games", []).get(str(game_id))
+        player_data = data["players"]
+        
+        player_names = []
+        total_scores = []
 
-    if game_data:
-        for player in game_data.get("players", []):
-            player_id = player["player_id"]
-            player_name = player_data[str(player_id)]["player_name"]
-            player_names.append(player_name)
-            total_scores.append(player["total_score"])
-    
+        if game_data:
+            for player in game_data.get("players", []):
+                player_id = player["player_id"]
+                player_name = player_data[str(player_id)]["player_name"]
+                player_names.append(player_name)
+                total_scores.append(player["total_score"])
+        
     x_pos = range(len(player_names))
     plt.bar(x_pos, total_scores, color='skyblue')
     plt.ylabel('Score')
@@ -72,6 +73,7 @@ def handle_request():
 
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print(response)
+    return
 
 if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)

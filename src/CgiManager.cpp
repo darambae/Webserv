@@ -74,6 +74,7 @@ int	CgiManager::forkProcess() {
 			exit(-1);
 		}
 	}
+	sleep(1);
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
 	return 0;
@@ -147,7 +148,7 @@ int CgiManager::check_pid() {
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
-	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")"); //<-------ON A FINI LA
+	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	if (check_pid() == -1)
 		return -1;
 	char	buffer[1024] = {0};
