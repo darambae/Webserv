@@ -725,6 +725,36 @@
                 "keys": 5,
                 "total_score": 50
             }
+        ],
+        "21": [
+            {
+                "player_id": "18",
+                "sq_1": 1,
+                "sq_2": 32,
+                "sq_3": 0,
+                "sq_4": 45,
+                "sq_5": 12,
+                "sq_6": 1,
+                "sq_7": 4,
+                "sq_8": 6,
+                "sq_9": 7,
+                "keys": 0,
+                "total_score": 108
+            },
+            {
+                "player_id": "19",
+                "sq_1": 11,
+                "sq_2": 12,
+                "sq_3": 3,
+                "sq_4": 3,
+                "sq_5": 10,
+                "sq_6": 2,
+                "sq_7": 2,
+                "sq_8": 3,
+                "sq_9": 0,
+                "keys": 3,
+                "total_score": 49
+            }
         ]
     },
     "players": {
@@ -1004,6 +1034,22 @@
             "game_history": {
                 "game_id": "20",
                 "total_score": 50
+            }
+        },
+        "18": {
+            "player_name": "John",
+            "profile_pic": "",
+            "game_history": {
+                "game_id": "21",
+                "total_score": 108
+            }
+        },
+        "19": {
+            "player_name": "Marion",
+            "profile_pic": "",
+            "game_history": {
+                "game_id": "21",
+                "total_score": 49
             }
         }
     }
