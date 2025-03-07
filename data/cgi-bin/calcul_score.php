@@ -13,6 +13,11 @@ echo $prénom . $nom; pour des string, '.' au lieu de +
 
 */
 
+function errorCgi($error_number) {
+	echo "status : $error_number";
+	exit;
+}
+
 function addDataToJson(array $names, array $players) {
 	$file = realpath("data/cgi-bin/record_copy.json");
 	$json = file_get_contents($file);//récupère les data de JSON
@@ -151,7 +156,10 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
     // Lire STDIN en boucle jusqu'à recevoir toutes les données
     $stdin = fopen("php://stdin", "r");
     while (strlen($post_data) < $content_length) {
-        $post_data .= fread($stdin, 1024); // Lire 1 Ko à la fois
+        $readstr = fread($stdin, 1024); // Lire 1 Ko à la fois
+		if ($readstr === false)
+			errorCgi("422 Unprocessable Entity");
+		$post_data .= $readstr;
     }
     fclose($stdin);
 
@@ -172,9 +180,6 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		exit;
 	}
 } else {
-    // Si l'utilisateur tente d'accéder directement à la page sans soumettre le formulaire
-    	header("HTTP/1.1 405 Method Not Allowed");
-    // echo "Méthode non autorisée. Veuillez soumettre un formulaire.";
-    	exit;
+	errorCgi("400 Bad Request");
 }
 ?>

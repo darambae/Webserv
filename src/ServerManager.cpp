@@ -13,6 +13,7 @@ void	ServerManager::launchServers() {
 		_servers.push_back(new Server(_configs[i], _configs[i].getListen()));
 	}
     while (stopProgram != 1) {
+
         int poll_count = poll(ALL_FDS.data(), ALL_FDS.size(), -1);  // Wait indefinitely
         if (poll_count == -1)
 			LOG_ERROR("Poll failed", true);
@@ -130,7 +131,7 @@ void	ServerManager::handlePollout(int FD) {
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		if (FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
+		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());
 			return;
 		}

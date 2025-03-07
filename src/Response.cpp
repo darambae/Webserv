@@ -14,9 +14,10 @@ void	Response::setResponseStatus(int code) {
 		case 408: _reasonPhrase = "Request Timeout"; break;
 		case 413: _reasonPhrase = "Payload Too Large"; break;
 		case 418: _reasonPhrase = "Unsupported Media Type"; break;
+		case 422: _reasonPhrase = "Unprocessable Entity"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
-		
+
 	}
 
 }

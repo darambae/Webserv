@@ -621,6 +621,36 @@
                 "keys": 0,
                 "total_score": 9
             }
+        ],
+        "18": [
+            {
+                "player_id": "9",
+                "sq_1": 5,
+                "sq_2": 5,
+                "sq_3": 5,
+                "sq_4": 5,
+                "sq_5": 5,
+                "sq_6": 5,
+                "sq_7": 5,
+                "sq_8": 5,
+                "sq_9": 5,
+                "keys": 5,
+                "total_score": 50
+            },
+            {
+                "player_id": "15",
+                "sq_1": 5,
+                "sq_2": 5,
+                "sq_3": 5,
+                "sq_4": 5,
+                "sq_5": 5,
+                "sq_6": 5,
+                "sq_7": 5,
+                "sq_8": 5,
+                "sq_9": 5,
+                "keys": 5,
+                "total_score": 50
+            }
         ]
     },
     "players": {
@@ -795,7 +825,11 @@
             "profile_pic": "",
             "game_history": {
                 "game_id": "10",
-                "total_score": 120
+                "total_score": 120,
+                "0": {
+                    "game_id": "18",
+                    "total_score": 50
+                }
             }
         },
         "10": {
@@ -860,6 +894,14 @@
                     "game_id": "17",
                     "total_score": 9
                 }
+            }
+        },
+        "15": {
+            "player_name": "o",
+            "profile_pic": "",
+            "game_history": {
+                "game_id": "18",
+                "total_score": 50
             }
         }
     }
