@@ -24,8 +24,8 @@ def handle_request():
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
         print(response)
         return
-    
-    file_path = os.path.realpath("data/record_copy.json")
+
+    file_path = os.path.realpath("data/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
 
@@ -54,11 +54,11 @@ def handle_request():
     plt.scatter(x_pos, max_scores, label='Max Score', color='red')
     plt.scatter(x_pos, average_scores, label='Average Score', color='gray')
     plt.bar(x_pos, player_scores, label=f'{player_name} Scores', color='skyblue', alpha=0.6)
-    
+
     plt.xlabel('nth game')
     plt.ylabel('Score')
     plt.title(f'{player_name}\' scores vs average score of the game')
-    
+
     plt.xticks(x_pos, game_ids) # Set label locations.
     plt.legend()
 

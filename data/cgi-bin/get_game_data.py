@@ -8,7 +8,7 @@ import sys
 
 def signal_handler(sig, frame):
     sys.exit(0)
-    
+
 def handle_request():
 
     response_body = []
@@ -25,7 +25,7 @@ def handle_request():
         print(response)
         return
     # game_id = 1
-    file_path = os.path.realpath("data/cgi-bin/record_copy.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     # file_path = os.path.realpath("record_copy.json")
     with open(file_path, "r") as file:
         data = json.load(file)
@@ -37,7 +37,7 @@ def handle_request():
         return
     game_player = data["games"][str(game_id)]
     player_data = data["players"]
-    
+
     player_names = []
     total_scores = []
 
