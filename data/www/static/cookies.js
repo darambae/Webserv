@@ -1,5 +1,5 @@
 function acceptCookies() {
-    fetch('/cookies-consent', {
+    fetch('/cgi-bin/cookies-consent.py', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'
@@ -15,7 +15,7 @@ function acceptCookies() {
 }
 
 function declineCookies() {
-    fetch('/cookies-consent', {
+    fetch('/cgi-bin/cookies-consent.py', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/x-www-form-urlencoded'

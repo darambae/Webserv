@@ -180,7 +180,7 @@ std::string	Response::generateAutoIndex(std::string path) {
 //IF request path is a directory
 //	=> IF index page exist, serve it
 //	=> ELSE => IF auto index is ON, file list is generated
-//			=> ELSE (auto-index off), error 404 Not found.
+//			=> ELSE (auto-index off), error 403 Forbidden.
 //ELSE IF request path is a file
 //	=> IF file exist, serve it
 //	=> ELSE, error 404 not found
@@ -414,8 +414,12 @@ int	Response::handleCgi() {
 
 void	Response::buildCgiResponse(CgiManager* cgiManager) {
 
+	setResponseStatus(cgiManager->getCgiResponseStatus());
+	if (std::atoi(_codeStatus.c_str()) >= 400) {
+		handleError();
+		return ;
+	}
 	_responseBuilder = new ResponseBuilder(*this);
-	setResponseStatus(200);
 	_responseReadyToSend = true;
 	_builtResponse = _responseBuilder->buildResponse(cgiManager->getCgiBody());
 }

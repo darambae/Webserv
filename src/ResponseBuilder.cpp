@@ -41,6 +41,15 @@ std::string	ResponseBuilder::buildHeaders() {
 	header += _headers._contentLength;
 	_headers._connection = "Connection: keep-alive";
 	header += _headers._connection;
+
+	if (_response.getCgiManager() != NULL) {
+		std::map<std::string, std::string>	cgiHeaders = _response.getCgiManager()->getCgiHeaders();
+		std::map<std::string, std::string>::iterator it = cgiHeaders.begin();
+		for (; it != cgiHeaders.end(); ++it) {
+			header += "\r\n";
+			header += it->first + ": " + it->second;
+		}
+	}
 	header += headerEnd;
 	LOG_INFO("ResponseBuiler made Headers: " + header);
 	return (header);
