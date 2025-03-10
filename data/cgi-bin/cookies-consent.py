@@ -13,7 +13,7 @@ if method != "POST":
 
 # --- Lecture sécurisée du body ---
 content_length = int(os.environ.get("CONTENT_LENGTH", 0))
-body = sys.stdin.read(content_length)
+body = os.environ.get("QUERY_STRING", "")
 
 # --- Parsing des paramètres ---
 params = urllib.parse.parse_qs(body)
