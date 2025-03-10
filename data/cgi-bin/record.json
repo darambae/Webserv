@@ -175,6 +175,36 @@
                 "keys": 12,
                 "total_score": 120
             }
+        ],
+        "5": [
+            {
+                "player_id": "8",
+                "sq_1": 4,
+                "sq_2": 2,
+                "sq_3": 4,
+                "sq_4": 2,
+                "sq_5": 8,
+                "sq_6": 3,
+                "sq_7": 8,
+                "sq_8": 2,
+                "sq_9": 8,
+                "keys": 5,
+                "total_score": 46
+            },
+            {
+                "player_id": "9",
+                "sq_1": 8,
+                "sq_2": 5,
+                "sq_3": 6,
+                "sq_4": 5,
+                "sq_5": 1,
+                "sq_6": 5,
+                "sq_7": 14,
+                "sq_8": 5,
+                "sq_9": 2,
+                "keys": 4,
+                "total_score": 55
+            }
         ]
     },
     "players": {
@@ -281,6 +311,26 @@
                 {
                     "game_id": "3",
                     "total_score": 135
+                }
+            ]
+        },
+        "8": {
+            "player_name": "martin",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "5",
+                    "total_score": 46
+                }
+            ]
+        },
+        "9": {
+            "player_name": "paul",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "5",
+                    "total_score": 55
                 }
             ]
         }
