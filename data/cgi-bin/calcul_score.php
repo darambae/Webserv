@@ -46,10 +46,10 @@ function addDataToJson(array $names, array $players) {
 				$data["players"][$player["player_id"]] = [
 					"player_name" => $player["player_name"],
 					"profile_pic" => "",
-					"game_history" => [
+					"game_history" => [[
 						"game_id" => $game_id,
 						"total_score" => $total
-						]
+					]]
 					];
 				}
 				$data["games"][$game_id][] = [

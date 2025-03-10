@@ -25,13 +25,8 @@ def handle_request():
         print("Status: 400")
         print(response)
         return
-<<<<<<< HEAD
 
-    file_path = os.path.realpath("data/record.json")
-=======
-    
     file_path = os.path.realpath("data/cgi-bin/record.json")
->>>>>>> main
     with open(file_path, "r") as file:
         data = json.load(file)
 
