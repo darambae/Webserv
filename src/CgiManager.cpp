@@ -181,7 +181,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
 			size_t pos = _tempBuffer.find("\r\n\r\n");
 			std::string header = _tempBuffer.substr(0, pos + 4);
-			_tempBuffer.erase(0, pos);
+			_tempBuffer.erase(0, pos + 4);
 			parseCgiHeader(header);
 			LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
 			_headerDoneReading = true;
