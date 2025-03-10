@@ -2,7 +2,8 @@
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 	 _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
-	_children_done = false;
+		_cgiResponseStatus = 200;
+		_children_done = false;
 	_children_status = -2;
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
@@ -55,7 +56,7 @@ int	CgiManager::forkProcess() {
 		close(_sockets[1]);
 		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
-		
+
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
@@ -64,14 +65,14 @@ int	CgiManager::forkProcess() {
 		std::string remote_addr_env = "REMOTE_ADDR=" + _cgi_env->remote_addr;
 
 		char *env[] = {const_cast<char *>(request_method_env.c_str()),
-			const_cast<char *>(query_env.c_str()), 
-			const_cast<char *>(content_length_env.c_str()), 
-			const_cast<char *>(content_type_env.c_str()), 
-			const_cast<char *>(script_name_env.c_str()), 
+			const_cast<char *>(query_env.c_str()),
+			const_cast<char *>(content_length_env.c_str()),
+			const_cast<char *>(content_type_env.c_str()),
+			const_cast<char *>(script_name_env.c_str()),
 			const_cast<char *>(remote_addr_env.c_str()), NULL};
-		char *argv[] = {const_cast<char *>(interpreter.c_str()), 
+		char *argv[] = {const_cast<char *>(interpreter.c_str()),
 			const_cast<char *>(script_path.c_str()), NULL};
-		
+
 		if (execve(argv[0], argv, env) == -1) {
 			LOG_ERROR("execve failed", true);
 			exit(-1);
@@ -143,7 +144,7 @@ void	CgiManager::parseCgiHeader(std::string header) {
 		if (pos != std::string::npos) {
 			std::string key = line.substr(0, pos);
 			std::string	value = line.substr(pos + 2);
-			if (key == "status") {
+			if (key == "Status") {
 				_cgiResponseStatus = std::atoi(value.c_str());
 				continue;
 			}

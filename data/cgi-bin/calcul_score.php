@@ -14,7 +14,7 @@ echo $prénom . $nom; pour des string, '.' au lieu de +
 */
 
 function errorCgi($error_number) {
-	echo "status : $error_number";
+	echo "Status : $error_number";
 	exit;
 }
 
@@ -174,7 +174,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		fillReturnBody($content, $scores, $names);
 		$length = strlen($content);
 		addDataToJson($names, players: $scores);
-		//echo "Content-Type: text/html\r\n";
+		echo "Status: 200\r\n";
 		echo "Content-Length: $length\r\n\r\n";
 		echo $content;
 		exit;
