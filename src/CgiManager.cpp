@@ -104,20 +104,6 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 	return returnValue;
 }
 
-void	CgiManager::findContentLength(std::string header) {
-
-	std::istringstream stream(header);
-	std::string	line;
-	while (std::getline(stream, line) && !line.empty()) {
-		size_t pos = line.find(": ");
-		if (pos != std::string::npos) {
-			std::string key = line.substr(0, pos);
-			std::string	value = line.substr(pos + 2);
-			if (key == "Content-Length")
-				_cgiContentLength = std::atoi(value.c_str());
-		}
-	}
-}
 
 int CgiManager::check_pid() {
 	if (_children_done)
@@ -148,6 +134,28 @@ int CgiManager::check_pid() {
 	return _children_status;
 }
 
+void	CgiManager::parseCgiHeader(std::string header) {
+
+	std::istringstream stream(header);
+	std::string	line;
+	while (std::getline(stream, line) && !line.empty()) {
+		size_t pos = line.find(": ");
+		if (pos != std::string::npos) {
+			std::string key = line.substr(0, pos);
+			std::string	value = line.substr(pos + 2);
+			if (key == "status") {
+				_cgiResponseStatus = std::atoi(value.c_str());
+				continue;
+			}
+			if (key == "Content-Length") {
+				_cgiContentLength = std::atoi(value.c_str());
+				continue;
+			}
+			_cgiHeaders[key] = value;
+		}
+	}
+}
+
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	check_pid();
@@ -167,24 +175,23 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 
 		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
 			size_t pos = _tempBuffer.find("\r\n\r\n");
-			_cgiHeader = _tempBuffer.substr(0, pos + 4);
+			std::string header = _tempBuffer.substr(0, pos + 4);
 			_tempBuffer.erase(0, pos);
-			findContentLength(_cgiHeader);
-			LOG_INFO("CONTENT LENGTH : "+to_string(_cgiContentLength));
+			parseCgiHeader(header);
+			LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
 			_headerDoneReading = true;
 		}
 
 		if (_cgiContentLength > 0) {
 			if (_tempBuffer.size() >= static_cast<size_t>(_cgiContentLength)) {
 				_cgiBody = _tempBuffer.substr(0, _cgiContentLength);
+				LOG_INFO("cgiBody: " + _cgiBody);
 				_tempBuffer.erase(0, _cgiContentLength);
 			}
 		}
 	}
 	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
-		_cgiResponse = _cgiHeader + _cgiBody;
-		LOG_ERROR("CGI response : "+_cgiResponse, 0);
 		_response->buildCgiResponse(this);
 	}}
 	return 0;

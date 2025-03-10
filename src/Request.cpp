@@ -111,7 +111,6 @@ void	Request::parseHeader(std::string headerPart) {
 		if (pos != std::string::npos) {
 			std::string key = line.substr(0, pos);
 			std::string	value = line.substr(pos + 2);
-			//LOG_INFO("Header key: " + key + " value: " + value);
 			_header[key] = value;
 			if (key == "Content-Length") {
 				_contentLength = std::atoi(value.c_str());
