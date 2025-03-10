@@ -24,8 +24,13 @@ def handle_request():
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
         print(response)
         return
+<<<<<<< HEAD
 
     file_path = os.path.realpath("data/record.json")
+=======
+    
+    file_path = os.path.realpath("data/cgi-bin/record.json")
+>>>>>>> main
     with open(file_path, "r") as file:
         data = json.load(file)
 

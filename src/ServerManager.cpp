@@ -82,7 +82,6 @@ void	ServerManager::handlePollin(int FD) {
 	} else if (FD_DATA[FD]->status == CGI_parent) { //read from CGI
 		if (FD_DATA[FD]->CGI->getStatus() > 0) {
 			closeCgi(500, FD_DATA[FD]->request->getClientFD());
-			//cleanFd(FD);
 			return;
 		}
 		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
@@ -102,12 +101,11 @@ void	ServerManager::handlePollout(int FD) {
 	if (FD_DATA[FD]->status == CLIENT) {
 		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) {
 			closeCgi(500, FD_DATA[FD]->request->getClientFD());
-			//cleanFd(FD);
 			return;
 		}
 		//LOG_INFO("The start time of this request from Client " + to_string(FD) + ": " + to_string(FD_DATA[FD]->request->getTimeStamp()));
 		if (FD_DATA[FD]->request && (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT)) {
-			LOG_INFO("This request is timeout");
+			//LOG_INFO("This request is timeout");
 			if (FD_DATA[FD]->response) {
 				FD_DATA[FD]->response->setResponseStatus(408);
 				FD_DATA[FD]->response->handleError();
@@ -118,10 +116,10 @@ void	ServerManager::handlePollout(int FD) {
 		}
 		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
 			//print_FD_status(FD);
-			LOG_INFO("POLLOUT signal");
-			LOG_INFO("response ready to be sent");
+			// LOG_INFO("POLLOUT signal");
+			// LOG_INFO("response ready to be sent");
 			if (FD_DATA[FD]->response->sendResponse() == -1) {
-				LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
+				//LOG_ERROR("client FD "+to_string(FD)+" disconected for response error", 0);
 				cleanFd(FD);
 			}
 			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
@@ -135,13 +133,12 @@ void	ServerManager::handlePollout(int FD) {
 					delete FD_DATA[FD]->request;
 					FD_DATA[FD]->request = NULL;
 				}
-				//FD_DATA[FD]->request = new Request(FD);
-				LOG_INFO("response send and delete");
+				//LOG_INFO("response send and delete");
 			}
 		}
 	}
 	else if (FD_DATA[FD]->status == CGI_children) {
-		LOG_INFO("Child process with Pollout");
+		//LOG_INFO("Child process with Pollout");
 		if (get_time() - FD_DATA[FD]->request->getTimeStamp() > TIME_OUT) {
 			LOG_INFO("This CGI children is timeout");
 			closeCgi(408, FD_DATA[FD]->request->getClientFD());
@@ -154,7 +151,7 @@ void	ServerManager::handlePollout(int FD) {
 			//LOG_INFO("POLLOUT signal");
 			int bodysend = FD_DATA[FD]->CGI->sendToCgi();
 			if (bodysend == -1) {
-				LOG_ERROR("write to send the body to CGI failed", true);
+				//LOG_ERROR("write to send the body to CGI failed", true);
 				closeCgi(501, FD_DATA[FD]->request->getClientFD());
 			}
 			// else if (bodysend == 0)
