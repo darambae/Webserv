@@ -29,7 +29,7 @@ if consent in ["accept", "reject"]:
     expire_date = (datetime.utcnow() + timedelta(days=365)).strftime("%a, %d %b %Y %H:%M:%S GMT")
     
     response_body = "OK"
-    print("Status: 200 OK")
+    print("Status: 200")
     print(f"Content-Length: {len(response_body)}")
     print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}\r\n\r\n")
     print(response_body)

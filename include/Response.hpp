@@ -41,7 +41,8 @@ class Response {
 	//void	setHeader(std::string key, std::string value) { _header[key] = value; }
 	void	setBuiltResponse(std::string responseComplete) { *_builtResponse = responseComplete; };
 	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
-	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }	
+	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }
+	void	setCgiManager(CgiManager* cgiManager) { _cgiManager = cgiManager; }
 
 	Request 			&getRequest() const { return _request; }
 	std::string			getCodeStatus() const { return _codeStatus; }
