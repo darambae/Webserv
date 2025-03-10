@@ -35,6 +35,7 @@ def handle_request():
     res_body.append("</section></body></html>")
     res_body = "\n".join(res_body)
     response = f"Content-Type: text/html\r\nContent-Length: {len(res_body)}\r\n\r\n{res_body}"
+    print("Status: 200")
     print(response)
     exit(0)
     return

@@ -22,6 +22,7 @@ def handle_request():
         response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 400")
         print(response)
         return
     # game_id = 1
@@ -33,6 +34,7 @@ def handle_request():
         response_body.append(f"<h1>The biggest id you can give is {len(data['games'])}</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 200")
         print(response)
         return
     game_player = data["games"][str(game_id)]
@@ -72,6 +74,7 @@ def handle_request():
     response_body = "\n".join(response_body)
 
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    print("Status: 200")
     print(response)
     exit(0)
     return

@@ -5,6 +5,7 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 		_cgiResponseStatus = 200;
 		_children_done = false;
 	_children_status = -2;
+	_cgiResponseStatus = 200;
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
