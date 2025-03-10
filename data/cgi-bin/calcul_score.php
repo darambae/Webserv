@@ -19,7 +19,7 @@ function errorCgi($error_number) {
 }
 
 function addDataToJson(array $names, array $players) {
-	$file = realpath("data/cgi-bin/record_copy.json");
+	$file = realpath("data/cgi-bin/record.json");
 	$json = file_get_contents($file);//récupère les data de JSON
 	$data = json_decode($json, true);//true pour json objet = associative array, transforme les data.json en objets php utilisables
 	$game_id = (string) ((int) array_key_last($data["games"]) + 1);

@@ -22,6 +22,7 @@ def handle_request():
         response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 400")
         print(response)
         return
     
@@ -37,6 +38,7 @@ def handle_request():
         response_body.append(f"<h1>No player with ID {player_id} found</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
         response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 200")
         print(response)
         return
 
@@ -77,8 +79,9 @@ def handle_request():
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
-    response = "status: 200\r"
+    response = "Status: 200\r"
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    print("Status: 200")
     print(response)
     exit(0)
     return
