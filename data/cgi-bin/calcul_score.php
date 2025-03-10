@@ -173,9 +173,9 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
 		fillReturnHead($content);
 		fillReturnBody($content, $scores, $names);
 		$length = strlen($content);
-		echo "Content-Type: text/html\r\n";
-		echo "Content-Length: $length\r\n\r\n";
 		addDataToJson($names, players: $scores);
+		//echo "Content-Type: text/html\r\n";
+		echo "Content-Length: $length\r\n\r\n";
 		echo $content;
 		exit;
 	}
