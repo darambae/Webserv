@@ -12,6 +12,8 @@ class	CgiManager {
 		Response*	_response;
 		int			_sockets[2];
 		pid_t		_children_pid;
+		bool		_children_done;
+		int			_children_status;
 		std::string	_python_path;
 		std::string _php_path;
 		std::string	_tempBuffer;
@@ -36,7 +38,8 @@ class	CgiManager {
 		void	findContentLength(std::string header);
 		void	parseCgiHeader(std::string header);
 		pid_t	getPid() {return _children_pid;}
-		int		check_pid();
+		int		getStatus() {return _children_status;}
+		int	check_pid();
 		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
 		~CgiManager();
 

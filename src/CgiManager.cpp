@@ -1,6 +1,9 @@
 #include "../include/CgiManager.hpp"
 
-CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) : _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
+CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
+	 _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
+	_children_done = false;
+	_children_status = -2;
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -77,6 +80,7 @@ int	CgiManager::forkProcess() {
 	sleep(1);
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
+	check_pid();
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -102,35 +106,32 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 
 
 int CgiManager::check_pid() {
-	int	status;
-
-	pid_t	result = waitpid(_children_pid, &status, WNOHANG);
-	if (result == 0)
-		return 0;//children don't finish
-	else if (result == -1) {//children doesn't exist anymore
-		LOG_ERROR("CGI failed, children doesn't exist anymore", false);
-		return -1;
-	}
-	else {
-		if (WIFEXITED(status)) {//if true children finish normally with exit
-			int exit_code = WEXITSTATUS(status);
-			LOG_INFO("children exited with code : "+to_string(exit_code));
-			if (exit_code == -1) {//extract in status the exit status code of children
-				LOG_ERROR("CGI failed, execve failed", false);
-				return -1;
-			}
-		}
-		else if (WIFSIGNALED(status)) {//true if children was killed by a signal
-			int signal = WTERMSIG(status);
-			LOG_INFO("children was terminated by signal : "+to_string(signal));
-			return -1;
-		}
-		else {
-			LOG_INFO("children exited abnormally");
-			return -1;
-		}
-	}
-	return 0;
+	if (_children_done)
+		return _children_status;
+    pid_t result = waitpid(_children_pid, &_children_status, WNOHANG);
+    if (result == 0) {
+        return -2; // Child process has not finished
+    } else if (result == -1) {
+        LOG_ERROR("CGI failed, child process does not exist", false);
+        _children_done = true;
+		_children_status = -1;
+		return _children_status;
+    } else {
+		_children_done = true;
+        if (WIFEXITED(_children_status)) {
+            int exit_code = WEXITSTATUS(_children_status);
+            LOG_INFO("Child exited with code: " + to_string(exit_code));
+            _children_status = exit_code; //0~255
+        } else if (WIFSIGNALED(_children_status)) {
+            int signal = WTERMSIG(_children_status);
+			_children_status = -1;
+            LOG_INFO("Child was terminated by signal: " + to_string(signal));
+        } else {
+            LOG_INFO("Child exited abnormally");
+			_children_status = -1;
+        }
+    }
+	return _children_status;
 }
 
 void	CgiManager::parseCgiHeader(std::string header) {
@@ -157,9 +158,11 @@ void	CgiManager::parseCgiHeader(std::string header) {
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
-	if (check_pid() == -1)
-		return -1;
-	char	buffer[1024] = {0};
+	check_pid();
+	LOG_DEBUG("Children status : "+to_string(_children_status));
+	LOG_DEBUG("Children done : "+to_string(_children_done));
+	if (_children_done)
+	{char	buffer[1024] = {0};
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	LOG_INFO("buffer read from children : "+std::string(buffer));
 	if (bytes < 0) {
@@ -190,7 +193,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
 		_response->buildCgiResponse(this);
-	}
+	}}
 	return 0;
 }
 

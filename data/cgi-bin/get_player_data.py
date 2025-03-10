@@ -25,11 +25,10 @@ def handle_request():
         print(response)
         return
     
-    
     file_path = os.path.realpath("data/cgi-bin/record.json")
-    
     with open(file_path, "r") as file:
         data = json.load(file)
+
     player_data = data["players"].get(str(player_id))
     if player_data:
         player_scores = [game["total_score"] for game in player_data["game_history"]]
@@ -44,21 +43,21 @@ def handle_request():
     average_scores = []
     max_scores = []
     for game_id in game_ids:
-        game = data["games"][game_id - 1]
-        max_score = max(player["total_score"] for player in game["players"]) 
-        max_scores.append(max_score)        
-        total_score = sum(player["total_score"] for player in game["players"])
-        num_players = len(game["players"])
+        game = data["games"][str(game_id)]
+        max_score = max(player["total_score"] for player in game)
+        max_scores.append(max_score)
+        total_score = sum(player["total_score"] for player in game)
+        num_players = len(game)
         average_scores.append(total_score / num_players)
-    
+    player_name = player_data.get("player_name")
     x_pos = range(len(game_ids))
     plt.scatter(x_pos, max_scores, label='Max Score', color='red')
     plt.scatter(x_pos, average_scores, label='Average Score', color='gray')
-    plt.bar(x_pos, player_scores, label=f'{player_data["player_name"]} Scores', color='skyblue', alpha=0.6)
+    plt.bar(x_pos, player_scores, label=f'{player_name} Scores', color='skyblue', alpha=0.6)
     
     plt.xlabel('nth game')
     plt.ylabel('Score')
-    plt.title(f'{player_data["player_name"]}\' scores vs average score of the game')
+    plt.title(f'{player_name}\' scores vs average score of the game')
     
     plt.xticks(x_pos, game_ids) # Set label locations.
     plt.legend()
@@ -78,9 +77,10 @@ def handle_request():
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
-
+    response = "status: 200\r"
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print(response)
+    exit(0)
     return
 
 if __name__ == "__main__":

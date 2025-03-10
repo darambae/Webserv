@@ -14,9 +14,11 @@ void	Response::setResponseStatus(int code) {
 		case 408: _reasonPhrase = "Request Timeout"; break;
 		case 413: _reasonPhrase = "Payload Too Large"; break;
 		case 418: _reasonPhrase = "Unsupported Media Type"; break;
+		case 422: _reasonPhrase = "Unprocessable Entity"; break;
+		case 500: _reasonPhrase = "Internal Server Error"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
-		
+
 	}
 
 }
@@ -60,6 +62,7 @@ int	Response::findIndex() {
 		if (access(path.c_str(), F_OK) != -1) {
 			LOG_INFO("access to " + path + " success");
 			setRequestedFile(path);
+			_requestedFile.open(path.c_str(), std::ios::binary);
 			return 1 ;
 		}
 	}
@@ -139,6 +142,7 @@ void	Response::handleError() {
 		if (generateDefaultErrorHtml() == 0) {
 			path = fullPath("/defaultError/defaultError.html");
 			setRequestedFile(path);
+			_requestedFile.open(path.c_str(), std::ios::binary);
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
@@ -191,9 +195,9 @@ void	Response::handleGet() {
 	std::string	requestPath = _request.getPath();
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
-	// LOG_INFO("rootPath: " + rootPath);
-	// LOG_INFO("request path before concatenation: " + requestPath);
-	// LOG_INFO("path: " + path);
+	LOG_INFO("rootPath: " + rootPath);
+	LOG_INFO("request path before concatenation: " + requestPath);
+	//LOG_INFO("path: " + path);
 
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 	// request path is a directory
@@ -222,26 +226,31 @@ void	Response::handleGet() {
 	}
 	else {
 	// request path is a file
-		LOG_INFO("Path is not a directory, treating as a file : " + requestPath);
+		//LOG_INFO("Path is not a directory, treating as a file : " + requestPath);
 		//If the file exists, set and serve it
-
-		if (!rootPath.empty() && requestPath.find(".json") == std::string::npos)
+		if (!rootPath.empty() && stat(path.c_str(), &pathStat) == 0 && S_ISREG(pathStat.st_mode)) {
+			//LOG_INFO("File found");
 			setRequestedFile(path.c_str());
-		if (_requestedFile) {
-			if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
-				LOG_INFO("Handling GET request with CGI");
+			//If the file is not a .json file, serve it
+			if (requestPath.find(".json") != std::string::npos) {
+				setResponseStatus(403);
+				handleError();
+			} else if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
 				}
+
 			} else {
-					setResponseStatus(200);
-					_responseReadyToSend = true;
-					_responseBuilder = new ResponseBuilder(*this);
-					_builtResponse = _responseBuilder->buildResponse("");
-					//LOG_INFO("Response built:\n" + *_builtResponse);
+				//LOG_INFO("path for the requested file : " + path);
+				_requestedFile.open(path.c_str(), std::ios::binary);
+				setResponseStatus(200);
+				_responseReadyToSend = true;
+				_responseBuilder = new ResponseBuilder(*this);
+				_builtResponse = _responseBuilder->buildResponse("");
 			}
 		} else {
+			//LOG_INFO("File not found");
 			setResponseStatus(404);
 			handleError();
 		}
@@ -333,6 +342,7 @@ void	Response::handleDelete() {
 	responseBody << "<html lang=\"en\">\n";
 	responseBody << "<head>\n";
 	responseBody << "<meta charset=\"UTF-8\">\n";
+	responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
 	responseBody << "<title>File Delete Success</title>\n";
 	responseBody << "</head>\n";
 	responseBody << "<body>\n";
@@ -370,7 +380,10 @@ void	Response::handleResponse() {
 
 	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
-		handleGet();
+		if (!_request.getQuery().empty() && _request.getQuery().find("_method=DELETE") != std::string::npos)
+			handleDelete();
+		else
+			handleGet();
 	} else if (requestMethod == "POST") {
 		if (requestPath.find("/cgi-bin") != std::string::npos) {
 			LOG_INFO("Handling POST request with CGI");
@@ -428,7 +441,7 @@ int	Response::sendResponse() {
 
 	size_t	responseSize = _builtResponse->size();
 	const size_t	BUFFER_SIZE = 4096;
-	LOG_INFO("sending response");
+	//LOG_INFO("sending response");
 	if (_totalBytesSent < responseSize) {
 		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
