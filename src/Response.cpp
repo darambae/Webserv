@@ -416,12 +416,13 @@ int	Response::handleCgi() {
 	}
 	else {
 		cgi->content_length = _request.getValueFromHeader("Content-Length");
+		LOG_INFO("Content-Length: " + cgi->content_length);
 		cgi->content_type = _request.getValueFromHeader("Content-Type");
-		cgi->query_string = "";
+		cgi->query_string = !_request.getBody().empty() ? _request.getBody() : "";
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
 	cgi->script_name = _request.getPath().substr(_request.getPath().find_last_of("/") + 1);
-	LOG_DEBUG("CGI script name: " + cgi->script_name);
+	//LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
 }
