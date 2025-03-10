@@ -42,6 +42,8 @@ std::string	ResponseBuilder::buildHeaders() {
 	_headers._connection = "Connection: keep-alive";
 	header += _headers._connection;
 
+	if (_response.getCgiManager() == NULL) 
+		LOG_INFO("CGI Manager is null\r");
 	if (_response.getCgiManager() != NULL) {
 		std::map<std::string, std::string>	cgiHeaders = _response.getCgiManager()->getCgiHeaders();
 		std::map<std::string, std::string>::iterator it = cgiHeaders.begin();
@@ -51,7 +53,7 @@ std::string	ResponseBuilder::buildHeaders() {
 		}
 	}
 	header += headerEnd;
-	LOG_INFO("ResponseBuiler made Headers: " + header);
+	//LOG_INFO("ResponseBuiler made Headers: " + header);
 	return (header);
 }
 

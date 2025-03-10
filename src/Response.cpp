@@ -429,6 +429,7 @@ int	Response::handleCgi() {
 
 void	Response::buildCgiResponse(CgiManager* cgiManager) {
 
+	LOG_INFO("Building CGI response...");
 	setResponseStatus(cgiManager->getCgiResponseStatus());
 	if (std::atoi(_codeStatus.c_str()) >= 400) {
 		handleError();
@@ -437,6 +438,7 @@ void	Response::buildCgiResponse(CgiManager* cgiManager) {
 	_responseBuilder = new ResponseBuilder(*this);
 	_responseReadyToSend = true;
 	_builtResponse = _responseBuilder->buildResponse(cgiManager->getCgiBody());
+	LOG_INFO("Built Response: " + *_builtResponse);
 }
 
 int	Response::sendResponse() {

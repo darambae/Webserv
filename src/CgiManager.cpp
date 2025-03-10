@@ -144,7 +144,7 @@ void	CgiManager::parseCgiHeader(std::string header) {
 		if (pos != std::string::npos) {
 			std::string key = line.substr(0, pos);
 			std::string	value = line.substr(pos + 2);
-			if (key == "status") {
+			if (key == "Status") {
 				_cgiResponseStatus = std::atoi(value.c_str());
 				continue;
 			}
@@ -155,6 +155,9 @@ void	CgiManager::parseCgiHeader(std::string header) {
 			_cgiHeaders[key] = value;
 		}
 	}
+	for (std::map<std::string, std::string>::iterator it = _cgiHeaders.begin(); it != _cgiHeaders.end(); ++it) {
+        LOG_INFO("CGI Header stored: " + it->first + " = " + it->second);
+    }
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
@@ -193,6 +196,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	}
 	if (_cgiBody.size() > 0) {
 		LOG_INFO("CGI response done reading");
+		_response->setCgiManager(this);
 		_response->buildCgiResponse(this);
 	}}
 	return 0;
