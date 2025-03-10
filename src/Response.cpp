@@ -305,9 +305,10 @@ void	Response::handlePost() {
 		responseBody << "<form action=\"" << _request.getPath() << "/" << fileData.fileName << "\" method=\"delete\">\n";
 		responseBody << "<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n";
 		responseBody << "<input type=\"hidden\" name=\"fileName\" value=\"" << fileData.fileName << "\">\n";
+		responseBody << "<div class=\"button-container\">\n";
 		responseBody << "<button type=\"submit\" class=\"delete-button\">x</button>\n";
+		responseBody << "<a href=\"/\" class=\"button\">Go to Index Page</a>\n";
 		responseBody << "</form>\n";
-		responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
 		responseBody << "</body>\n";
         responseBody << "</html>\n";
 		//LOG_INFO("Response body stream : " + responseBody.str());
