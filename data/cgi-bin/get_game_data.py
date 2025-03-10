@@ -25,7 +25,7 @@ def handle_request():
         print(response)
         return
     # game_id = 1
-    file_path = os.path.realpath("data/cgi-bin/record_copy.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     # file_path = os.path.realpath("record_copy.json")
     with open(file_path, "r") as file:
         data = json.load(file)

@@ -25,7 +25,7 @@ def handle_request():
         print(response)
         return
     
-    file_path = os.path.realpath("data/record_copy.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     with open(file_path, "r") as file:
         data = json.load(file)
 
