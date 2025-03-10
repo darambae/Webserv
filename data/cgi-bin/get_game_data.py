@@ -46,7 +46,7 @@ def handle_request():
     if game_player:
         for player in game_player:
             player_id = player["player_id"]
-            player_name = player_data[str(player_id)]["player_name"]
+            player_name = player_data[player_id]["player_name"]
             player_names.append(player_name)
             total_scores.append(player["total_score"])
 

@@ -25,13 +25,8 @@ def handle_request():
         print("Status: 400")
         print(response)
         return
-<<<<<<< HEAD
-
-    file_path = os.path.realpath("data/record.json")
-=======
     
     file_path = os.path.realpath("data/cgi-bin/record.json")
->>>>>>> main
     with open(file_path, "r") as file:
         data = json.load(file)
 
@@ -50,7 +45,7 @@ def handle_request():
     average_scores = []
     max_scores = []
     for game_id in game_ids:
-        game = data["games"][str(game_id)]
+        game = data["games"][game_id]
         max_score = max(player["total_score"] for player in game)
         max_scores.append(max_score)
         total_score = sum(player["total_score"] for player in game)
