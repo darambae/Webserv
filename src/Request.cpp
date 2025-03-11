@@ -119,10 +119,12 @@ void	Request::parseHeader(std::string headerPart) {
 	}
 }
 
-uploadData Request::parseBody() {
+uploadData Request::setFileContent() {
 	struct uploadData data;
 	std::string content;
-	LOG_INFO("Body to parse: " + _body);
+	//LOG_INFO("Body to parse: " + _body);
+	if (_body.find("filename=") == std::string::npos)
+		return data;
 	std::string filename = _body.substr(_body.find("filename=") + 10, _body.find("\"\r\n") - (_body.find("filename=") + 10));
 	size_t start_pos = _body.find("\r\n\r\n");
 	size_t end_pos = _body.find("\r\n----");

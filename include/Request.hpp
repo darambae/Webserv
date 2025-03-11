@@ -67,7 +67,7 @@ public:
 	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
-	struct uploadData	parseBody();
+	struct uploadData	setFileContent();
 	std::string		parseQueryString();
 	void	createQueryMap(std::string path);
 
