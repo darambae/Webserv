@@ -148,16 +148,18 @@ void	CgiManager::parseCgiHeader(std::string header) {
 				_cgiResponseStatus = std::atoi(value.c_str());
 				continue;
 			}
-			if (key == "Content-Length") {
+			else if (key == "Content-Length") {
 				_cgiContentLength = std::atoi(value.c_str());
 				continue;
 			}
-			_cgiHeaders[key] = value;
+			else
+				_cgiHeaders[key].push_back(value);
 		}
 	}
-	for (std::map<std::string, std::string>::iterator it = _cgiHeaders.begin(); it != _cgiHeaders.end(); ++it) {
-        LOG_INFO("CGI Header stored: " + it->first + " = " + it->second);
-    }
+	for (std::map<std::string, std::vector<std::string> >::iterator it = _cgiHeaders.begin(); it != _cgiHeaders.end(); ++it) {
+		for (size_t i = 0; i < it->second.size(); i++)
+			LOG_INFO("CGI Header stored: " + it->first + " = " + it->second[i]);
+	}
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent

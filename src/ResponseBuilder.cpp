@@ -29,7 +29,7 @@ std::string	ResponseBuilder::buildFirstLine() {
 std::string	ResponseBuilder::buildHeaders() {
 	
 	std::string	header;
-	std::string	headerEnd = "\r\n\r\n";
+	//std::string	headerEnd = "\r\n\r\n";
 
 	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
 	header += _headers._timeStamp;
@@ -39,20 +39,21 @@ std::string	ResponseBuilder::buildHeaders() {
 	}
 	_headers._contentLength = "Content-Length: " + to_string(_body.size()) + "\r\n";
 	header += _headers._contentLength;
-	_headers._connection = "Connection: keep-alive";
+	_headers._connection = "Connection: keep-alive\r\n";
 	header += _headers._connection;
 
 	if (_response.getCgiManager() == NULL) 
 		LOG_INFO("CGI Manager is null\r");
 	if (_response.getCgiManager() != NULL) {
-		std::map<std::string, std::string>	cgiHeaders = _response.getCgiManager()->getCgiHeaders();
-		std::map<std::string, std::string>::iterator it = cgiHeaders.begin();
+		std::map<std::string, std::vector<std::string> >	cgiHeaders = _response.getCgiManager()->getCgiHeaders();
+		std::map<std::string, std::vector<std::string> >::iterator it = cgiHeaders.begin();
 		for (; it != cgiHeaders.end(); ++it) {
-			header += "\r\n";
-			header += it->first + ": " + it->second;
+			for (size_t i = 0; i < it->second.size(); i++) {
+				header += it->first + ": " + it->second[i] + "\r\n";
+			}
 		}
 	}
-	header += headerEnd;
+	header += "\r\n";
 	//LOG_INFO("ResponseBuiler made Headers: " + header);
 	return (header);
 }
