@@ -2,6 +2,8 @@
 import sys
 import os
 import urllib.parse
+import uuid
+import pytz
 from datetime import datetime, timedelta
 
 # --- Vérification de la méthode HTTP ---
@@ -19,19 +21,29 @@ body = os.environ.get("QUERY_STRING", "")
 params = urllib.parse.parse_qs(body)
 consent = params.get("consent", [""])[0].strip()
 
-# --- DEBUG LOGS ---
-print(f"#DEBUG Body: '{body}'", file=sys.stderr)
-print(f"#DEBUG Consent: '{consent}'", file=sys.stderr)
-
 # --- check consent ---
 if consent in ["accept", "reject"]:
-    # Date d'expiration du cookie dans 1 an
-    expire_date = (datetime.utcnow() + timedelta(days=365)).strftime("%a, %d %b %Y %H:%M:%S GMT")
-    
+    #expiration date in 1 year
+    #expire_date = (datetime.utcnow() + timedelta(days=365)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    #expiration date in 3mn
+    local_tz = pytz.timezone("Europe/Paris")
+    utc_now = datetime.utcnow()
+    local_now = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
+    expire_date = (local_now + timedelta(minutes=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+
+    if consent == "accept":
+        session_id = str(uuid.uuid4())
+    else: 
+        session_id = ""
+
     response_body = "OK"
     print("Status: 200")
     print(f"Content-Length: {len(response_body)}")
-    print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}\r\n\r")
+    if session_id:
+        print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}")
+        print(f"Set-Cookie: session_id={session_id}; Path=/; HttpOnly\r\n\r")
+    else:
+        print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}\r\n\r")
     print(response_body)
 else:
     print("Status: 400 Bad Request\r\n\r\n")
