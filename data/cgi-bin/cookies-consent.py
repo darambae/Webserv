@@ -31,7 +31,7 @@ if consent in ["accept", "reject"]:
     response_body = "OK"
     print("Status: 200")
     print(f"Content-Length: {len(response_body)}")
-    print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}\r\n\r\n")
+    print(f"Set-Cookie: cookie-consent={consent}; Path=/; Expires={expire_date}\r\n\r")
     print(response_body)
 else:
     print("Status: 400 Bad Request\r\n\r\n")
