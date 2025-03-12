@@ -1,6 +1,7 @@
 #include "../include/ResponseBuilder.hpp"
 
 std::string*	ResponseBuilder::buildResponse(std::string body) {
+	LOG_INFO("Building response");
 	std::ifstream& file = _response.getRequestedFile();
 	if (file.is_open()) {
 		std::stringstream buffer;
@@ -103,7 +104,8 @@ std::string	ResponseBuilder::buildContentType() {
 				break ;
 			}
 		}
-	}
+	} else 
+		contentType = "text/html";
 	return contentType;
 }
 

@@ -12,7 +12,7 @@ Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequ
 
 int	Request::parseRequest() {
 
-	char	buffer[1024];
+	char	buffer[1024] = {0};
 	// std::cout<<"trying to read fd "<<_clientFd<<std::endl;
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 	//ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
@@ -25,7 +25,7 @@ int	Request::parseRequest() {
 		LOG_INFO("0 bytes read, Client disconnected");
 		return -1;
 	}
-	LOG_INFO("request received : \n"+std::string(buffer)+"\n");
+	//LOG_INFO("request received : \n"+std::string(buffer)+"\n");
 	_tempBuffer.append(buffer, bytes);
 	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
@@ -58,7 +58,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			//LOG_INFO("Body received : " + _body);
+			LOG_INFO("Body received : " + _body);
 		}
 	}
 	else if (isHeaderRead && _contentLength == 0) {
@@ -127,10 +127,12 @@ void	Request::parseHeader(std::string headerPart) {
 	LOG_INFO("session ID parsed: " + _sessionID);
 }
 
-uploadData Request::parseBody() {
+uploadData Request::setFileContent() {
 	struct uploadData data;
 	std::string content;
-	LOG_INFO("Body to parse: " + _body);
+	//LOG_INFO("Body to parse: " + _body);
+	if (_body.find("filename=") == std::string::npos)
+		return data;
 	std::string filename = _body.substr(_body.find("filename=") + 10, _body.find("\"\r\n") - (_body.find("filename=") + 10));
 	size_t start_pos = _body.find("\r\n\r\n");
 	size_t end_pos = _body.find("\r\n----");

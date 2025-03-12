@@ -32,7 +32,6 @@ public:
     void setRoot(const std::string &root);
     void setLimitClientBodySize(const std::string &limit_client_body_size);
     void setErrorPages(const std::string &error_page);
-    void setDefaultErrorPages();
     void setLocations(const ConfigLocation &location);
 };
 ;
