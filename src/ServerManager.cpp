@@ -99,7 +99,7 @@ void	ServerManager::handlePollin(int FD) {
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
-		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) {
+		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) { //if cgi program failed
 			closeCgi(500, FD_DATA[FD]->request->getClientFD());
 			return;
 		}

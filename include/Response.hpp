@@ -44,14 +44,15 @@ class Response {
 	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }
 	void	setCgiManager(CgiManager* cgiManager) { _cgiManager = cgiManager; }
 
-	Request 			&getRequest() const { return _request; }
-	std::string			getCodeStatus() const { return _codeStatus; }
-	std::string const&	getReasonPhrase() const { return _reasonPhrase; }
-	std::string			getRequestedFilePath() const { return _requestedFilePath; }
-	std::ifstream&		getRequestedFile() { return _requestedFile; }
-	bool				getResponseReadyToSend() { return _responseReadyToSend; }
-	ResponseBuilder*	getResponseBuilder() const { return _responseBuilder; }
-	CgiManager*			getCgiManager() const { return _cgiManager; }
+	Request 				&getRequest() const { return _request; }
+	ConfigLocation const*	getLocation() const { return _location; }
+	std::string				getCodeStatus() const { return _codeStatus; }
+	std::string const&		getReasonPhrase() const { return _reasonPhrase; }
+	std::string				getRequestedFilePath() const { return _requestedFilePath; }
+	std::ifstream&			getRequestedFile() { return _requestedFile; }
+	bool					getResponseReadyToSend() { return _responseReadyToSend; }
+	ResponseBuilder*		getResponseBuilder() const { return _responseBuilder; }
+	CgiManager*				getCgiManager() const { return _cgiManager; }
 	//std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */

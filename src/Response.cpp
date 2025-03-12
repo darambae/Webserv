@@ -236,6 +236,7 @@ void	Response::handleGet() {
 				setResponseStatus(403);
 				handleError();
 			} else if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
+				LOG_INFO("CGI file extension found in the request path");
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
@@ -474,7 +475,7 @@ int	Response::sendResponse() {
 		_totalBytesSent += bytesSent;
 	}
 
-	if (_totalBytesSent == responseSize) {
+	if (_totalBytesSent == responseSize && _responseReadyToSend) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
 		if (_responseBuilder) {

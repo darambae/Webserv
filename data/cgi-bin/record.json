@@ -235,6 +235,50 @@
                 "keys": 3,
                 "total_score": 23
             }
+        ],
+        "7": [
+            {
+                "player_id": "12",
+                "sq_1": 1,
+                "sq_2": 1,
+                "sq_3": 1,
+                "sq_4": 9,
+                "sq_5": 9,
+                "sq_6": 9,
+                "sq_7": 4,
+                "sq_8": 3,
+                "sq_9": 3,
+                "keys": 0,
+                "total_score": 40
+            },
+            {
+                "player_id": "13",
+                "sq_1": 2,
+                "sq_2": 2,
+                "sq_3": 2,
+                "sq_4": 3,
+                "sq_5": 2,
+                "sq_6": 1,
+                "sq_7": 5,
+                "sq_8": 3,
+                "sq_9": 3,
+                "keys": 0,
+                "total_score": 23
+            },
+            {
+                "player_id": "14",
+                "sq_1": 3,
+                "sq_2": 3,
+                "sq_3": 3,
+                "sq_4": 3,
+                "sq_5": 4,
+                "sq_6": 3,
+                "sq_7": 2,
+                "sq_8": 3,
+                "sq_9": 3,
+                "keys": 0,
+                "total_score": 27
+            }
         ]
     },
     "players": {
@@ -381,6 +425,36 @@
                 {
                     "game_id": "6",
                     "total_score": 23
+                }
+            ]
+        },
+        "12": {
+            "player_name": "Ben",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "7",
+                    "total_score": 40
+                }
+            ]
+        },
+        "13": {
+            "player_name": "Jerry",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "7",
+                    "total_score": 23
+                }
+            ]
+        },
+        "14": {
+            "player_name": "Hagendaz",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "7",
+                    "total_score": 27
                 }
             ]
         }

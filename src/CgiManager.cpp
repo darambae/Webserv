@@ -7,22 +7,6 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 	_children_status = -2;
 	_requestBody = "";
 
-	std::string _python_path;
-	std::string _php_path;
-	std::ifstream   python_path("python3_path.txt");
-	if (!python_path.is_open())
-		LOG_ERROR("The file that has Python3 path can't be opened", 1);
-	std::getline(python_path, _python_path);
-	python_path.close();
-
-	std::ifstream   php_path("php_path.txt");
-	if (!php_path.is_open())
-		LOG_ERROR("The file that has php path can't be opened", 1);
-	std::getline(php_path, _php_path);
-	php_path.close();
-	_cgiPass.push_back(_python_path);
-	_cgiPass.push_back(_php_path);
-	
 	if (_cgi_env->request_method == "POST")
 		_requestBody = _request->getBody();
 }
@@ -61,7 +45,7 @@ int	CgiManager::forkProcess() {
 		dup2(_sockets[1], STDOUT_FILENO);
 		close(_sockets[1]);
 		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
-		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _cgiPass);
+		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _response->getLocation()->getCgiPass());
 		LOG_DEBUG("INTERPRETER : "+interpreter);
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
@@ -79,6 +63,7 @@ int	CgiManager::forkProcess() {
 		char **argv;
 		if (interpreter.empty()) {
 			argv = new char*[2];
+			LOG_DEBUG("script_path : "+script_path);
 			argv[0] = const_cast<char *>(script_path.c_str());
 			argv[1] = NULL;
 		} else {
