@@ -12,7 +12,7 @@ Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequ
 
 int	Request::parseRequest() {
 
-	char	buffer[1024];
+	char	buffer[1024] = {0};
 	// std::cout<<"trying to read fd "<<_clientFd<<std::endl;
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
 	//ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
@@ -25,7 +25,7 @@ int	Request::parseRequest() {
 		LOG_INFO("0 bytes read, Client disconnected");
 		return -1;
 	}
-	LOG_INFO("request received : \n"+std::string(buffer)+"\n");
+	//LOG_INFO("request received : \n"+std::string(buffer)+"\n");
 	_tempBuffer.append(buffer, bytes);
 	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
@@ -58,7 +58,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			//LOG_INFO("Body received : " + _body);
+			LOG_INFO("Body received : " + _body);
 		}
 	}
 	else if (isHeaderRead && _contentLength == 0) {

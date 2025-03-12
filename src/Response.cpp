@@ -236,7 +236,6 @@ void	Response::handleGet() {
 				setResponseStatus(403);
 				handleError();
 			} else if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
-				LOG_INFO("CGI file extension found in the request path");
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
@@ -393,14 +392,14 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	//LOG_INFO("requestPath: " + requestPath);
+	LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		if (!_request.getQuery().empty() && _request.getQuery().find("_method=DELETE") != std::string::npos)
 			handleDelete();
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
-		if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
+		if (requestPath.find(".") != std::string::npos && !isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
@@ -475,7 +474,7 @@ int	Response::sendResponse() {
 		_totalBytesSent += bytesSent;
 	}
 
-	if (_totalBytesSent == responseSize && _responseReadyToSend) {
+	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
 		if (_responseBuilder) {
