@@ -60,16 +60,18 @@ int	CgiManager::forkProcess() {
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
-		std::string content_type_env = "CONTENT_TYPE" + _cgi_env->content_type;
+		std::string content_type_env = "CONTENT_TYPE=" + _cgi_env->content_type;
 		std::string script_name_env = "SCRIPT_NAME=" + _cgi_env->script_name;
 		std::string remote_addr_env = "REMOTE_ADDR=" + _cgi_env->remote_addr;
+		std::string http_cookie_env = "HTTP_COOKIE=" + _cgi_env->http_cookie;
 
 		char *env[] = {const_cast<char *>(request_method_env.c_str()),
 			const_cast<char *>(query_env.c_str()),
 			const_cast<char *>(content_length_env.c_str()),
 			const_cast<char *>(content_type_env.c_str()),
 			const_cast<char *>(script_name_env.c_str()),
-			const_cast<char *>(remote_addr_env.c_str()), NULL};
+			const_cast<char *>(remote_addr_env.c_str()),
+			const_cast<char *>(http_cookie_env.c_str()), NULL};
 		char *argv[] = {const_cast<char *>(interpreter.c_str()),
 			const_cast<char *>(script_path.c_str()), NULL};
 
