@@ -2,10 +2,13 @@
 
 CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 	 _cgi_env(cgi_env), _request(request), _response(response), _headerDoneReading(false) {
-		_cgiResponseStatus = 200;
-		_children_done = false;
-	_children_status = -2;
 	_cgiResponseStatus = 200;
+	_children_done = false;
+	_children_status = -2;
+	_requestBody = "";
+
+	std::string _python_path;
+	std::string _php_path;
 	std::ifstream   python_path("python3_path.txt");
 	if (!python_path.is_open())
 		LOG_ERROR("The file that has Python3 path can't be opened", 1);
@@ -17,14 +20,16 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 		LOG_ERROR("The file that has php path can't be opened", 1);
 	std::getline(php_path, _php_path);
 	php_path.close();
-	_requestBody = "";
+	_cgiPass.push_back(_python_path);
+	_cgiPass.push_back(_php_path);
+	
 	if (_cgi_env->request_method == "POST")
 		_requestBody = _request->getBody();
 }
 
 int	CgiManager::forkProcess() {
-	LOG_INFO("Query = "+_cgi_env->query_string);
-	LOG_INFO("scriptname = "+_cgi_env->script_name);
+	// LOG_INFO("Query = "+_cgi_env->query_string);
+	//LOG_INFO("scriptname = "+_cgi_env->script_name);
 	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
@@ -56,12 +61,12 @@ int	CgiManager::forkProcess() {
 		dup2(_sockets[1], STDOUT_FILENO);
 		close(_sockets[1]);
 		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
-		std::string interpreter = _cgi_env->script_name.find(".py") != std::string::npos ? _python_path : _php_path;
-
+		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _cgiPass);
+		LOG_DEBUG("INTERPRETER : "+interpreter);
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
-		std::string content_type_env = "CONTENT_TYPE" + _cgi_env->content_type;
+		std::string content_type_env = "CONTENT_TYPE=" + _cgi_env->content_type;
 		std::string script_name_env = "SCRIPT_NAME=" + _cgi_env->script_name;
 		std::string remote_addr_env = "REMOTE_ADDR=" + _cgi_env->remote_addr;
 
@@ -71,10 +76,20 @@ int	CgiManager::forkProcess() {
 			const_cast<char *>(content_type_env.c_str()),
 			const_cast<char *>(script_name_env.c_str()),
 			const_cast<char *>(remote_addr_env.c_str()), NULL};
-		char *argv[] = {const_cast<char *>(interpreter.c_str()),
-			const_cast<char *>(script_path.c_str()), NULL};
+		char **argv;
+		if (interpreter.empty()) {
+			argv = new char*[2];
+			argv[0] = const_cast<char *>(script_path.c_str());
+			argv[1] = NULL;
+		} else {
+			argv = new char*[3];
+			argv[0] = const_cast<char *>(interpreter.c_str());
+			argv[1] = const_cast<char *>(script_path.c_str());
+			argv[2] = NULL;
+		}
 
 		if (execve(argv[0], argv, env) == -1) {
+			delete[] argv; // Free the allocated memory
 			LOG_ERROR("execve failed", true);
 			exit(-1);
 		}

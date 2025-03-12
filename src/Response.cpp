@@ -235,7 +235,7 @@ void	Response::handleGet() {
 			if (requestPath.find(".json") != std::string::npos) {
 				setResponseStatus(403);
 				handleError();
-			} else if (isFoundIn(requestPath, _location->getCgiExtension())) {
+			} else if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
@@ -399,7 +399,7 @@ void	Response::handleResponse() {
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
-		if (isFoundIn(requestPath, _location->getCgiExtension())) {
+		if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);

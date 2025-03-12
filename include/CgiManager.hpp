@@ -14,8 +14,9 @@ class	CgiManager {
 		pid_t		_children_pid;
 		bool		_children_done;
 		int			_children_status;
-		std::string	_python_path;
-		std::string _php_path;
+		std::vector<std::string>	_cgiPass;
+		// std::string	_python_path;
+		// std::string _php_path;
 		std::string	_tempBuffer;
 		std::string	_cgiBody;
 		int			_cgiContentLength;

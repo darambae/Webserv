@@ -46,12 +46,14 @@ uint64_t	get_time(void){
 	return ((time.tv_sec * 1000) + (time.tv_usec / 1000));
 }
 
-bool	isFoundIn(std::string subject, std::vector<std::string> vector) {
+std::string isFoundIn(std::string subject, std::vector<std::string> vector) {
 	std::vector<std::string>::const_iterator it = vector.begin();
 	for (; it != vector.end(); ++it) {
-		if (subject.find(*it) != std::string::npos) {
-			return true;
+        LOG_DEBUG("Checking if " + subject + " is in " + *it);
+        std::string tmp = *it;
+		if (tmp.find(subject) != std::string::npos) {
+			return *it;
 		}
 	}
-	return false;
+	return "";
 }
