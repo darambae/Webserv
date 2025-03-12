@@ -29,6 +29,7 @@ class Request {
 	int				_contentLength;
 	uint64_t		_time_stamp;
 	std::string		_savedErrorCode;
+	std::string		_sessionID;
 	// CGI data struct to be implemented
 	// std::string _content_type;
 	std::string _firstLine;

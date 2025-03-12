@@ -1,0 +1,14 @@
+"filename", "language", "C++", "comment", "blank", "total"
+"/home/gdaignea/42/cursus/webserv/git_daram/src/CgiManager.cpp", "C++", 198, 2, 15, 215
+"/home/gdaignea/42/cursus/webserv/git_daram/src/ConfigLocation.cpp", "C++", 104, 1, 17, 122
+"/home/gdaignea/42/cursus/webserv/git_daram/src/ConfigParser.cpp", "C++", 208, 5, 26, 239
+"/home/gdaignea/42/cursus/webserv/git_daram/src/ConfigServer.cpp", "C++", 90, 0, 10, 100
+"/home/gdaignea/42/cursus/webserv/git_daram/src/Logger.cpp", "C++", 58, 0, 10, 68
+"/home/gdaignea/42/cursus/webserv/git_daram/src/Request.cpp", "C++", 136, 15, 20, 171
+"/home/gdaignea/42/cursus/webserv/git_daram/src/Response.cpp", "C++", 406, 27, 41, 474
+"/home/gdaignea/42/cursus/webserv/git_daram/src/ResponseBuilder.cpp", "C++", 105, 15, 23, 143
+"/home/gdaignea/42/cursus/webserv/git_daram/src/ServerManager.cpp", "C++", 217, 24, 15, 256
+"/home/gdaignea/42/cursus/webserv/git_daram/src/main.cpp", "C++", 52, 7, 9, 68
+"/home/gdaignea/42/cursus/webserv/git_daram/src/server.cpp", "C++", 105, 87, 11, 203
+"/home/gdaignea/42/cursus/webserv/git_daram/src/utils.cpp", "C++", 38, 3, 6, 47
+"Total", "-", 1717, 186, 203, 2106
