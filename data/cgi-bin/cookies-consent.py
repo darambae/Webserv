@@ -23,13 +23,13 @@ consent = params.get("consent", [""])[0].strip()
 
 # --- check consent ---
 if consent in ["accept", "reject"]:
-    #expiration date in 1 year
-    #expire_date = (datetime.utcnow() + timedelta(days=365)).strftime("%a, %d %b %Y %H:%M:%S GMT")
-    #expiration date in 3mn
     local_tz = pytz.timezone("Europe/Paris")
     utc_now = datetime.utcnow()
     local_now = utc_now.replace(tzinfo=pytz.utc).astimezone(local_tz)
-    expire_date = (local_now + timedelta(minutes=1)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    #expiration date in 1 year
+    #expire_date = (datetime.utcnow() + timedelta(days=365)).strftime("%a, %d %b %Y %H:%M:%S GMT")
+    #expiration date in 3mn
+    expire_date = (local_now + timedelta(minutes=3)).strftime("%a, %d %b %Y %H:%M:%S GMT")
 
     if consent == "accept":
         session_id = str(uuid.uuid4())
