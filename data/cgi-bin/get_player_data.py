@@ -79,7 +79,6 @@ def handle_request():
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
-    response = "Status: 200\r"
     response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
     print("Status: 200")
     print(response)

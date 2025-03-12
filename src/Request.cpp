@@ -9,6 +9,7 @@
 Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false), _clientFd(fd), _contentLength(0) {
 	_time_stamp = get_time();
 }
+
 int	Request::parseRequest() {
 
 	char	buffer[1024];
@@ -115,8 +116,15 @@ void	Request::parseHeader(std::string headerPart) {
 			if (key == "Content-Length") {
 				_contentLength = std::atoi(value.c_str());
 			}
+			else if (key == "Cookie") {
+				size_t pos	= value.find("session_id");
+				if (pos != std::string::npos) {
+					_sessionID = value.substr(pos + 11, pos + 47);
+				}
+			}
 		}
 	}
+	LOG_INFO("session ID parsed: " + _sessionID);
 }
 
 uploadData Request::setFileContent() {
