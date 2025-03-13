@@ -9,6 +9,7 @@ import sys
 def signal_handler(sig, frame):
     sys.exit(0)
 def error_message(message):
+    response_body = []
     response_body.append(f"<h1>")
     response_body.append(message)
     response_body.append(f"</h1><a href='/' class=\"button\">Go back</a></body></html>")

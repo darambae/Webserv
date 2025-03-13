@@ -1,0 +1,24 @@
+[2025-03-13 11:41:41] [DEBUG] Valid root
+[2025-03-13 11:41:41] [DEBUG] Valid error page
+[2025-03-13 11:41:41] [DEBUG] Valid error page
+[2025-03-13 11:41:41] [DEBUG] Valid error page
+[2025-03-13 11:41:41] [DEBUG] Valid error page
+[2025-03-13 11:41:41] [DEBUG] Valid error page
+[2025-03-13 11:41:41] [DEBUG] Valid body size
+[2025-03-13 11:41:41] [DEBUG] Valid path
+[2025-03-13 11:41:41] [DEBUG] Valid root
+[2025-03-13 11:41:41] [DEBUG] Valid autoindex
+[2025-03-13 11:41:41] [DEBUG] Valid methods
+[2025-03-13 11:41:41] [DEBUG] Valid path
+[2025-03-13 11:41:41] [DEBUG] Valid root
+[2025-03-13 11:41:41] [DEBUG] Valid methods
+[2025-03-13 11:41:41] [DEBUG] Valid autoindex
+[2025-03-13 11:41:41] [DEBUG] Valid path
+[2025-03-13 11:41:41] [DEBUG] Valid CGI path
+[2025-03-13 11:41:41] [DEBUG] Valid CGI extension
+[2025-03-13 11:41:41] [DEBUG] Valid methods
+[2025-03-13 11:41:41] [DEBUG] Valid autoindex
+[2025-03-13 11:41:41] [DEBUG] Valid root
+[2025-03-13 11:41:41] [DEBUG] Valid path
+[2025-03-13 11:41:41] [DEBUG] Valid root
+[2025-03-13 11:43:53] [DEBUG] Interrupt signal 2 received

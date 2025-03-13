@@ -47,10 +47,11 @@
                 <button type="submit">Send</button>
             </form>
 			<br>
-            <h4>get my historic</h4>
-            <form action="/cgi-bin/get_client_historic.py" method="get">
-                <button type="submit">GO</button>
+            <h4>Get my historic</h4>
+            <form action="/cgi-bin/get_client_historic.py" method="get" onsubmit="return checkCookies(event)">
+                <button type="submit">Go</button>
             </form>
+            <script src="/static/cookies.js"></script>
         </section>
         <section id="add-result">
             <br>
@@ -60,7 +61,7 @@
         </section>
     </main>
     <footer>
-        <p>&copy; 2023 Webserv Project. All rights reserved.</p>
+        <p>&copy; 2025 Webserv Project. All rights reserved.</p>
     </footer>
     <!--cookie pop-up window -->
 

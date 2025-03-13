@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cookies requis</title>
+</head>
+<body>
+    <h2>Cookies are required to acces this page</h2>
+    <p>Please accept the cookies to continue.</p>
+    <button onclick="acceptCookiesAndContinue()">Accept cookies and continue</button>
+
+    <script>
+    function acceptCookiesAndContinue() {
+        document.cookie = "cookiesAccepted=true; path=/; max-age=31536000"; // Stocke le cookie pour 1 an
+        window.location.href = "/cgi-bin/get_client_historic.py"; // Redirige vers la page demandée
+    }
+    </script>
+</body>
+</html>

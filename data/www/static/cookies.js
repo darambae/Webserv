@@ -44,3 +44,33 @@ function declineCookies() {
         console.error('Error while refusing cookies:', error);
     });
 }
+
+/* function checkCookies(event) {
+    if (getCookie("cookie-consent") !== "accept") {
+        event.preventDefault(); // Empêche l'envoi du formulaire
+        window.location.href = "/cookiesRequired.html"; // Redirige vers la page expliquant l'importance des cookies
+        return false;
+    }
+    return true;
+} */
+
+function checkCookies(event) {
+    event.preventDefault(); // Empêche l'envoi immédiat du formulaire
+
+    fetch('/cgi-bin/check_cookies.py', { // Fichier CGI qui gère la redirection
+        method: 'GET',
+        credentials: 'same-origin'
+    }).then(response => {
+        if (response.redirected) {
+            window.location.href = response.url; // Redirige si le serveur l'exige
+        } else {
+            event.target.submit(); // Si pas de redirection, envoie le formulaire
+        }
+    }).catch(error => {
+        console.error("Erreur lors de la vérification des cookies :", error);
+    });
+
+    return false; // Empêche l’envoi du formulaire avant d’avoir une réponse du serveur
+}
+
+window.checkCookies = checkCookies;
