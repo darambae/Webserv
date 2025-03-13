@@ -9,6 +9,7 @@ import sys
 def signal_handler(sig, frame):
     sys.exit(0)
 def error_message(message):
+    response_body = []
     response_body.append(f"<h1>")
     response_body.append(message)
     response_body.append(f"</h1><a href='/' class=\"button\">Go back</a></body></html>")
@@ -56,14 +57,15 @@ def handle_request():
     response_body.append("<!DOCTYPE html>")
     response_body.append("<html><body>")
     response_body.append("<link rel='stylesheet' href='style.css'/>")
-    id_client = os.environ.get("HTTP_COOKIE")
-    if id_client:
+    session_id = os.environ.get("HTTP_COOKIE")
+    if session_id:
         cookies_path = os.path.realpath("data/cgi-bin/cookies.json")
         with open(cookies_path, "r") as file:
             cookies = json.load(file)
-        game_ids = cookies.get(id_client)
+        game_ids = cookies.get(session_id)
         if game_ids == None:
-             error_message("no historic for this client")
+            error_message(f"For session id {session_id}, no historic for this client")
+            return
         file_path = os.path.realpath("data/cgi-bin/record.json")
         with open(file_path, "r") as file:
             data = json.load(file)

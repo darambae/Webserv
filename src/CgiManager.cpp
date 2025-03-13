@@ -46,7 +46,7 @@ int	CgiManager::forkProcess() {
 		close(_sockets[1]);
 		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _response->getLocation()->getCgiPass());
-		LOG_DEBUG("INTERPRETER : "+interpreter);
+		//LOG_DEBUG("INTERPRETER : "+interpreter);
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
@@ -65,7 +65,7 @@ int	CgiManager::forkProcess() {
 		char **argv;
 		if (interpreter.empty()) {
 			argv = new char*[2];
-			LOG_DEBUG("script_path : "+script_path);
+			//LOG_DEBUG("script_path : "+script_path);
 			argv[0] = const_cast<char *>(script_path.c_str());
 			argv[1] = NULL;
 		} else {
@@ -168,8 +168,8 @@ void	CgiManager::parseCgiHeader(std::string header) {
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	check_pid();
-	LOG_DEBUG("Children status : "+to_string(_children_status));
-	LOG_DEBUG("Children done : "+to_string(_children_done));
+	// LOG_DEBUG("Children status : "+to_string(_children_status));
+	// LOG_DEBUG("Children done : "+to_string(_children_done));
 	if (_children_done)
 	{char	buffer[1024] = {0};
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
