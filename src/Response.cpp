@@ -388,6 +388,13 @@ void	Response::handleResponse() {
 				return ;
 			}
 		}
+		else if (!_location->getReturn().empty()) {
+			std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
+			setResponseStatus(it->first);
+			_responseReadyToSend = true;
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse("");
+		}
 	} else {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
