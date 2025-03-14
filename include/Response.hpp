@@ -23,6 +23,7 @@ class Response {
 	std::string				_requestedFilePath;
 	std::ifstream			_requestedFile;
 	//std::map<std::string, std::string>	_header;
+	std::string				_redirectionResponseHeader;
 	bool					_responseReadyToSend;
 	size_t					_totalBytesSent;
 
@@ -53,6 +54,7 @@ class Response {
 	bool					getResponseReadyToSend() { return _responseReadyToSend; }
 	ResponseBuilder*		getResponseBuilder() const { return _responseBuilder; }
 	CgiManager*				getCgiManager() const { return _cgiManager; }
+	std::string				getRedirectionResponseHeader() const { return _redirectionResponseHeader; }
 	//std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */

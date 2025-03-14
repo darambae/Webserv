@@ -34,6 +34,9 @@ std::string	ResponseBuilder::buildHeaders() {
 
 	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
 	header += _headers._timeStamp;
+	if(!_response.getRedirectionResponseHeader().empty()) {
+		header += "location: " + _response.getRedirectionResponseHeader();
+	}
 	if (!_body.empty()) {
 		_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
 		header += _headers._contentType;
