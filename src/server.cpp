@@ -75,7 +75,7 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	if (listen(new_fd, 10) < 0)//make serverfd listening new connections, 10 connections max can wait to be accepted
 	    LOG_ERROR("Listen failed", true);
 	//std::cout << "a new socket was created for " << _config.getServerNames()[0] <<" and port " << ipPort.second << " on FD " << new_fd << std::endl;
-	LOG_INFO("A new socket was created for " + _config->getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
+	//LOG_INFO("A new socket was created for " + _config->getServerNames()[0] + " and port " + to_string(ipPort.second) + " on FD " + to_string(new_fd));
 	if (unblockFD(new_fd) == -1)
 		return;
 	addFdToFds(new_fd);
