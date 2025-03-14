@@ -205,7 +205,6 @@ void    ConfigParser::validReturn(const std::string& line) {
         const std::string&  path = tmp_vector.back();
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
             THROW("Invalid return status code");
-        validRoot(path);
         return;
     }   
     THROW("Invalid return");
