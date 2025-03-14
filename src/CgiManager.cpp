@@ -98,10 +98,15 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 		if (_requestBody.size() > 0) {
 			const void* buffer = static_cast<const void*>(_requestBody.data());//converti std::string en const void* data
 			returnValue = write(_sockets[0], buffer, _requestBody.size());
-			if (returnValue > 0 && static_cast<size_t>(returnValue) < _requestBody.size())
+			if (returnValue > 0 && static_cast<size_t>(returnValue) < _requestBody.size()) {
 				_requestBody = _requestBody.substr(returnValue, _requestBody.size() - returnValue);
-			else
-				_requestBody = "";
+				return returnValue;
+			}
+			else if (returnValue <= 0){
+			//	_requestBody = "";
+				LOG_INFO("an error occurs since Parent send the body to Children");
+				return -1;
+			}
 		}
 		LOG_DEBUG("returnValue : " + to_string(returnValue));
 	}
@@ -174,7 +179,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 	{char	buffer[1024] = {0};
 	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 	LOG_INFO("buffer read from children : "+std::string(buffer));
-	if (bytes < 0) {
+	if (bytes <= 0) {
 		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
 		return -1;
 	}

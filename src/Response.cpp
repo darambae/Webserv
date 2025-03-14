@@ -466,9 +466,9 @@ int	Response::sendResponse() {
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
 		if (bytesSent <= 0) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				return -1;
-			}
+			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			// 	return -1;
+			// }
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
 			return -1;
