@@ -178,7 +178,7 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
 	delete FD_DATA[FdClient]->CGI;
 	FD_DATA[FdClient]->CGI = NULL;
-	LOG_INFO("CGI is close");
+	LOG_INFO("CGI is closed");
 }
 
 void	ServerManager::print_all_FD_DATA() {

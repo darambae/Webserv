@@ -240,7 +240,6 @@ void	Response::handleGet() {
 					setResponseStatus(415);
 					handleError();
 				}
-
 			} else {
 				//LOG_INFO("path for the requested file : " + path);
 				_requestedFile.open(path.c_str(), std::ios::binary);
@@ -416,7 +415,7 @@ int	Response::handleCgi() {
 	}
 	else {
 		cgi->content_length = _request.getValueFromHeader("Content-Length");
-		LOG_INFO("Content-Length: " + cgi->content_length);
+		//LOG_INFO("Content-Length: " + cgi->content_length);
 		cgi->content_type = _request.getValueFromHeader("Content-Type");
 		cgi->query_string = !_request.getBody().empty() ? _request.getBody() : "";
 	}

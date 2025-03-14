@@ -81,7 +81,7 @@ int	CgiManager::forkProcess() {
 	sleep(1);
 	LOG_INFO("CGI parent process, the children pid is "+to_string(pid));
 	_children_pid = pid;
-	check_pid();
+	//check_pid();
 	return 0;
 	//return to the main loop waiting to be able to write or send to cgi
 	//after write to send body, if exit == -1, print error message found in socket_cgi[0] and return -1;
@@ -161,7 +161,7 @@ void	CgiManager::parseCgiHeader(std::string header) {
 }
 
 int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
-	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
+	//LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	check_pid();
 	LOG_DEBUG("Children status : "+to_string(_children_status));
 	LOG_DEBUG("Children done : "+to_string(_children_done));
@@ -182,7 +182,7 @@ int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have 
 			std::string header = _tempBuffer.substr(0, pos + 4);
 			_tempBuffer.erase(0, pos + 4);
 			parseCgiHeader(header);
-			LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
+			//LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
 			_headerDoneReading = true;
 		}
 

@@ -11,7 +11,6 @@ ConfigParser::ConfigParser(const std::string& file) {
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test;
 
-	
 	test.open(file.c_str());
     if (!test.is_open())
         THROW("Configuration file " + file + " cannot be opened.");
@@ -155,12 +154,12 @@ void    ConfigParser::validIp(std::string ip) {
         segment = ip.substr(0, pos);
         num = std::atoi(segment.c_str());
         if (num < 0 || num > 255)
-            THROW("The given IP is Out of range");
+            THROW("The given IP is out of range");
         ip = ip.substr(pos + 1);
     }
     num = std::atoi(ip.c_str());
     if (num < 0 || num > 255)
-        THROW("The given IP is Out of range");
+        THROW("The given IP is out of range");
 }
 
 void    ConfigParser::validPort(const std::string& port) {
@@ -214,7 +213,8 @@ void    ConfigParser::validReturn(const std::string& line) {
 void    ConfigParser::validRoot(const std::string& line) {
     if (line.empty() || line[0] != '/')
         THROW ("Invalid root");
-    fullPath(line);
+    if (fullPath(line).empty())
+        THROW("Invalid root path");
 }
 
 void    ConfigParser::validBodySize(const std::string& line) {
