@@ -9,14 +9,6 @@
 <body>
     <header>
         <h1>Welcome to Webserv</h1>
-        <nav>
-            <ul>
-                <li><a href="#">Home</a></li>
-                <li><a href="#upload">Upload image</a></li>
-                <li><a href="#history">Play History</a></li>
-                <li><a herf="#add-result">Add game result</a></li>
-            </ul>
-        </nav>
     </header>
     <main>
         <section id="upload">
@@ -72,5 +64,22 @@
     </div>
 
     <script src="/static/cookies.js"></script>
+    <button id="randomButton" onclick="window.location.href='/redirect'">Redirection</button>
+    <script>
+      document.addEventListener('DOMContentLoaded', function() {
+            function setRandomPosition() {
+                let button = document.getElementById('randomButton');
+                button.style.position = 'absolute';
+                let screenWidth = window.innerWidth - button.offsetWidth;
+                let screenHeight = window.innerHeight - button.offsetHeight;
+                let randomX = Math.floor(Math.random() * screenWidth);
+                let randomY = Math.floor(Math.random() * screenHeight);
+                button.style.left = `${randomX}px`;
+                button.style.top = `${randomY}px`;
+            }
+            setRandomPosition();
+            window.addEventListener('resize', setRandomPosition);
+        });
+    </script>
 </body>
 </html>

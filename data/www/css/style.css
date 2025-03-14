@@ -176,3 +176,13 @@ button:hover {
     background-color: red;
     color: white;
 }
+
+.randomButton {
+    position: absolute;
+    padding: 10px 20px;
+    background-color: blue;
+    color: white;
+    border: none;
+    cursor: pointer;
+    border-radius: 5px;
+}
