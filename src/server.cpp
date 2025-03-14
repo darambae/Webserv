@@ -147,7 +147,8 @@ int	Server::unblockFD(int fd) {
 }
 
 Server::~Server() {
-	std::cout<<"the server : "<<_config->getServerNames()[0]<<" is closed"<<std::endl;
+	if (!_config->getServerNames().empty())
+		std::cout<<"the server : "<<_config->getServerNames()[0]<<" is closed"<<std::endl;
 }
 
 /*
