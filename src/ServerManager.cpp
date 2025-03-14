@@ -22,24 +22,24 @@ void	ServerManager::launchServers() {
         for (size_t i = 0; i < ALL_FDS.size(); ++i) {
             if (ALL_FDS[i].revents == 0)
                 continue;
-            if (ALL_FDS[i].revents & POLLHUP) {
+            else if (ALL_FDS[i].revents & POLLHUP) {
                 handlePollhup(ALL_FDS[i].fd);
                 continue;
             }
-            if (ALL_FDS[i].revents & POLLIN) {
+            else if (ALL_FDS[i].revents & POLLIN) {
                 handlePollin(ALL_FDS[i].fd);
                 continue;
             }
-            if (ALL_FDS[i].revents & POLLOUT) {
+            else if (ALL_FDS[i].revents & POLLOUT) {
                 handlePollout(ALL_FDS[i].fd);
                 continue;
             }
-            if (ALL_FDS[i].revents & POLLERR) {
+            else if (ALL_FDS[i].revents & POLLERR) {
                 LOG_ERROR("POLLERR flag, error on socket : " + to_string(ALL_FDS[i].fd), true);
                 cleanFd(ALL_FDS[i].fd);
                 continue;
             }
-            if (ALL_FDS[i].revents & POLLNVAL) { // Invalid socket
+            else if (ALL_FDS[i].revents & POLLNVAL) { // Invalid socket
                 LOG_ERROR("POLLNVAL flag, socket invalid : " + to_string(ALL_FDS[i].fd), true);
                 cleanFd(ALL_FDS[i].fd);
                 continue;

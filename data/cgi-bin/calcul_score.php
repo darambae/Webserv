@@ -76,7 +76,7 @@ function addDataToJson(array $names, array $players) {
 	}
 	if (!empty($_SERVER['HTTP_COOKIE'])) {
 		$id_client = $_SERVER['HTTP_COOKIE'];
-		$cookie_file = realpath("data/cgi-bin/cookies.json");
+		$cookie_file = realpath("data/cgi-bin/games_per_sess_id.json");
 		if ($cookie_file === false || !file_exists($cookie_file)) {
 			mkdir($cookie_file, 0777, true); // Création récursive avec permissions
 			$cookie_data = [];
