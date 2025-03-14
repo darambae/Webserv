@@ -99,7 +99,7 @@ void	ServerManager::handlePollin(int FD) {
 void	ServerManager::handlePollout(int FD) {
 	//print_FD_status(FD);
 	if (FD_DATA[FD]->status == CLIENT) {
-		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) {
+		if (FD_DATA[FD]->CGI && FD_DATA[FD]->CGI->getStatus() > 0) { //if cgi program failed
 			closeCgi(500, FD_DATA[FD]->request->getClientFD());
 			return;
 		}
@@ -178,7 +178,9 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	cleanFd(FD_DATA[FdClient]->CGI->getSocketsParent());
 	delete FD_DATA[FdClient]->CGI;
 	FD_DATA[FdClient]->CGI = NULL;
-	LOG_INFO("CGI is closed");
+	LOG_INFO("CGI is close");
+	if (errorNumber > 0)
+		cleanFd(FdClient);
 }
 
 void	ServerManager::print_all_FD_DATA() {

@@ -235,7 +235,7 @@ void	Response::handleGet() {
 			if (requestPath.find(".json") != std::string::npos) {
 				setResponseStatus(403);
 				handleError();
-			} else if (requestPath.find(".py") != std::string::npos || requestPath.find(".php") != std::string::npos) {
+			} else if (!isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 				if (handleCgi() == -1) {
 					setResponseStatus(415);
 					handleError();
@@ -258,75 +258,89 @@ void	Response::handleGet() {
 
 
 void	Response::handlePost() {
-	LOG_ERROR("Handling POST request", 0);
-	struct uploadData fileData = _request.parseBody();
-	//Accept only a file with .jpg, .jpeg or .png extension
+	LOG_INFO("Handling POST request");
+	struct uploadData fileData = _request.setFileContent();
+	//Post request with no file content
+	if (fileData.fileName.empty() && fileData.fileContent.empty()) {
+		LOG_INFO("Post request with no file content");
+		setResponseStatus(200);
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		std::ostringstream responseBody;
+		responseBody << "<!DOCTYPE html>\n";
+		responseBody << "<html lang=\"en\">\n";
+		responseBody << "<head>\n";
+		responseBody << "<meta charset=\"UTF-8\">\n";
+		responseBody << "<title>Post request received</title>\n";
+		responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
+		responseBody << "</head>\n";
+		responseBody << "<body>\n";
+		responseBody << "<h1>Post request received</h1>\n";
+		responseBody << "<p>Body content : " << _request.getBody() << "</p>\n";
+		responseBody << "</body>\n";
+		responseBody << "</html>\n";
+		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+		return ;
+	}
+	//Post request with img file content
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
 		setResponseStatus(400);
 		handleError();
 		return ;
 	}
-	if (!fileData.fileName.empty() && !fileData.fileContent.empty()) {
-		std::string upload_location = _location->getRoot() + _request.getPath();
-		std::string path = fullPath(upload_location) + "/" + fileData.fileName;
-		std::ofstream file(path.c_str(), std::ios::binary);
-		if (!file.is_open()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400);
-			handleError();
-			return ;
-		}
-		file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
-		if (file.fail()) {
-			LOG_INFO("Failed to upload the requested file");
-			setResponseStatus(400);
-      		handleError();
-			return ;
-		}
-		file.close();
-		setResponseStatus(200);
-		LOG_INFO("File uploaded successfully");
-		_responseReadyToSend = true;
-		_responseBuilder = new ResponseBuilder(*this);
-		std::ostringstream responseBody;
-        responseBody << "<!DOCTYPE html>\n";
-        responseBody << "<html lang=\"en\">\n";
-        responseBody << "<head>\n";
-        responseBody << "<meta charset=\"UTF-8\">\n";
-        responseBody << "<title>File Upload Success</title>\n";
-		responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
-		responseBody << "</head>\n";
-        responseBody << "<body>\n";
-        responseBody << "<h1>File Upload Successful</h1>\n";
-        responseBody << "<p>Your file has been uploaded successfully.</p>\n";
-        responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
-		responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";
-		responseBody << "<form action=\"" << _request.getPath() << "/" << fileData.fileName << "\" method=\"delete\">\n";
-		responseBody << "<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n";
-		responseBody << "<input type=\"hidden\" name=\"fileName\" value=\"" << fileData.fileName << "\">\n";
-		responseBody << "<div class=\"button-container\">\n";
-		responseBody << "<button type=\"submit\" class=\"delete-button\">x</button>\n";
-		responseBody << "<a href=\"/\" class=\"button\">Go to Index Page</a>\n";
-		responseBody << "</form>\n";
-		responseBody << "</body>\n";
-        responseBody << "</html>\n";
-		//LOG_INFO("Response body stream : " + responseBody.str());
-		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
-		//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
-	}
-	else {
+	std::string upload_location = _location->getRoot() + _request.getPath();
+	std::string path = fullPath(upload_location) + "/" + fileData.fileName;
+	std::ofstream file(path.c_str(), std::ios::binary);
+	if (!file.is_open()) {
 		LOG_INFO("Failed to upload the requested file");
 		setResponseStatus(400);
 		handleError();
+		return ;
 	}
-
+	file.write(fileData.fileContent.c_str(), fileData.fileContent.size());
+	if (file.fail()) {
+		LOG_INFO("Failed to upload the requested file");
+		setResponseStatus(400);
+		handleError();
+		return ;
+	}
+	file.close();
+	setResponseStatus(201);
+	LOG_INFO("File uploaded successfully");
+	_responseReadyToSend = true;
+	_responseBuilder = new ResponseBuilder(*this);
+	std::ostringstream responseBody;
+	responseBody << "<!DOCTYPE html>\n";
+	responseBody << "<html lang=\"en\">\n";
+	responseBody << "<head>\n";
+	responseBody << "<meta charset=\"UTF-8\">\n";
+	responseBody << "<title>File Upload Success</title>\n";
+	responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
+	responseBody << "</head>\n";
+	responseBody << "<body>\n";
+	responseBody << "<h1>File Upload Successful</h1>\n";
+	responseBody << "<p>Your file has been uploaded successfully.</p>\n";
+	responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
+	responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";
+	responseBody << "<form action=\"" << _request.getPath() << "/" << fileData.fileName << "\" method=\"delete\">\n";
+	responseBody << "<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n";
+	responseBody << "<input type=\"hidden\" name=\"fileName\" value=\"" << fileData.fileName << "\">\n";
+	responseBody << "<div class=\"button-container\">\n";
+	responseBody << "<button type=\"submit\" class=\"delete-button\">x</button>\n";
+	responseBody << "<a href=\"/\" class=\"button\">Go to Index Page</a>\n";
+	responseBody << "</form>\n";
+	responseBody << "</body>\n";
+	responseBody << "</html>\n";
+	//LOG_INFO("Response body stream : " + responseBody.str());
+	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+	//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 }
 
 void	Response::handleDelete() {
 	LOG_INFO("Handling DELETE request");
 	std::string path = fullPath(_location->getRoot());
 	path += _request.getPath();
-	LOG_INFO("Path to delete: " + path);
+	//LOG_INFO("Path to delete: " + path);
 	if (remove(path.c_str()) != 0) {
 		LOG_INFO("Failed to delete the requested file");
 		setResponseStatus(400);
@@ -378,14 +392,14 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	//LOG_INFO("requestPath: " + requestPath);
+	LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		if (!_request.getQuery().empty() && _request.getQuery().find("_method=DELETE") != std::string::npos)
 			handleDelete();
 		else
 			handleGet();
 	} else if (requestMethod == "POST") {
-		if (requestPath.find("/cgi-bin") != std::string::npos) {
+		if (requestPath.find(".") != std::string::npos && !isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
 				setResponseStatus(666);
@@ -393,7 +407,7 @@ void	Response::handleResponse() {
 				return ;
 			}
 		}
-		else if (requestPath == "/upload")
+		else
 			handlePost();
 	} else if (requestMethod == "DELETE")
 		handleDelete();
@@ -420,6 +434,8 @@ int	Response::handleCgi() {
 		cgi->query_string = !_request.getBody().empty() ? _request.getBody() : "";
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
+	cgi->http_cookie = _request.getSessionID();
+	LOG_DEBUG("session id stack for cgi env is : "+cgi->http_cookie);
 	cgi->script_name = _request.getPath().substr(_request.getPath().find_last_of("/") + 1);
 	//LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
@@ -450,9 +466,9 @@ int	Response::sendResponse() {
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
 		if (bytesSent <= 0) {
-			if (errno == EAGAIN || errno == EWOULDBLOCK) {
-				return -1;
-			}
+			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
+			// 	return -1;
+			// }
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
 			return -1;

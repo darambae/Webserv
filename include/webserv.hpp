@@ -72,6 +72,7 @@ struct CGI_env
 	std::string	content_type;
 	std::string	script_name;//path of the CGI executed
 	std::string	remote_addr;//client addr
+	std::string	http_cookie;
 
 };
 

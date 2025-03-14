@@ -74,6 +74,23 @@ function addDataToJson(array $names, array $players) {
 		$errorMessage = "an error occurs updating datas";
 		echo "<p style='color: red; font-weight: bold;'>$errorMessage</p>";
 	}
+	if (!empty($_SERVER['HTTP_COOKIE'])) {
+		$id_client = $_SERVER['HTTP_COOKIE'];
+		$cookie_file = realpath("data/cgi-bin/cookies.json");
+		if ($cookie_file === false || !file_exists($cookie_file)) {
+			mkdir($cookie_file, 0777, true); // Création récursive avec permissions
+			$cookie_data = [];
+		} else {
+			$cookie_json = file_get_contents($cookie_file);
+			$cookie_data = json_decode($cookie_json, true);
+		}
+		$cookie_data[$id_client][] = $game_id;
+		$new_cookie_json = json_encode($cookie_data, JSON_PRETTY_PRINT);
+		if (file_put_contents($cookie_file,$new_cookie_json) === false) {
+			$errorMessage = "an error occurs updating datas";
+			echo "<p style='color: red; font-weight: bold;'>$errorMessage</p>";
+		}
+	}
 }
 function extractDataFromBody($body) {
 	parse_str($body, $parsed_postData);
@@ -148,7 +165,7 @@ function fillReturnBody(&$content, array $players, array $names) {
 	</html>';
 }
 // Vérification que le formulaire a été soumis
-if ($_SERVER['REQUEST_METHOD'] == 'POST' && $_SERVER['CONTENT_LENGTH'] > 0) {
+if ($_SERVER['REQUEST_METHOD'] == 'POST' && !empty($_SERVER['CONTENT_LENGTH'])) {
     // Récupérer les données envoyées par le formulaire pour chaque joueur
 	$content_length = (int) $_SERVER['CONTENT_LENGTH']; // Taille des données POST
     $post_data = "";

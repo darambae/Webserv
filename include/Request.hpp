@@ -29,6 +29,7 @@ class Request {
 	int				_contentLength;
 	uint64_t		_time_stamp;
 	std::string		_savedErrorCode;
+	std::string		_sessionID;
 	// CGI data struct to be implemented
 	// std::string _content_type;
 	std::string _firstLine;
@@ -50,6 +51,7 @@ public:
 	std::map<std::string, std::string>	getHeader() const { return _header; }
 	std::string	getMethod() const { return _method; }
 	std::string	getPath() const { return _path; }
+	std::string	getSessionID() const { return _sessionID; }
 	std::string	getVersion() const { return _version; }
 	int			getClientFD() const { return _clientFd; }
 	bool		getIsRequestPathDirectory() const { return isRequestPathDirectory; }
@@ -67,7 +69,7 @@ public:
 	int		parseRequest();
 	void	parseFirstLine();
 	void	parseHeader(std::string headerPart);
-	struct uploadData	parseBody();
+	struct uploadData	setFileContent();
 	std::string		parseQueryString();
 	void	createQueryMap(std::string path);
 

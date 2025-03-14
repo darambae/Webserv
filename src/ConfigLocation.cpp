@@ -32,7 +32,7 @@ void    ConfigLocation::setIndex(const std::string& line) {
 }
 
 void    ConfigLocation::setCgiExtension(const std::string& line) {
-    ConfigParser::validCgiExtension(line);
+    //ConfigParser::validCgiExtension(line);
     LOG_DEBUG("Valid CGI extension");
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
@@ -40,11 +40,26 @@ void    ConfigLocation::setCgiExtension(const std::string& line) {
 void    ConfigLocation::setCgiPass(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
     while (!tmp_vector.empty()) {
-        if (access(tmp_vector.front().c_str(), X_OK) == -1)
+        if (access(fullPath(tmp_vector.front()).c_str(), X_OK) == -1)
             THROW("Invalid CGI pass");
         this->_cgi_pass.push_back(tmp_vector.front());
         tmp_vector.erase(tmp_vector.begin());
     }
+    std::string _python_path;
+	std::string _php_path;
+	std::ifstream   python_path("python3_path.txt");
+	if (!python_path.is_open())
+		LOG_ERROR("The file that has Python3 path can't be opened", 1);
+	std::getline(python_path, _python_path);
+	python_path.close();
+
+	std::ifstream   php_path("php_path.txt");
+	if (!php_path.is_open())
+		LOG_ERROR("The file that has php path can't be opened", 1);
+	std::getline(php_path, _php_path);
+	php_path.close();
+	_cgi_pass.push_back(_python_path);
+	_cgi_pass.push_back(_php_path);
     LOG_DEBUG("Valid CGI path");
 }
 
@@ -67,7 +82,9 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
 
 void    ConfigLocation::setReturn(const std::string& line) {
     ConfigParser::validReturn(line);
-    this->_return_value = splitString<std::vector<std::string> >(line, ' ');
+    int status_code = std::atoi(line.substr(0, line.find(" ")).c_str());
+    //add the status code and the path to map
+    this->_return_value[status_code] = line.substr(line.find(" ") + 1);
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
@@ -112,10 +129,11 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
         }
     }
 
-    std::vector<std::string> return_value = location.getReturn();
+    std::map<int, std::string> return_value = location.getReturn();
     if (!return_value.empty()) {
         os << "\tReturn: ";
-        printContainer(return_value);
+        for (std::map<int, std::string>::const_iterator it = return_value.begin(); it != return_value.end(); ++it)
+            os << it->first << " " << it->second << std::endl;
     }
     std::cout << std::endl;
     return os;

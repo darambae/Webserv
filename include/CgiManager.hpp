@@ -14,8 +14,6 @@ class	CgiManager {
 		pid_t		_children_pid;
 		bool		_children_done;
 		int			_children_status;
-		std::string	_python_path;
-		std::string _php_path;
 		std::string	_tempBuffer;
 		std::string	_cgiBody;
 		int			_cgiContentLength;
@@ -23,14 +21,14 @@ class	CgiManager {
 		bool		_headerDoneReading;
 		std::string _cgiContentType;
 		std::string	_requestBody;
-		std::map<std::string, std::string>	_cgiHeaders;
+		std::map<std::string, std::vector<std::string> >	_cgiHeaders;
 
 	public:
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
 		int		getSocketsParent() {return _sockets[0];}
 		int		getSocketsChildren() {return _sockets[1];}
 		int		getCgiResponseStatus() { return _cgiResponseStatus; }
-		std::map<std::string, std::string>	getCgiHeaders() const { return _cgiHeaders; }
+		std::map<std::string, std::vector<std::string> >	getCgiHeaders() const { return _cgiHeaders; }
 		std::string	getCgiBody() const { return _cgiBody; }
 		int		forkProcess();
 		int		sendToCgi();

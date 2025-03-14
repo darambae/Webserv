@@ -46,6 +46,12 @@
                 <input type="text" name="game_id" id="game_id" required>
                 <button type="submit">Send</button>
             </form>
+			<br>
+            <h4>Get my historic</h4>
+            <form action="/cgi-bin/get_client_historic.py" method="get" onsubmit="return checkCookies(event)">
+                <button type="submit">Go</button>
+            </form>
+            <script src="/static/cookies.js"></script>
         </section>
         <section id="add-result">
             <br>
@@ -55,16 +61,16 @@
         </section>
     </main>
     <footer>
-        <p>&copy; 2023 Webserv Project. All rights reserved.</p>
+        <p>&copy; 2025 Webserv Project. All rights reserved.</p>
     </footer>
     <!--cookie pop-up window -->
-    
+
     <div class="cookie-popup" id="cookiePopup">
         <p>Do you want a cookie ? Take a cookie. Cookies are good. Accept my cookie</p>
         <button class="accept-btn" onclick="acceptCookies()">Accept</button>
         <button class="decline-btn" onclick="declineCookies()">Decline</button>
     </div>
-    
+
     <script src="/static/cookies.js"></script>
 </body>
 </html>
