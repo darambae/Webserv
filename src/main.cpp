@@ -44,7 +44,7 @@ int main(int ac, char **av)
         LOG_ERROR("Usage: ./config_parser [config_file]", 0);
         return 1;
     }
-    std::string file = ac == 2 ? std::string("config/") + av[1] : "config/default.conf";
+    std::string file = ac == 2 ? av[1] : "config/default.conf";
     try {
         ConfigParser parser(file);
         parser.parseFile();

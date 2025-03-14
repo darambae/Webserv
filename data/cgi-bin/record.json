@@ -975,6 +975,10 @@
                 {
                     "game_id": "15",
                     "total_score": 48
+                },
+                {
+                    "game_id": "17",
+                    "total_score": 83
                 }
             ]
         },
@@ -1069,6 +1073,10 @@
                 {
                     "game_id": "12",
                     "total_score": 81
+                },
+                {
+                    "game_id": "17",
+                    "total_score": 106
                 }
             ]
         },
@@ -1147,6 +1155,10 @@
                 {
                     "game_id": "14",
                     "total_score": 46
+                },
+                {
+                    "game_id": "17",
+                    "total_score": 75
                 }
             ]
         },
@@ -1157,6 +1169,10 @@
                 {
                     "game_id": "14",
                     "total_score": 118
+                },
+                {
+                    "game_id": "17",
+                    "total_score": 120
                 }
             ]
         },

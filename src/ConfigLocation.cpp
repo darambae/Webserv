@@ -82,7 +82,9 @@ void    ConfigLocation::setErrorPages(const std::string& line) {
 
 void    ConfigLocation::setReturn(const std::string& line) {
     ConfigParser::validReturn(line);
-    this->_return_value = splitString<std::vector<std::string> >(line, ' ');
+    int status_code = std::atoi(line.substr(0, line.find(" ")).c_str());
+    //add the status code and the path to map
+    this->_return_value[status_code] = line.substr(line.find(" ") + 1);
 }
 
 std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
@@ -127,10 +129,11 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
         }
     }
 
-    std::vector<std::string> return_value = location.getReturn();
+    std::map<int, std::string> return_value = location.getReturn();
     if (!return_value.empty()) {
         os << "\tReturn: ";
-        printContainer(return_value);
+        for (std::map<int, std::string>::const_iterator it = return_value.begin(); it != return_value.end(); ++it)
+            os << it->first << " " << it->second << std::endl;
     }
     std::cout << std::endl;
     return os;
