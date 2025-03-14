@@ -17,7 +17,6 @@ setup:
 	@chmod +x data/cgi-bin/*.py
 	@chmod 777 data/cgi-bin/record.json
 	@chmod +x data/cgi-bin/*.php
-	@apt install siege
 	
 $(OBJ_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
