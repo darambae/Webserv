@@ -29,7 +29,8 @@ ConfigLocation const*	Response::findRequestLocation(ConfigServer const& config, 
 	std::vector<ConfigLocation>::const_iterator	it = config.getLocations().begin();
 
 	for (; it != config.getLocations().end(); ++it) {
-		if (requestPath.find(it->getPath()) != std::string::npos) {
+		const std::string& locationPath = it->getPath();
+		if (requestPath == locationPath || (requestPath.find(locationPath) == 0 && (requestPath[locationPath.size()] == '/' || locationPath == "/"))) {
 			if (!bestMatch || it->getPath().size() > bestMatch->getPath().size()) {
 				bestMatch = &(*it);
 			}
@@ -371,10 +372,12 @@ void	Response::handleDelete() {
 
 void	Response::handleResponse() {
 
+	LOG_INFO("handling response...");
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
+	LOG_INFO("location bloc : " + _location->getPath());
 
 	if (_location) {
 		//if specific methods are specified in the location block, check if the request's
@@ -387,6 +390,16 @@ void	Response::handleResponse() {
 				handleError();
 				return ;
 			}
+		}
+		else if (!_location->getReturn().empty()) {
+			std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
+			setResponseStatus(it->first);
+			_redirectionResponseHeader = it->second;
+			_responseReadyToSend = true;
+			_responseBuilder = new ResponseBuilder(*this);
+			_builtResponse = _responseBuilder->buildResponse("");
+			LOG_INFO("Response :\n" + *_builtResponse);
+			return ;
 		}
 	} else {
 		LOG_INFO("No location found for request path: " + requestPath);
