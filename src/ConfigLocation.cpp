@@ -132,7 +132,8 @@ std::ostream& operator<<(std::ostream& os, const ConfigLocation& location) {
     std::map<int, std::string> return_value = location.getReturn();
     if (!return_value.empty()) {
         os << "\tReturn: ";
-        printContainer(return_value);
+        for (std::map<int, std::string>::const_iterator it = return_value.begin(); it != return_value.end(); ++it)
+            os << it->first << " " << it->second << std::endl;
     }
     std::cout << std::endl;
     return os;
