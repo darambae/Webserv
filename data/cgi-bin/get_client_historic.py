@@ -59,7 +59,7 @@ def handle_request():
     response_body.append("<link rel='stylesheet' href='style.css'/>")
     session_id = os.environ.get("HTTP_COOKIE")
     if session_id:
-        cookies_path = os.path.realpath("data/cgi-bin/cookies.json")
+        cookies_path = os.path.realpath("data/cgi-bin/games_per_sess_id.json")
         with open(cookies_path, "r") as file:
             cookies = json.load(file)
         game_ids = cookies.get(session_id)
