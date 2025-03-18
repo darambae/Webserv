@@ -36,3 +36,4 @@ bool    onlyDigits(const std::string& str); //Check if a string contains only di
 bool    validBracket(const std::string& line, char a, char b); //Check if a string contains a valid bracket(a), not b
 uint64_t    get_time(void); //Get the current time in milliseconds
 std::string isFoundIn(std::string subject, std::vector<std::string> vector); //Check if a string is found in a vector of strings
+std::string generateHTMLstr(const std::string& title, const std::string& message, const std::string& opt); //Generate an HTML page

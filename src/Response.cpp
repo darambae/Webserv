@@ -89,22 +89,7 @@ int	Response::generateDefaultErrorHtml() {
 		return -1;
 	}
 
-	file << "<!DOCTYPE html>\n"
-			<< "<html>\n"
-			<< "<head>\n"
-			<< "    <meta charset=\"UTF-8\">\n"
-			<< "    <title>Erreur " << _codeStatus << "</title>\n"
-			<< "    <style>\n"
-			<< "        body { font-family: Arial, sans-serif; text-align: center; padding: 50px; }\n"
-			<< "        h1 { color: red; }\n"
-			<< "    </style>\n"
-			<< "</head>\n"
-			<< "<body>\n"
-			<< "    <h1>Erreur " << _codeStatus << " - " << _reasonPhrase << "</h1>\n"
-			<< "    <p>Requested page has encountered a problem</p>\n"
-			<< "</body>\n"
-			<< "</html>\n";
-
+	file << generateHTMLstr("Error " + to_string(_codeStatus) + " - " + _reasonPhrase, "Requested page has encountered a problem", "");
 	file.close();
 
 	return 0;
@@ -200,7 +185,7 @@ void	Response::handleGet() {
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 	// request path is a directory
 		if (findIndex() == 1) {
-			setResponseStatus(200);
+			//setResponseStatus(200);
 			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
@@ -210,7 +195,7 @@ void	Response::handleGet() {
 			if (_location->getAutoindex()) {
 				LOG_INFO("Autoindex enabled, generating directory listing...");
 				std::string autoIndexPage = generateAutoIndex(path);
-				setResponseStatus(200);
+				//setResponseStatus(200);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);
 				_builtResponse = _responseBuilder->buildResponse(autoIndexPage);
@@ -260,9 +245,6 @@ void	Response::handlePost() {
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
 
-	LOG_DEBUG("Request path: " + requestPath);
-	LOG_DEBUG("Root path: " + rootPath);
-	LOG_DEBUG("Full path: " + path);
 	//If the requested directory doesn't exist, return 404
 	if (stat(path.c_str(), &pathStat)== -1 || S_ISDIR(pathStat.st_mode) == 0) {
 		LOG_INFO("Requested directory doesn't exist");
@@ -280,23 +262,12 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.setFileContent();
 	if (fileData.fileName.empty() && fileData.fileContent.empty()) {
 		LOG_INFO("Post request with no file content");
-		setResponseStatus(200);
+		//setResponseStatus(200);
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
-		std::ostringstream responseBody;
-		responseBody << "<!DOCTYPE html>\n";
-		responseBody << "<html lang=\"en\">\n";
-		responseBody << "<head>\n";
-		responseBody << "<meta charset=\"UTF-8\">\n";
-		responseBody << "<title>Post request received</title>\n";
-		responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
-		responseBody << "</head>\n";
-		responseBody << "<body>\n";
-		responseBody << "<h1>Post request received</h1>\n";
-		responseBody << "<p>Body content : " << _request.getBody() << "</p>\n";
-		responseBody << "</body>\n";
-		responseBody << "</html>\n";
-		_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+		_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("Post request received",
+																		 "Body content : " + _request.getBody(),
+																		 "<p>File Name: <strong>" + _request.getPath().substr(_request.getPath().find_last_of("/") + 1) + "</strong></p>"));
 		return ;
 	}
 	//Post request with img file content
@@ -330,30 +301,13 @@ void	Response::handleUpload(struct uploadData fileData) {
 	LOG_INFO("File uploaded successfully");
 	_responseReadyToSend = true;
 	_responseBuilder = new ResponseBuilder(*this);
-	std::ostringstream responseBody;
-	responseBody << "<!DOCTYPE html>\n";
-	responseBody << "<html lang=\"en\">\n";
-	responseBody << "<head>\n";
-	responseBody << "<meta charset=\"UTF-8\">\n";
-	responseBody << "<title>File Upload Success</title>\n";
-	responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
-	responseBody << "</head>\n";
-	responseBody << "<body>\n";
-	responseBody << "<h1>File Upload Successful</h1>\n";
-	responseBody << "<p>Your file has been uploaded successfully.</p>\n";
-	responseBody << "<p>File Name: <strong>" << fileData.fileName << "</strong></p>\n";
-	responseBody << "<img src=\"" << _request.getPath() << "/" << fileData.fileName << "\" alt=\"" << fileData.fileName << "\">\n";
-	responseBody << "<form action=\"" << _request.getPath() << "/" << fileData.fileName << "\" method=\"delete\">\n";
-	responseBody << "<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n";
-	responseBody << "<input type=\"hidden\" name=\"fileName\" value=\"" << fileData.fileName << "\">\n";
-	responseBody << "<div class=\"button-container\">\n";
-	responseBody << "<button type=\"submit\" class=\"delete-button\">x</button>\n";
-	responseBody << "<a href=\"/\" class=\"button\">Go to Index Page</a>\n";
-	responseBody << "</form>\n";
-	responseBody << "</body>\n";
-	responseBody << "</html>\n";
-
-	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+	_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("File Upload Success",
+																	"Your file has been uploaded successfully.",
+																	"<img src=\"" + _request.getPath() + "/" + fileData.fileName 
+																	+ "\" alt=\"" + fileData.fileName + "\">\n<form action=\"" 
+																	+ _request.getPath() + "/" + fileData.fileName 
+																	+ "\" method=\"delete\">\n<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n<input type=\"hidden\" name=\"fileName\" value=\"" 
+																	+ fileData.fileName + "\">\n<div class=\"button-container\">\n<button type=\"submit\" class=\"delete-button\">x</button>\n"));
 }
 
 void	Response::handleDelete() {
@@ -367,26 +321,11 @@ void	Response::handleDelete() {
 		handleError();
 		return ;
 	}
-	setResponseStatus(200);
+	//setResponseStatus(200);
 	LOG_INFO("File deleted successfully");
 	_responseReadyToSend = true;
 	_responseBuilder = new ResponseBuilder(*this);
-	std::ostringstream responseBody;
-	responseBody << "<!DOCTYPE html>\n";
-	responseBody << "<html lang=\"en\">\n";
-	responseBody << "<head>\n";
-	responseBody << "<meta charset=\"UTF-8\">\n";
-	responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
-	responseBody << "<title>File Delete Success</title>\n";
-	responseBody << "</head>\n";
-	responseBody << "<body>\n";
-	responseBody << "<h1>File Delete Successful</h1>\n";
-	responseBody << "<p>Your file has been deleted successfully.</p>\n";
-	responseBody << "<p>File Name: <strong>" << _request.getPath().substr(_request.getPath().find_last_of("/") + 1) << "</strong></p>\n";
-	responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
-	responseBody << "</body>\n";
-	responseBody << "</html>\n";
-	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
+	_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("File Delete Success", "Your file has been deleted successfully.", ""));
 }
 
 bool	isRedirection(ConfigLocation const* location) {
