@@ -27,6 +27,15 @@ def handle_request():
         return
 
     file_path = os.path.realpath("data/cgi-bin/record.json")
+    #file_path = os.path.realpath("data/cgi-bin/wrong_file.json")    
+    if not os.path.exists(file_path):
+        response_body.append(f"<h1>Server Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 500")
+        print(response)
+        return
+    
     with open(file_path, "r") as file:
         data = json.load(file)
 

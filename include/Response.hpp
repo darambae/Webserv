@@ -65,6 +65,7 @@ class Response {
 	int			sendResponse();
 	void		handleGet();
 	void		handlePost();
+	void		handleUpload(struct uploadData fileData);
 	void		handleDelete();
 	void		handleError();
 	void		buildCgiResponse(CgiManager* cgiManager);

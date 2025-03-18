@@ -260,8 +260,25 @@ void	Response::handleGet() {
 
 void	Response::handlePost() {
 	LOG_INFO("Handling POST request");
+	struct stat	pathStat;
+	std::string	requestPath = _request.getPath();
+	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
+	std::string path = rootPath + requestPath;
+	//If the requested directory doesn't exist, return 404
+	if (!stat(path.c_str(), &pathStat) || S_ISDIR(pathStat.st_mode) == 0) {
+		//LOG_INFO("Requested directory doesn't exist");
+		setResponseStatus(404);
+		handleError();
+		return ; 
+	}
+	//Check if the request method is allowed
+	if (_location->getAllowMethods().find("POST") == _location->getAllowMethods().end()) {
+		LOG_INFO("Method not allowed");
+		setResponseStatus(405);
+		handleError();
+		return ;
+	}
 	struct uploadData fileData = _request.setFileContent();
-	//Post request with no file content
 	if (fileData.fileName.empty() && fileData.fileContent.empty()) {
 		LOG_INFO("Post request with no file content");
 		setResponseStatus(200);
@@ -284,6 +301,10 @@ void	Response::handlePost() {
 		return ;
 	}
 	//Post request with img file content
+	handleUpload(fileData);
+}
+
+void	Response::handleUpload(struct uploadData fileData) {
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
 		setResponseStatus(400);
 		handleError();
