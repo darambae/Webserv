@@ -15,18 +15,30 @@
             <h2>Add profile picture</h2>
             <p>Choose an image file to upload (Only jpg, jpeg, png accepted)</p>
             <form action="/upload" method="post" enctype="multipart/form-data">
-                <label for="avatar">Profile Picture:</label>
                 <input type="file" name="avatar" id="avatar" required>
                 <button type="submit">Upload</button>
             </form>
         </section>
+        <section id="add-result">
+            <h2>Add new game</h2>
+            <br>
+            <form action="scoreTableChateauCombo.html" method="get">
+				<button type="submit">Add</button>
+            </form>
+            <br>
+            <h4>Review the games you added</h4>
+            <form action="/cgi-bin/get_client_historic.py" method="get" onsubmit="return checkCookies(event)">
+                <button type="submit">Go</button>
+            </form>
+        </section>
         <section id="history">
             <h2>Play History</h2>
-            <h4>Load players</h4>
+            <h4>Load games</h4>
             <form action="/cgi-bin/load_game.py" method="get">
                 <input type="hidden" name="dummy" value="1">
                 <button type="submit">Load</button>
             </form>
+            <br>
             <h4>Choose a player id</h4>
             <form action="/cgi-bin/get_player_data.py" method="get">
                 <input type="text" name="player_id" id="player_id" required>
@@ -39,18 +51,9 @@
                 <button type="submit">Send</button>
             </form>
 			<br>
-            <h4>Get my historic</h4>
-            <form action="/cgi-bin/get_client_historic.py" method="get" onsubmit="return checkCookies(event)">
-                <button type="submit">Go</button>
-            </form>
             <script src="/static/cookies.js"></script>
         </section>
-        <section id="add-result">
-            <br>
-            <form action="scoreTableChateauCombo.html" method="get">
-				<button type="submit">Add a game result</button>
-            </form>
-        </section>
+        
     </main>
     <footer>
         <p>&copy; 2025 Webserv Project. All rights reserved.</p>
