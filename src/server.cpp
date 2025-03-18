@@ -140,10 +140,10 @@ void	Server::decreaseClientCount() {_client_count--;}
 functions will send -1 instead to wait if there is no connection or if there is
 nothing to read or if there is no place to write*/
 int	Server::unblockFD(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1)
-        return -1;
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    // int flags = fcntl(fd, F_GETFL, 0);
+    // if (flags == -1)
+    //     return -1;
+    return fcntl(fd, F_SETFL, FD_CLOEXEC | O_NONBLOCK);
 }
 
 Server::~Server() {
