@@ -18,7 +18,7 @@ class Response {
 	ConfigLocation const*	_location;
 	CgiManager*				_cgiManager;
 	Request&				_request;
-	std::string				_codeStatus;
+	int						_codeStatus;
 	std::string				_reasonPhrase;
 	std::string				_requestedFilePath;
 	std::ifstream			_requestedFile;
@@ -30,7 +30,7 @@ class Response {
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _codeStatus(200),_responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
 	/* setters / getters */
@@ -47,7 +47,7 @@ class Response {
 
 	Request 				&getRequest() const { return _request; }
 	ConfigLocation const*	getLocation() const { return _location; }
-	std::string				getCodeStatus() const { return _codeStatus; }
+	int						getCodeStatus() const { return _codeStatus; }
 	std::string const&		getReasonPhrase() const { return _reasonPhrase; }
 	std::string				getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&			getRequestedFile() { return _requestedFile; }

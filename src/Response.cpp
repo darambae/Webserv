@@ -1,7 +1,7 @@
 #include "../include/Response.hpp"
 
 void	Response::setResponseStatus(int code) {
-	_codeStatus = to_string(code);
+	_codeStatus = code;
 
 	switch (code) {
 		case 200: _reasonPhrase = "OK"; break;
@@ -118,7 +118,7 @@ int	Response::generateDefaultErrorHtml() {
 //	=> same reprocess as above.
 //ELSE
 //	-> serve default one.
-void	Response::handleError() {
+void	Response::    handleError() {
 
 	std::string	path;
 	std::vector<ErrorPage>	errorPages = (_location && !_location->getErrorPages().empty()) ? _location->getErrorPages() : _config.getErrorPages();
@@ -127,7 +127,7 @@ void	Response::handleError() {
 	if (!errorPages.empty()) {
 		std::vector<ErrorPage>::const_iterator	it = errorPages.begin();
 		for (; it != errorPages.end(); ++it) {
-			std::set<int>::const_iterator errorCodesIt = it->error_codes.find(atoi(_codeStatus.c_str()));
+			std::set<int>::const_iterator errorCodesIt = it->error_codes.find(_codeStatus);
 			if (errorCodesIt !=  it->error_codes.end()) {
 				_request.setPath(it->error_path);
 				errorPageFound = true;
@@ -196,8 +196,8 @@ void	Response::handleGet() {
 	std::string	requestPath = _request.getPath();
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
-	LOG_INFO("rootPath: " + rootPath);
-	LOG_INFO("request path before concatenation: " + requestPath);
+	//LOG_INFO("rootPath: " + rootPath);
+	//LOG_INFO("request path before concatenation: " + requestPath);
 	//LOG_INFO("path: " + path);
 
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
@@ -244,7 +244,7 @@ void	Response::handleGet() {
 			} else {
 				//LOG_INFO("path for the requested file : " + path);
 				_requestedFile.open(path.c_str(), std::ios::binary);
-				setResponseStatus(200);
+				//setResponseStatus(200);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);
 				_builtResponse = _responseBuilder->buildResponse("");
@@ -415,7 +415,7 @@ void	Response::handleResponse() {
 		if (requestPath.find(".") != std::string::npos && !isFoundIn(requestPath.substr(requestPath.find_last_of(".")), _location->getCgiExtension()).empty()) {
 			LOG_INFO("Handling POST request with CGI");
 			if (handleCgi() == -1) {
-				setResponseStatus(666);
+				setResponseStatus(500);
 				handleError();
 				return ;
 			}
@@ -459,14 +459,14 @@ void	Response::buildCgiResponse(CgiManager* cgiManager) {
 
 	LOG_INFO("Building CGI response...");
 	setResponseStatus(cgiManager->getCgiResponseStatus());
-	if (std::atoi(_codeStatus.c_str()) >= 400) {
+	if (_codeStatus >= 400) {
 		handleError();
 		return ;
 	}
 	_responseBuilder = new ResponseBuilder(*this);
 	_responseReadyToSend = true;
 	_builtResponse = _responseBuilder->buildResponse(cgiManager->getCgiBody());
-	LOG_INFO("Built Response: " + *_builtResponse);
+	LOG_DEBUG("Built Response: " + *_builtResponse);
 }
 
 int	Response::sendResponse() {
