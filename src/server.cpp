@@ -22,10 +22,24 @@ toutes les opérations entrées/sorties entre le client et le serveur (listen in
 Server::Server(ConfigServer & config, const std::vector<std::pair<std::string, int> > &	listen) : _config(&config), _listen(listen) {
 	_client_count = 0;
 	for (size_t i = 0; i < _listen.size(); ++i) {
-		memset(&_address, 0, sizeof(_address));
-		_len_address = sizeof(_address);
-		initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
+		int	fd = socketUsed(_listen[i].first, _listen[i].second);
+		if (fd != -1 ) {
+			FD_DATA[fd]->SetOfConfig.push_back(_config);
+		} else {
+			memset(&_address, 0, sizeof(_address));
+			_len_address = sizeof(_address);
+			initServerSocket(_listen[i]);//create one FD by port, bind it and make it listening
+		}
 	}
+}
+
+int	Server::socketUsed(std::string IP, int port) {
+	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
+		int fd = ALL_FDS[i].fd;
+		if (FD_DATA[fd]->status == SERVER && FD_DATA[fd]->ip == IP && FD_DATA[fd]->port == port)
+			return fd;
+	}
+	return -1;
 }
 
 /*one socket == one IP specific and one port.
@@ -101,6 +115,7 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 		FD_DATA[fd]->CGI = cgi;
 	else
 		FD_DATA[fd]->CGI = NULL;
+	FD_DATA[fd]->SetOfConfig.push_back(server->_config);
 }
 
 void	Server::addFdToFds(int fd_to_add) {
@@ -140,10 +155,10 @@ void	Server::decreaseClientCount() {_client_count--;}
 functions will send -1 instead to wait if there is no connection or if there is
 nothing to read or if there is no place to write*/
 int	Server::unblockFD(int fd) {
-    int flags = fcntl(fd, F_GETFL, 0);
-    if (flags == -1)
-        return -1;
-    return fcntl(fd, F_SETFL, flags | O_NONBLOCK);
+    // int flags = fcntl(fd, F_GETFL, 0);
+    // if (flags == -1)
+    //     return -1;
+    return fcntl(fd, F_SETFL, FD_CLOEXEC | O_NONBLOCK);
 }
 
 Server::~Server() {
