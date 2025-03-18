@@ -18,7 +18,7 @@ void	Response::setResponseStatus(int code) {
 		case 500: _reasonPhrase = "Internal Server Error"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
-
+		case 508: _reasonPhrase = "Loop Detected"; break;
 	}
 
 }
@@ -370,6 +370,46 @@ void	Response::handleDelete() {
 	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
 }
 
+bool	isRedirection(ConfigLocation const* location) {
+	if (!location->getReturn().empty())
+		return true;
+	return false;
+}
+
+bool	Response::isRedirectionInfiniteLoop() {
+	std::map<int, std::string>::const_iterator	it;
+	std::string				currentPath;
+	std::set<std::string>	visitedPaths;
+	ConfigLocation const*	location = _location;
+	
+	while (isRedirection(location)) {
+		it = location->getReturn().begin();
+		currentPath = it->second;
+		if (visitedPaths.find(currentPath) != visitedPaths.end()) {
+			return true;
+		}
+		visitedPaths.insert(currentPath);
+		location = findRequestLocation(_config, currentPath);
+	}
+	return false;
+}
+
+void	Response::handleRedirection() {
+
+	if (isRedirectionInfiniteLoop()) {
+			setResponseStatus(508);
+			handleError();
+			return ;
+		}
+		std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
+		setResponseStatus(it->first);
+		_redirectionResponseHeader = it->second;
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		_builtResponse = _responseBuilder->buildResponse("");
+		return ;
+}
+
 void	Response::handleResponse() {
 
 	LOG_INFO("handling response...");
@@ -391,14 +431,8 @@ void	Response::handleResponse() {
 				return ;
 			}
 		}
-		else if (!_location->getReturn().empty()) {
-			std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
-			setResponseStatus(it->first);
-			_redirectionResponseHeader = it->second;
-			_responseReadyToSend = true;
-			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse("");
-			LOG_INFO("Response :\n" + *_builtResponse);
+		else if (isRedirection(_location)) {
+			handleRedirection();
 			return ;
 		}
 	} else {
