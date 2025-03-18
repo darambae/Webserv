@@ -260,8 +260,11 @@ void	Response::handlePost() {
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
 
+	LOG_DEBUG("Request path: " + requestPath);
+	LOG_DEBUG("Root path: " + rootPath);
+	LOG_DEBUG("Full path: " + path);
 	//If the requested directory doesn't exist, return 404
-	if (!stat(path.c_str(), &pathStat) || S_ISDIR(pathStat.st_mode) == 0) {
+	if (stat(path.c_str(), &pathStat)== -1 || S_ISDIR(pathStat.st_mode) == 0) {
 		LOG_INFO("Requested directory doesn't exist");
 		setResponseStatus(404);
 		handleError();
