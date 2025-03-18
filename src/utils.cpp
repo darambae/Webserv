@@ -57,3 +57,21 @@ std::string isFoundIn(std::string subject, std::vector<std::string> vector) {
 	}
 	return "";
 }
+
+std::string generateHTMLstr(const std::string& title, const std::string& message, const std::string& opt) {
+    std::ostringstream responseBody;
+	responseBody << "<!DOCTYPE html>\n";
+	responseBody << "<html lang=\"en\">\n";
+	responseBody << "<head>\n";
+	responseBody << "<meta charset=\"UTF-8\">\n";
+	responseBody << "<link rel=\"stylesheet\" type=\"text/css\" href=\"/css/style.css\">\n";
+	responseBody << "<title>" << title << "</title>\n";
+	responseBody << "</head>\n";
+	responseBody << "<body>\n";
+	responseBody << "<h1>"<< message <<"</h1>\n";
+	responseBody << opt;
+	responseBody << "<p><a href=\"/\" class=\"button\">Go to Index Page</a></p>\n";
+	responseBody << "</body>\n";
+	responseBody << "</html>\n";
+    return responseBody.str();
+}
