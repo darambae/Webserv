@@ -55,13 +55,6 @@ int main(int ac, char **av)
 
     } catch (std::exception & e) {
         LOG_ERROR(e.what(), 0);
-    // } catch (const std::exception& e) {
-    //     Logger::log(ERROR, "main", e.what(), 0);
-    //     Logger::getInstance(FILE_OUTPUT).log(INFO, "Configuration file parsed successfully");
-    //     //printContainer(servers);
-    // } catch (const Exception& e) {
-    //     LOG(e.what());
-    //     return 1;
     }
     return 0;
 }

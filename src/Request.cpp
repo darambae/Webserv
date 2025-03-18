@@ -5,7 +5,6 @@
 // - 1st line containing (in this order) : method (GET/POST/DELETE) ; path (to a file or a directory) ; protocol_version (HTTP/1.1)
 // - Header containing extra data
 // - Body (the content if needed)
-
 Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false), _clientFd(fd), _contentLength(0) {
 	_time_stamp = get_time();
 }
@@ -13,11 +12,8 @@ Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequ
 int	Request::parseRequest() {
 
 	char	buffer[1024] = {0};
-	// std::cout<<"trying to read fd "<<_clientFd<<std::endl;
 	ssize_t	bytes = read(_clientFd, buffer, sizeof(buffer));
-	//ssize_t bytes = recv(_clientFd, buffer, sizeof(buffer) - 1, MSG_DONTWAIT);
 
-	// std::cout<<"succeed to read fd "<<_clientFd<<std::endl;
 	if (bytes < 0) {
 		LOG_ERROR("Error reading from client_fd(" + to_string(_clientFd) +")", 1);
 		return -1; //client disconnected
@@ -25,9 +21,7 @@ int	Request::parseRequest() {
 		LOG_INFO("0 bytes read, Client disconnected");
 		return -1;
 	}
-	//LOG_INFO("request received : \n"+std::string(buffer)+"\n");
 	_tempBuffer.append(buffer, bytes);
-	//std::cout<< "What's read in buffer : " << buffer<<std::endl;
 
 	//read request's first line if not read yet
 	if (_firstLine.empty() && _tempBuffer.find("\r\n") != std::string::npos) {
@@ -124,13 +118,12 @@ void	Request::parseHeader(std::string headerPart) {
 			}
 		}
 	}
-	LOG_INFO("session ID parsed: " + _sessionID);
 }
 
 uploadData Request::setFileContent() {
 	struct uploadData data;
 	std::string content;
-	//LOG_INFO("Body to parse: " + _body);
+
 	if (_body.find("filename=") == std::string::npos)
 		return data;
 	std::string filename = _body.substr(_body.find("filename=") + 10, _body.find("\"\r\n") - (_body.find("filename=") + 10));
@@ -148,7 +141,6 @@ std::string	Request::parseQueryString() {
 	if (_path.find("?") != std::string::npos) {
 		size_t	pos = _path.find("?");
 		queryString = _path.substr(pos + 1, _path.size() - pos);
-		// LOG_INFO("Query = "+queryString);
 		return queryString;
 	}
 	return "";
@@ -173,7 +165,6 @@ int	Request::handleRequest() {
 		FD_DATA[_clientFd]->response = new Response(*this, *config);
 		_Response = FD_DATA[_clientFd]->response;
 		_Response->handleResponse();
-		// LOG_INFO("Response: " + _Response->getReasonPhrase());
 	}
 	return 0;
 }

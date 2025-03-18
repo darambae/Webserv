@@ -49,8 +49,6 @@ void    ConfigServer::setErrorPages(const std::string& line) {
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
         else {
             error_page.error_path = tmp_vector.front();
-            const char* toPrint = error_page.error_path.c_str();
-            std::cout << toPrint << std::endl;
         }
         tmp_vector.erase(tmp_vector.begin());
     }

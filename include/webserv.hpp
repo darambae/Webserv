@@ -4,6 +4,12 @@
 #define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
 #define TIME_OUT 10000 //10s
+//colors for logs
+#define RESET   "\033[0m"
+#define RED     "\033[31m"
+#define GREEN   "\033[32m"
+#define YELLOW  "\033[33m"
+#define BLUE    "\033[34m"
 
 #include <iostream>
 #include <csignal>
@@ -38,6 +44,7 @@ enum fd_status
 	CGI_parent,
 	CGI_children,
 };
+
 #include "Logger.hpp"
 #include "ResponseBuilder.hpp"
 #include "ServerManager.hpp"
