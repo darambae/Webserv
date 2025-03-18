@@ -25,9 +25,7 @@ def handle_request():
         print("Status: 400")
         print(response)
         return
-    # game_id = 1
-    file_path = os.path.realpath("data/cgi-bin/record.json")
-    # file_path = os.path.realpath("record_copy.json")
+    file_path = os.path.realpath("data/cgi-bin/record_correction.json")
     with open(file_path, "r") as file:
         data = json.load(file)
     if (game_id > len(data["games"]) or game_id < 1):
