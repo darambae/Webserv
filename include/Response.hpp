@@ -55,6 +55,7 @@ class Response {
 	ResponseBuilder*		getResponseBuilder() const { return _responseBuilder; }
 	CgiManager*				getCgiManager() const { return _cgiManager; }
 	std::string				getRedirectionResponseHeader() const { return _redirectionResponseHeader; }
+	ConfigServer const&		getConfig() const { return _config; }
 	//std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */
@@ -65,9 +66,12 @@ class Response {
 	int			sendResponse();
 	void		handleGet();
 	void		handlePost();
+	void		handleUpload(struct uploadData fileData);
 	void		handleDelete();
 	void		handleError();
+	void		handleRedirection();
 	void		buildCgiResponse(CgiManager* cgiManager);
 	int			generateDefaultErrorHtml();
 	std::string	generateAutoIndex(std::string path);
+	bool		isRedirectionInfiniteLoop();
 };

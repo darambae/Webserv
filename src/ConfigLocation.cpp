@@ -1,12 +1,12 @@
 
 #include "../include/ConfigLocation.hpp"
 
-void    ConfigLocation::setPath(const std::string& path) {
+    void    ConfigLocation::setPath(const std::string& path) {
     if (path.empty() || path[0] != '/')
         THROW("Invalid path");
     LOG_DEBUG("Valid path");
     this->_path = path;
-}
+    }
 
 void    ConfigLocation::setRoot(const std::string& root) {
     ConfigParser::validRoot(root);
@@ -32,7 +32,6 @@ void    ConfigLocation::setIndex(const std::string& line) {
 }
 
 void    ConfigLocation::setCgiExtension(const std::string& line) {
-    //ConfigParser::validCgiExtension(line);
     LOG_DEBUG("Valid CGI extension");
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }

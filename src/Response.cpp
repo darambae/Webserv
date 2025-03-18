@@ -18,7 +18,7 @@ void	Response::setResponseStatus(int code) {
 		case 500: _reasonPhrase = "Internal Server Error"; break;
 		case 501: _reasonPhrase = "Not Implemented"; break;
 		case 502: _reasonPhrase = "Bad Gateway"; break;
-
+		case 508: _reasonPhrase = "Loop Detected"; break;
 	}
 
 }
@@ -196,9 +196,6 @@ void	Response::handleGet() {
 	std::string	requestPath = _request.getPath();
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
 	std::string path = rootPath + requestPath;
-	//LOG_INFO("rootPath: " + rootPath);
-	//LOG_INFO("request path before concatenation: " + requestPath);
-	//LOG_INFO("path: " + path);
 
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 	// request path is a directory
@@ -208,7 +205,6 @@ void	Response::handleGet() {
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
-			//LOG_INFO("Response built:\n" + *_builtResponse);
 		} else {
 			LOG_INFO("No index file found, checking if auto-index enable");
 			if (_location->getAutoindex()) {
@@ -227,10 +223,10 @@ void	Response::handleGet() {
 	}
 	else {
 	// request path is a file
-		//LOG_INFO("Path is not a directory, treating as a file : " + requestPath);
+
 		//If the file exists, set and serve it
 		if (!rootPath.empty() && stat(path.c_str(), &pathStat) == 0 && S_ISREG(pathStat.st_mode)) {
-			//LOG_INFO("File found");
+		
 			setRequestedFile(path.c_str());
 			//If the file is not a .json file, serve it
 			if (requestPath.find(".json") != std::string::npos) {
@@ -242,15 +238,14 @@ void	Response::handleGet() {
 					handleError();
 				}
 			} else {
-				//LOG_INFO("path for the requested file : " + path);
+
 				_requestedFile.open(path.c_str(), std::ios::binary);
-				//setResponseStatus(200);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);
 				_builtResponse = _responseBuilder->buildResponse("");
 			}
 		} else {
-			//LOG_INFO("File not found");
+			LOG_INFO("File not found");
 			setResponseStatus(404);
 			handleError();
 		}
@@ -260,8 +255,26 @@ void	Response::handleGet() {
 
 void	Response::handlePost() {
 	LOG_INFO("Handling POST request");
+	struct stat	pathStat;
+	std::string	requestPath = _request.getPath();
+	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
+	std::string path = rootPath + requestPath;
+
+	//If the requested directory doesn't exist, return 404
+	if (!stat(path.c_str(), &pathStat) || S_ISDIR(pathStat.st_mode) == 0) {
+		LOG_INFO("Requested directory doesn't exist");
+		setResponseStatus(404);
+		handleError();
+		return ; 
+	}
+	//Check if the request method is allowed
+	if (_location->getAllowMethods().find("POST") == _location->getAllowMethods().end()) {
+		LOG_INFO("Method not allowed");
+		setResponseStatus(405);
+		handleError();
+		return ;
+	}
 	struct uploadData fileData = _request.setFileContent();
-	//Post request with no file content
 	if (fileData.fileName.empty() && fileData.fileContent.empty()) {
 		LOG_INFO("Post request with no file content");
 		setResponseStatus(200);
@@ -284,6 +297,10 @@ void	Response::handlePost() {
 		return ;
 	}
 	//Post request with img file content
+	handleUpload(fileData);
+}
+
+void	Response::handleUpload(struct uploadData fileData) {
 	if (fileData.fileName.find(".jpg") == std::string::npos && fileData.fileName.find(".jpeg") == std::string::npos && fileData.fileName.find(".png") == std::string::npos) {
 		setResponseStatus(400);
 		handleError();
@@ -332,16 +349,15 @@ void	Response::handlePost() {
 	responseBody << "</form>\n";
 	responseBody << "</body>\n";
 	responseBody << "</html>\n";
-	//LOG_INFO("Response body stream : " + responseBody.str());
+
 	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
-	//LOG_INFO("Response built:\n" + _responseBuilder->getBuiltResponse());
 }
 
 void	Response::handleDelete() {
 	LOG_INFO("Handling DELETE request");
 	std::string path = fullPath(_location->getRoot());
 	path += _request.getPath();
-	//LOG_INFO("Path to delete: " + path);
+
 	if (remove(path.c_str()) != 0) {
 		LOG_INFO("Failed to delete the requested file");
 		setResponseStatus(400);
@@ -370,6 +386,46 @@ void	Response::handleDelete() {
 	_builtResponse = _responseBuilder->buildResponse(responseBody.str());
 }
 
+bool	isRedirection(ConfigLocation const* location) {
+	if (!location->getReturn().empty())
+		return true;
+	return false;
+}
+
+bool	Response::isRedirectionInfiniteLoop() {
+	std::map<int, std::string>::const_iterator	it;
+	std::string				currentPath;
+	std::set<std::string>	visitedPaths;
+	ConfigLocation const*	location = _location;
+	
+	while (isRedirection(location)) {
+		it = location->getReturn().begin();
+		currentPath = it->second;
+		if (visitedPaths.find(currentPath) != visitedPaths.end()) {
+			return true;
+		}
+		visitedPaths.insert(currentPath);
+		location = findRequestLocation(_config, currentPath);
+	}
+	return false;
+}
+
+void	Response::handleRedirection() {
+
+	if (isRedirectionInfiniteLoop()) {
+			setResponseStatus(508);
+			handleError();
+			return ;
+		}
+		std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
+		setResponseStatus(it->first);
+		_redirectionResponseHeader = it->second;
+		_responseReadyToSend = true;
+		_responseBuilder = new ResponseBuilder(*this);
+		_builtResponse = _responseBuilder->buildResponse("");
+		return ;
+}
+
 void	Response::handleResponse() {
 
 	LOG_INFO("handling response...");
@@ -391,14 +447,8 @@ void	Response::handleResponse() {
 				return ;
 			}
 		}
-		else if (!_location->getReturn().empty()) {
-			std::map<int, std::string>::const_iterator it = _location->getReturn().begin();
-			setResponseStatus(it->first);
-			_redirectionResponseHeader = it->second;
-			_responseReadyToSend = true;
-			_responseBuilder = new ResponseBuilder(*this);
-			_builtResponse = _responseBuilder->buildResponse("");
-			LOG_INFO("Response :\n" + *_builtResponse);
+		else if (isRedirection(_location)) {
+			handleRedirection();
 			return ;
 		}
 	} else {
@@ -442,15 +492,12 @@ int	Response::handleCgi() {
 	}
 	else {
 		cgi->content_length = _request.getValueFromHeader("Content-Length");
-		//LOG_INFO("Content-Length: " + cgi->content_length);
 		cgi->content_type = _request.getValueFromHeader("Content-Type");
 		cgi->query_string = !_request.getBody().empty() ? _request.getBody() : "";
 	}
 	cgi->remote_addr = FD_DATA[_request.getClientFD()]->ip;
 	cgi->http_cookie = _request.getSessionID();
-	LOG_DEBUG("session id stack for cgi env is : "+cgi->http_cookie);
 	cgi->script_name = _request.getPath().substr(_request.getPath().find_last_of("/") + 1);
-	//LOG_DEBUG("CGI script name: " + cgi->script_name);
 	FD_DATA[_request.getClientFD()]->CGI = new CgiManager(cgi, &_request, this);
 	return FD_DATA[_request.getClientFD()]->CGI->forkProcess();
 }
@@ -473,15 +520,12 @@ int	Response::sendResponse() {
 
 	size_t	responseSize = _builtResponse->size();
 	const size_t	BUFFER_SIZE = 4096;
-	//LOG_INFO("sending response");
+
 	if (_totalBytesSent < responseSize) {
 		size_t bytesToSend = std::min(responseSize - _totalBytesSent, BUFFER_SIZE);
 		ssize_t bytesSent = send(_request.getClientFD(), _builtResponse->c_str() + _totalBytesSent, bytesToSend, 0);
 
 		if (bytesSent <= 0) {
-			// if (errno == EAGAIN || errno == EWOULDBLOCK) {
-			// 	return -1;
-			// }
 			LOG_INFO("Client disconnected");
 			_responseReadyToSend = false;
 			return -1;
