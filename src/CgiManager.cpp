@@ -104,7 +104,7 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 			}
 			else if (returnValue <= 0){
 			//	_requestBody = "";
-				LOG_INFO("an error occurs since Parent send the body to Children");
+				LOG_INFO("an error occured when Parent sent the body to Children");
 				return -1;
 			}
 		}
@@ -170,45 +170,45 @@ void	CgiManager::parseCgiHeader(std::string header) {
 	}
 }
 
-int	CgiManager::recvFromCgi() {//if we enter in this function, it means we have a POLLIN for CGI_parent
+//if we enter in this function, it means we have a POLLIN for CGI_parent
+int	CgiManager::recvFromCgi() {
 	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	check_pid();
-	// LOG_DEBUG("Children status : "+to_string(_children_status));
-	// LOG_DEBUG("Children done : "+to_string(_children_done));
-	if (_children_done)
-	{char	buffer[1024] = {0};
-	int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
-	//LOG_INFO("buffer read from children : "+std::string(buffer));
-	if (bytes <= 0) {
-		LOG_ERROR("reading CGI answer from parent's socket failed", 1);
-		return -1;
-	}
-	else if (bytes > 0) {
-		buffer[bytes] = '\0';
-		_tempBuffer.append(buffer);
 
-		if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
-			size_t pos = _tempBuffer.find("\r\n\r\n");
-			std::string header = _tempBuffer.substr(0, pos + 4);
-			_tempBuffer.erase(0, pos + 4);
-			parseCgiHeader(header);
-			LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
-			_headerDoneReading = true;
+	if (_children_done) {
+		char	buffer[1024] = {0};
+		int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
+
+		if (bytes <= 0) {
+			LOG_ERROR("reading CGI answer from parent's socket failed", 1);
+			return -1;
 		}
+		else if (bytes > 0) {
+			buffer[bytes] = '\0';
+			_tempBuffer.append(buffer);
 
-		if (_cgiContentLength > 0) {
-			if (_tempBuffer.size() >= static_cast<size_t>(_cgiContentLength)) {
-				_cgiBody = _tempBuffer.substr(0, _cgiContentLength);
-				//LOG_INFO("cgiBody: " + _cgiBody);
-				_tempBuffer.erase(0, _cgiContentLength);
+			if (_tempBuffer.find("\r\n\r\n") != std::string::npos) {
+				size_t pos = _tempBuffer.find("\r\n\r\n");
+				std::string header = _tempBuffer.substr(0, pos + 4);
+				_tempBuffer.erase(0, pos + 4);
+				parseCgiHeader(header);
+				LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
+				_headerDoneReading = true;
+			}
+
+			if (_cgiContentLength > 0) {
+				if (_tempBuffer.size() >= static_cast<size_t>(_cgiContentLength)) {
+					_cgiBody = _tempBuffer.substr(0, _cgiContentLength);
+					_tempBuffer.erase(0, _cgiContentLength);
+				}
 			}
 		}
+		if (_cgiBody.size() > 0) {
+			LOG_INFO("CGI response done reading");
+			_response->setCgiManager(this);
+			_response->buildCgiResponse(this);
+		}
 	}
-	if (_cgiBody.size() > 0) {
-		LOG_INFO("CGI response done reading");
-		_response->setCgiManager(this);
-		_response->buildCgiResponse(this);
-	}}
 	return 0;
 }
 
@@ -217,5 +217,5 @@ CgiManager::~CgiManager() {
 		delete _cgi_env;
 		_cgi_env = NULL;
 	}
-	LOG_INFO("CGI finish");
+	LOG_INFO("CGI handled");
 }
