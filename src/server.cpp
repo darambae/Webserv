@@ -36,7 +36,7 @@ Server::Server(ConfigServer & config, const std::vector<std::pair<std::string, i
 int	Server::socketUsed(std::string IP, int port) {
 	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
 		int fd = ALL_FDS[i].fd;
-		if (FD_DATA[fd]->status == SERVER && FD_DATA[fd]->ip == IP && FD_DATA[fd]->port == port)
+		if (FD_DATA[fd]->status == SERVER && (FD_DATA[fd]->ip == IP || IP == "0.0.0.0" || FD_DATA[fd]->ip == "0.0.0.0") && FD_DATA[fd]->port == port)
 			return fd;
 	}
 	return -1;
@@ -93,16 +93,17 @@ void	Server::initServerSocket(std::pair<std::string, int> ipPort) {
 	if (unblockFD(new_fd) == -1)
 		return;
 	addFdToFds(new_fd);
-	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, NULL, NULL, NULL);
+	addFdData(new_fd, ipPort.first, ipPort.second, this, SERVER, NULL, NULL, NULL, new_fd);
 }
 
-void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, Request* request, Response* response, CgiManager* cgi) {
+void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_status status, Request* request, Response* response, CgiManager* cgi, int serverFd) {
 	FD_DATA[fd] = new Fd_data;
 	FD_DATA[fd]->ip = ip;
 	FD_DATA[fd]->port = port;
 	FD_DATA[fd]->server = server;
 	FD_DATA[fd]->status = status;
 	FD_DATA[fd]->response = NULL;
+	FD_DATA[fd]->serverFd = serverFd;
 	if (request)
 		FD_DATA[fd]->request = request;
 	else
@@ -145,7 +146,7 @@ int	Server::createClientSocket(int fd) {
 	if (unblockFD(new_socket) == -1)
 		return -1;
 	addFdToFds(new_socket);
-	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, NULL, NULL, NULL);
+	addFdData(new_socket, std::string(inet_ntoa(_address.sin_addr)), _address.sin_port, this, CLIENT, NULL, NULL, NULL, fd);
 	return new_socket;
 }
 

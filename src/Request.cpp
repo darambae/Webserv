@@ -116,6 +116,9 @@ void	Request::parseHeader(std::string headerPart) {
 					_sessionID = value.substr(pos + 11, pos + 47);
 				}
 			}
+			else if (key == "Host") {
+				_host = value;
+			}
 		}
 	}
 }
@@ -146,9 +149,28 @@ std::string	Request::parseQueryString() {
 	return "";
 }
 
+ConfigServer*	Request::findServerConfig() {
+	
+	if (!_host.empty()) {
+		ConfigServer* serverToUse;
+		int	fdServer = FD_DATA[_clientFd]->serverFd;
+		if (FD_DATA[fdServer]->SetOfConfig.size() > 1) {
+			for (size_t i = 0; i < FD_DATA[fdServer]->SetOfConfig.size(); ++i) {
+				serverToUse = FD_DATA[fdServer]->SetOfConfig[i];
+				std::vector<std::string> serverNames = FD_DATA[fdServer]->SetOfConfig[i]->getServerNames();
+				std::vector<std::string>::iterator it = std::find(serverNames.begin(), serverNames.end(), _host);
+				if (it != serverNames.end())
+					return serverToUse;
+			}
+		}
+	}
+	return FD_DATA[_clientFd]->server->getConfigServer();
+}
+
+
 int	Request::handleRequest() {
 	LOG_INFO("FD "+to_string(_clientFd)+" received a request");
-	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
+	ConfigServer* config = findServerConfig();
 	int result_parseRequest = parseRequest();
 	if (result_parseRequest == -1) {
 		LOG_INFO("Request parsing failed");
