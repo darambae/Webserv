@@ -1,0 +1,252 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tableau de Score - Château Combo</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            text-align: center;
+        }
+        table {
+            margin: 20px auto;
+            border-collapse: collapse;
+            width: 60%;
+        }
+        th, td {
+            padding: 10px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+		.iconplayer {
+            width: 50px;
+            height: 75px;
+        }
+        .iconcard {
+            width: 50px;
+            height: 50px;
+        }
+        .iconkey {
+            width: 50px;
+            height: 60px;
+        }
+		input[type="number"], input[type="text"] {
+            width: 80%;
+            text-align: center;
+        }
+        .button {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .button:hover {
+            background-color: #45a049;
+        }
+        /* input[type="number"] {
+            width: 50px;
+            text-align: center;
+        }*/
+        input[type="submit"] {
+            padding: 10px 20px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+        input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>Score Table - Château Combo</h1>
+	<button type="button" class="button" onclick="addPlayer()">+ Add Player</button>
+    <button type="button" class="button" onclick="removePlayer()">- Remove Player</button>
+    <form action="/cgi-bin/calcul_score.php" method="POST">
+        <table>
+            <tbody>
+                <tr>
+					<td class="icon-cell"><img src="images/players.png" alt="Icon player" class="iconplayer"></td>
+                    <td><input type="text" name="name[]" placeholder="Player 1" pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td><input type="text" name="name[]" placeholder="Player 2" pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." required onchange="validateUniqueNames()"></td>
+					<td class="player-col-3" style="display: none;"><input type="text" name="name[]" placeholder="Player 3" pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." onchange="validateUniqueNames()"></td>
+					<td class="player-col-4" style="display: none;"><input type="text" name="name[]" placeholder="Player 4" pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." onchange="validateUniqueNames()"></td>
+					<td class="player-col-5" style="display: none;"><input type="text" name="name[]" placeholder="Player 5" pattern="[A-Za-z0-9]+" title="Only letters without accents and numbers are allowed." onchange="validateUniqueNames()"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card1.png" alt="Icon card1" class="iconcard"></td>
+                    <td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card2.png" alt="Icon card2" class="iconcard"></td>
+                    <td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                	<td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card3.png" alt="Icon card3" class="iconcard">
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card4.png" alt="Icon card4" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card5.png" alt="Icon card5" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card6.png" alt="Icon card6" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card7.png" alt="Icon card7" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card8.png" alt="Icon card8" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/card9.png" alt="Icon card9" class="iconcard"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+                <tr>
+					<td class="icon-cell"><img src="images/keys.png" alt="Icon key" class="iconkey"></td>
+					<td><input type="number" name="player1[]" min="0" required></td>
+                    <td><input type="number" name="player2[]" min="0" required></td>
+                    <td class="player-col-3" style="display: none;"><input type="number" name="player3[]" min="0"></td>
+				    <td class="player-col-4" style="display: none;"><input type="number" name="player4[]" min="0"></td>
+    				<td class="player-col-5" style="display: none;"><input type="number" name="player5[]" min="0"></td>
+				</tr>
+			</tbody>
+        </table>
+
+        <input type="submit" value="Calculate Final Score ">
+		<a href='/' class=\"button\">Go back</a>
+    </form>
+	<script>
+        let playerCount = 2; // Nombre initial de joueurs visibles
+const maxPlayers = 5; // Nombre maximum de joueurs
+
+function addPlayer() {
+    if (playerCount < maxPlayers) {
+        playerCount++; // Incrémente le nombre de joueurs visibles
+        let columns = document.querySelectorAll(`.player-col-${playerCount}`);
+        columns.forEach(col => {
+            col.style.display = 'table-cell'; // Affiche la colonne entière
+            col.querySelectorAll('input').forEach(input => {
+                input.required = true; // Ajoute `required` uniquement sur les champs visibles
+            });
+        });
+    }
+}
+
+function removePlayer() {
+    if (playerCount > 2) {
+        let columns = document.querySelectorAll(`.player-col-${playerCount}`);
+        columns.forEach(col => {
+            col.style.display = 'none'; // Masque la colonne entière
+            col.querySelectorAll('input').forEach(input => {
+                input.required = false; // Supprime `required` quand on cache le champ
+                input.value = ''; // Vide les champs pour éviter d’envoyer de mauvaises valeurs
+            });
+        });
+        playerCount--; // Décrémente le nombre de joueurs visibles
+    }
+}
+
+
+// function addPlayer() {
+//     if (playerCount < maxPlayers) {
+//         playerCount++; // Incrémente le nombre de joueurs visibles
+//         let columns = document.querySelectorAll(`.player-col-${playerCount}`);
+//         columns.forEach(col => col.style.display = 'table-cell'); // Affiche la colonne entière
+//     }
+// }
+
+// function removePlayer() {
+//     if (playerCount > 2) {
+//         let columns = document.querySelectorAll(`.player-col-${playerCount}`);
+//         columns.forEach(col => {
+//             col.style.display = 'none'; // Masque la colonne entière
+//             col.querySelectorAll('input').forEach(input => input.value = ''); // Vide les champs
+//         });
+//         playerCount--; // Décrémente le nombre de joueurs visibles
+//     }
+// }
+
+function validateUniqueNames() {
+    let nameInputs = document.querySelectorAll('input[name="name[]"]');
+    let names = [];
+
+    nameInputs.forEach(input => {
+        let name = input.value.trim();
+        if (name !== "") {
+            if (names.includes(name)) {
+                alert("Ce nom est déjà utilisé par un autre joueur. Veuillez en choisir un autre.");
+                input.value = ""; // Efface la saisie du joueur
+            } else {
+                names.push(name);
+            }
+        }
+    });
+}
+
+// Ajoute l'événement de vérification sur chaque champ de nom
+document.querySelectorAll('input[name="name[]"]').forEach(input => {
+    input.addEventListener("change", validateUniqueNames);
+});
+
+function toggleRequiredFields() {
+    document.querySelectorAll('td[style*="display: none;"] input').forEach(input => {
+        input.required = false;
+    });
+}
+
+// Exécute cette fonction avant soumission du formulaire
+document.querySelector("form").addEventListener("submit", toggleRequiredFields);
+
+    </script>
+</body>
+</html>
