@@ -88,6 +88,7 @@ struct Fd_data
 {
 	fd_status		status;
 	Server*			server;
+	int				serverFd;
 	Request*		request;
 	Response*		response;
 	CgiManager*		CGI;

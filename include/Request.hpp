@@ -29,12 +29,11 @@ class Request {
 	uint64_t		_time_stamp;
 	std::string		_savedErrorCode;
 	std::string		_sessionID;
-	// CGI data struct to be implemented
-	// std::string _content_type;
 	std::string _firstLine;
 	std::string	_method, _path, _version; //1st line parts (GET/POST/DELETE ; / /index.html ; HTTP/1.1)
 	std::string	_tempBuffer;
 	std::map<std::string, std::string>	_header;
+	std::string	_host;
 	std::string	_body;
 	std::string _query;
 	std::map<std::string, std::string>	_query_map;
@@ -64,13 +63,13 @@ public:
 	std::string	getBody() const { return _body; }
 
 	/* methods */
-	int		handleRequest();
-	int		parseRequest();
-	void	parseFirstLine();
-	void	parseHeader(std::string headerPart);
+	int					handleRequest();
+	int					parseRequest();
+	void				parseFirstLine();
+	void				parseHeader(std::string headerPart);
 	struct uploadData	setFileContent();
-	std::string		parseQueryString();
-	void	createQueryMap(std::string path);
-
+	std::string			parseQueryString();
+	void				createQueryMap(std::string path);
+	ConfigServer*		findServerConfig();
 
 };
