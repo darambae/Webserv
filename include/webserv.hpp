@@ -86,6 +86,7 @@ struct Fd_data
 	CgiManager*		CGI;
 	int				port;
 	std::string		ip;
+	std::vector<ConfigServer*>	SetOfConfig;//default server is the one saved as server
 	bool			just_connected; // In Mac OS to ignore POLLHUP for new clients after after new client connection is accepted
 };
 
