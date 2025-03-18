@@ -21,12 +21,21 @@ def handle_request():
     else:
         response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
-        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
         print("Status: 400")
         print(response)
         return
 
     file_path = os.path.realpath("data/cgi-bin/record.json")
+    #file_path = os.path.realpath("data/cgi-bin/wrong_file.json")    
+    if not os.path.exists(file_path):
+        response_body.append(f"<h1>Server Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
+        response_body = "\n".join(response_body)
+        response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
+        print("Status: 500")
+        print(response)
+        return
+    
     with open(file_path, "r") as file:
         data = json.load(file)
 
@@ -37,7 +46,7 @@ def handle_request():
     else:
         response_body.append(f"<h1>No player with ID {player_id} found</h1><a href='/' class=\"button\">Go back</a></body></html>")
         response_body = "\n".join(response_body)
-        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
         print("Status: 200")
         print(response)
         return
@@ -79,7 +88,7 @@ def handle_request():
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
-    response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
     print("Status: 200")
     print(response)
     exit(0)

@@ -23,7 +23,7 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 std::string	ResponseBuilder::buildFirstLine() {
 
-	std::string	firstLine = _response.getRequest().getVersion() + " " + _response.getCodeStatus() + " " + _response.getReasonPhrase() + "\r\n";
+	std::string	firstLine = _response.getRequest().getVersion() + " " + to_string(_response.getCodeStatus()) + " " + _response.getReasonPhrase() + "\r\n";
 	return firstLine;
 }
 
