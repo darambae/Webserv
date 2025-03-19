@@ -64,7 +64,7 @@ def handle_request():
             cookies = json.load(file)
         game_ids = cookies.get(session_id)
         if game_ids == None:
-            error_message(f"For session id {session_id}, no historic for this client")
+            error_message(f"For session id {session_id}, no history for this client")
             return
         file_path = os.path.realpath("data/cgi-bin/record.json")
         with open(file_path, "r") as file:

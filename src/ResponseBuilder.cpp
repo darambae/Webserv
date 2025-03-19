@@ -15,6 +15,7 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 	_builtResponse = buildFirstLine();
 	_builtResponse += buildHeaders();
+	LOG_INFO("Response :\n" + std::string(YELLOW) + _builtResponse);
 	if (!_body.empty())
 		_builtResponse += _body;
 
@@ -23,6 +24,9 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 std::string	ResponseBuilder::buildFirstLine() {
 
+	if (_response.getCodeStatus() == 200) {
+		_response.setResponseStatus(200);
+	}
 	std::string	firstLine = _response.getRequest().getVersion() + " " + to_string(_response.getCodeStatus()) + " " + _response.getReasonPhrase() + "\r\n";
 	return firstLine;
 }
