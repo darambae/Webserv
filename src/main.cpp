@@ -15,6 +15,7 @@ void    signalHandler(int signal) {
         CgiManager* cgi = it->second->CGI;
         if (cgi) {
             kill(cgi->getPid(), SIGTERM);
+            delete cgi;
         }
     }
 
@@ -41,7 +42,7 @@ int main(int ac, char **av)
     sigaction(SIGTERM, &sa, NULL);
     if (ac > 2)
     {
-        LOG_ERROR("Usage: ./config_parser [config_file]", 0);
+        LOG_ERROR("Usage: ./config_parser config/[config_file]", 0);
         return 1;
     }
     std::string file = ac == 2 ? av[1] : "config/default.conf";

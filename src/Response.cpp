@@ -120,7 +120,7 @@ void	Response::    handleError() {
 				errorPageFound = true;
 				LOG_INFO("error_path: " + it->error_path);
 				_location = findRequestLocation(_config, _request.getPath());
-				LOG_INFO("Location block for error: " + _location->getPath());
+				//LOG_INFO("Location block for error: " + _location->getPath());
 				handleGet();
 				break ;
 			}
@@ -243,10 +243,8 @@ void	Response::handleGet() {
 void	Response::handlePost() {
 	LOG_INFO("Handling POST request");
 	struct stat	pathStat;
-	std::string	requestPath = _request.getPath();
-	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
-	std::string path = rootPath + requestPath;
-
+	std::string	path = fullPath(_location->getRoot().empty() ? _config.getRoot() : _location->getRoot());
+	path += _request.getPath();
 	//If the requested directory doesn't exist, return 404
 	if (stat(path.c_str(), &pathStat)== -1 || S_ISDIR(pathStat.st_mode) == 0) {
 		LOG_INFO("Requested directory doesn't exist");
@@ -322,7 +320,6 @@ void	Response::handleDelete() {
 		handleError();
 		return ;
 	}
-	//setResponseStatus(200);
 	LOG_INFO("File deleted successfully");
 	_responseReadyToSend = true;
 	_responseBuilder = new ResponseBuilder(*this);
@@ -376,6 +373,7 @@ void	Response::handleResponse() {
 	std::string requestMethod = _request.getMethod();
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
+	LOG_INFO("request Path : " + requestPath);
 	LOG_INFO("location bloc : " + _location->getPath());
 
 	if (_location) {
@@ -398,7 +396,7 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	LOG_INFO("requestPath: " + requestPath);
+	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		if (!_request.getQuery().empty() && _request.getQuery().find("_method=DELETE") != std::string::npos)
 			handleDelete();
