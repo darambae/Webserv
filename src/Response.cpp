@@ -49,13 +49,15 @@ int	Response::findIndex() {
 
 	std::vector<std::string> indexesToTry;
 
-	if (_location) {
+	if (_location && !_location->getIndex().empty()) {
 		indexesToTry = _location->getIndex();
+	} else if (!_config.getIndex().empty()) {
+		indexesToTry = _config.getIndex();
 	} else {
 		indexesToTry.push_back("index.html");
 	}
 
-	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
+	std::string rootPath = fullPath(_location && !_location->getRoot().empty() ? _location->getRoot() : _config.getRoot());
 
 	std::vector<std::string>::const_iterator it = indexesToTry.begin();
 	for (; it != indexesToTry.end(); ++it) {
