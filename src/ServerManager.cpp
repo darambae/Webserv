@@ -131,7 +131,7 @@ void	ServerManager::handlePollout(int FD) {
 		else {
 			int bodysend = FD_DATA[FD]->CGI->sendToCgi();
 			if (bodysend == -1) {
-				LOG_ERROR("write to send the body to CGI failed", true);
+				LOG_ERROR("Body sent to CGI failed", true);
 				closeCgi(501, FD_DATA[FD]->request->getClientFD());
 			}
 		}
@@ -159,27 +159,6 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	LOG_INFO("CGI is close");
 	if (errorNumber > 0)
 		cleanFd(FdClient);
-}
-
-void	ServerManager::print_all_FD_DATA() {
-	for (size_t i = 0; i < ALL_FDS.size(); ++i) {
-		std::cout<<"Datas of FD "<<ALL_FDS[i].fd<<" are :\nIP : "<<FD_DATA[ALL_FDS[i].fd]->ip\
-		<<"\nPORT : "<<FD_DATA[ALL_FDS[i].fd]->port\
-		<<"\n status: "<<FD_DATA[ALL_FDS[i].fd]->status<<std::endl;
-	}
-}
-
-void	ServerManager::print_FD_status(int FD) {
-	std::string	status = "";
-	if (FD_DATA[FD]->status == CLIENT)
-		status = "CLIENT";
-	else if (FD_DATA[FD]->status == SERVER)
-		status = "SERVER";
-	else if (FD_DATA[FD]->status == CGI_parent)
-		status = "CGI_PARENT";
-	else if (FD_DATA[FD]->status == CGI_children)
-		status = "CGI_CHILDREN";
-	std::cout<<"The FD "<<FD<<" with the status "<<status<<std::endl;
 }
 
 //clean fd in _all_fds; _mapFd_data;

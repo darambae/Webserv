@@ -29,7 +29,7 @@ int	Request::parseRequest() {
 		_firstLine = _tempBuffer.substr(0, pos);
 		_tempBuffer.erase(0, pos + 2);
 		parseFirstLine();
-		LOG_INFO("Request received : " + _firstLine);
+		LOG_INFO("Request received : " + std::string(GREEN) + _firstLine + RESET);
 	}
 
 	//read request's header
@@ -39,7 +39,7 @@ int	Request::parseRequest() {
 		_tempBuffer.erase(0, pos + 4);
 		parseHeader(headerPart);
 		isHeaderRead = true;
-		LOG_INFO("Header received: " + headerPart);
+		LOG_INFO("Header received:\n" + std::string(GREEN) + headerPart + "\n" + RESET);
 	}
 
 	//if body size is bigger than client max buffer size, we send error 413
@@ -52,7 +52,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			LOG_INFO("Body received : " + _body);
+			//LOG_INFO("Body received : " + _body);
 		}
 	}
 	else if (isHeaderRead && _contentLength == 0) {
@@ -95,7 +95,7 @@ void	Request::parseHeader(std::string headerPart) {
 			else if (key == "Cookie") {
 				size_t pos	= value.find("session_id");
 				if (pos != std::string::npos) {
-					_sessionID = value.substr(pos + 11, pos + 47);
+					_sessionID = value.substr(pos + 11, pos + 36);
 				}
 			}
 		}
@@ -133,7 +133,6 @@ int	Request::handleRequest() {
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
 	int result_parseRequest = parseRequest();
 	if (result_parseRequest == -1) {
-		//LOG_INFO("Request parsing failed");
 		return -1;
 	} else if (result_parseRequest == 1) {
 		LOG_INFO("Request body too big");

@@ -371,6 +371,14 @@
                 {
                     "game_id": "8",
                     "total_score": 43
+                },
+                {
+                    "game_id": "9",
+                    "total_score": 122
+                },
+                {
+                    "game_id": "10",
+                    "total_score": 137
                 }
             ]
         },
@@ -385,6 +393,14 @@
                 {
                     "game_id": "8",
                     "total_score": 47
+                },
+                {
+                    "game_id": "9",
+                    "total_score": 172
+                },
+                {
+                    "game_id": "10",
+                    "total_score": 44
                 }
             ]
         },
@@ -533,6 +549,40 @@
                 {
                     "game_id": "9",
                     "total_score": 45
+                }
+            ]
+        },
+        "15": {
+            "player_name": "gerard",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "11",
+                    "total_score": 51
+                }
+            ]
+        },
+        "16": {
+            "player_name": "marcel",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "11",
+                    "total_score": 61
+                },
+                {
+                    "game_id": "12",
+                    "total_score": 58
+                }
+            ]
+        },
+        "17": {
+            "player_name": "bernard",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "12",
+                    "total_score": 86
                 }
             ]
         }

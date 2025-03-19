@@ -178,7 +178,6 @@ std::string	Response::generateAutoIndex(std::string path) {
 //	=> ELSE, error 404 not found
 void	Response::handleGet() {
 
-	LOG_INFO("Handling GET request");
 	struct stat	pathStat;
 	std::string	requestPath = _request.getPath();
 	std::string rootPath = fullPath(_location ? _location->getRoot() : _config.getRoot());
@@ -187,8 +186,6 @@ void	Response::handleGet() {
 	if (stat(path.c_str(), &pathStat) == 0 && S_ISDIR(pathStat.st_mode)) {
 	// request path is a directory
 		if (findIndex() == 1) {
-			//setResponseStatus(200);
-			LOG_INFO("Index found");
 			_responseReadyToSend = true;
 			_responseBuilder = new ResponseBuilder(*this);
 			_builtResponse = _responseBuilder->buildResponse("");
@@ -197,7 +194,6 @@ void	Response::handleGet() {
 			if (_location->getAutoindex()) {
 				LOG_INFO("Autoindex enabled, generating directory listing...");
 				std::string autoIndexPage = generateAutoIndex(path);
-				//setResponseStatus(200);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);
 				_builtResponse = _responseBuilder->buildResponse(autoIndexPage);
@@ -262,7 +258,6 @@ void	Response::handlePost() {
 	struct uploadData fileData = _request.setFileContent();
 	if (fileData.fileName.empty() && fileData.fileContent.empty()) {
 		LOG_INFO("Post request with no file content");
-		//setResponseStatus(200);
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
 		_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("Post request received",
@@ -270,6 +265,7 @@ void	Response::handlePost() {
 																		 "<p>File Name: <strong>" + _request.getPath().substr(_request.getPath().find_last_of("/") + 1) + "</strong></p>"));
 		return ;
 	}
+
 	//Post request with img file content
 	handleUpload(fileData);
 }
@@ -371,10 +367,9 @@ void	Response::handleResponse() {
 	LOG_INFO("handling response...");
 	std::string requestPath = _request.getPath();
 	std::string requestMethod = _request.getMethod();
+
 	//find the proper location block to read depending on the path given in the request
 	_location = findRequestLocation(_config, requestPath);
-	LOG_INFO("request Path : " + requestPath);
-	LOG_INFO("location bloc : " + _location->getPath());
 
 	if (_location) {
 		//if specific methods are specified in the location block, check if the request's
@@ -396,7 +391,6 @@ void	Response::handleResponse() {
 		LOG_INFO("No location found for request path: " + requestPath);
 	}
 
-	//LOG_INFO("requestPath: " + requestPath);
 	if (requestMethod == "GET") {
 		if (!_request.getQuery().empty() && _request.getQuery().find("_method=DELETE") != std::string::npos)
 			handleDelete();

@@ -172,7 +172,7 @@ void	CgiManager::parseCgiHeader(std::string header) {
 
 //if we enter in this function, it means we have a POLLIN for CGI_parent
 int	CgiManager::recvFromCgi() {
-	LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
+	//LOG_INFO("POLLIN flag on the parent socket, something to read from child pid ("+ to_string(_children_pid) +")");
 	check_pid();
 
 	if (_children_done) {
