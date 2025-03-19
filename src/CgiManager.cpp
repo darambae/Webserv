@@ -11,6 +11,26 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 		_requestBody = _request->getBody();
 }
 
+char** CgiManager::setEnv() {
+    std::vector<std::string> envStrings;
+	envStrings.push_back("REQUEST_METHOD=" + _cgi_env->request_method);
+    envStrings.push_back("QUERY_STRING=" + _cgi_env->query_string);
+    envStrings.push_back("CONTENT_LENGTH=" + _cgi_env->content_length);
+    envStrings.push_back("CONTENT_TYPE=" + _cgi_env->content_type);
+    envStrings.push_back("SCRIPT_NAME=" + _cgi_env->script_name);
+    envStrings.push_back("REMOTE_ADDR=" + _cgi_env->remote_addr);
+    envStrings.push_back("HTTP_COOKIE=" + _cgi_env->http_cookie);
+
+    char** env = new char*[envStrings.size() + 1]; 
+    for (size_t i = 0; i < envStrings.size(); ++i) {
+        env[i] = new char[envStrings[i].size() + 1]; 
+        std::strcpy(env[i], envStrings[i].c_str());
+    }
+    env[envStrings.size()] = NULL; 
+
+    return env;
+}
+
 int	CgiManager::forkProcess() {
 	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
@@ -40,23 +60,10 @@ int	CgiManager::forkProcess() {
 		dup2(_sockets[1], STDIN_FILENO);
 		dup2(_sockets[1], STDOUT_FILENO);
 		close(_sockets[1]);
-		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _response->getLocation()->getCgiPass());
-		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
-		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
-		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
-		std::string content_type_env = "CONTENT_TYPE=" + _cgi_env->content_type;
-		std::string script_name_env = "SCRIPT_NAME=" + _cgi_env->script_name;
-		std::string remote_addr_env = "REMOTE_ADDR=" + _cgi_env->remote_addr;
-		std::string http_cookie_env = "HTTP_COOKIE=" + _cgi_env->http_cookie;
+		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 
-		char *env[] = {const_cast<char *>(request_method_env.c_str()),
-			const_cast<char *>(query_env.c_str()),
-			const_cast<char *>(content_length_env.c_str()),
-			const_cast<char *>(content_type_env.c_str()),
-			const_cast<char *>(script_name_env.c_str()),
-			const_cast<char *>(remote_addr_env.c_str()),
-			const_cast<char *>(http_cookie_env.c_str()), NULL};
+		char **env = setEnv();
 		char **argv;
 		if (interpreter.empty()) {
 			argv = new char*[2];
@@ -70,6 +77,10 @@ int	CgiManager::forkProcess() {
 		}
 
 		if (execve(argv[0], argv, env) == -1) {
+			for (size_t i = 0; env[i] != NULL; ++i) {
+				delete[] env[i];
+			}
+			delete[] env;
 			delete[] argv;
 			LOG_ERROR("execve failed", true);
 			exit(-1);
@@ -124,6 +135,7 @@ int CgiManager::check_pid() {
             _children_status = exit_code; //0~255
         } else if (WIFSIGNALED(_children_status)) {
             int signal = WTERMSIG(_children_status);
+			(void)signal;
 			_children_status = -1;
         } else
 			_children_status = -1;

@@ -40,7 +40,7 @@ class	CgiManager {
 		
 		void setCgiContentType(std::string contentType) { _cgiContentType = contentType; }
 		void setCgiContentLength(int contentLength) { _cgiContentLength = contentLength; }
-
+		char**	setEnv();
 		int		forkProcess();
 		int		sendToCgi();
 		int		recvFromCgi();
