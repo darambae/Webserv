@@ -25,12 +25,12 @@ int	CgiManager::forkProcess() {
 	if (server_cgi->unblockFD(_sockets[1]) == -1)
 		return -1;
 
-	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this, FD_DATA[_request->getClientFD()]->serverFd);
+	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
 	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 	// server_cgi->addFdToFds(_sockets[1]);
 	if (_cgi_env->request_method == "POST") {//to follow children CGI only if we need to send something
-		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this, FD_DATA[_request->getClientFD()]->serverFd);
+		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
 	}
 
