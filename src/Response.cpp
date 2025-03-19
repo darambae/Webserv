@@ -316,7 +316,6 @@ void	Response::handleDelete() {
 	LOG_INFO("Handling DELETE request");
 	std::string path = fullPath(_location->getRoot());
 	path += _request.getPath();
-	LOG_INFO("Delete path: " + path);
 
 	if (remove(path.c_str()) != 0) {
 		LOG_INFO("Failed to delete the requested file");
