@@ -129,7 +129,6 @@ std::string	Request::parseQueryString() {
 }
 
 int	Request::handleRequest() {
-	LOG_INFO("FD "+to_string(_clientFd)+" received a request");
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
 	int result_parseRequest = parseRequest();
 	if (result_parseRequest == -1) {

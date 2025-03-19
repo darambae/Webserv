@@ -5,6 +5,7 @@ void	Response::setResponseStatus(int code) {
 
 	switch (code) {
 		case 200: _reasonPhrase = "OK"; break;
+		case 201: _reasonPhrase = "Created"; break;
 		case 301: _reasonPhrase = "Moved Permanently"; break;
 		case 302: _reasonPhrase = "Found"; break;
 		case 400: _reasonPhrase = "Bad Request"; break;
