@@ -33,10 +33,9 @@ class Request {
 		std::string		_method, _path, _version; //1st line parts (GET/POST/DELETE ; / /index.html ; HTTP/1.1)
 		std::string		_tempBuffer;
 		std::map<std::string, std::string>	_header;
-		std::string		_host;
 		std::string		_body;
 		std::string 	_query;
-	
+
 		Request();
 
 	public:
@@ -45,7 +44,7 @@ class Request {
 		~Request() {}
 
 		struct uploadData	uploadData;
-		
+
 		/* getters */
 		std::map<std::string, std::string>	getHeader() const { return _header; }
 		std::string	getMethod() const { return _method; }
@@ -57,7 +56,7 @@ class Request {
 		std::string	getValueFromHeader(const std::string& key) const;
 		std::string getQuery() const { return _query; }
 		uint64_t	getTimeStamp() const { return _time_stamp; }
-		
+
 		/* setters */
 		void	setPath(std::string path) { _path = path; }
 		void	setTimeStamp(uint64_t time) { _time_stamp = time; }
@@ -70,6 +69,4 @@ class Request {
 		void				parseHeader(std::string headerPart);
 		struct uploadData	setFileContent();
 		std::string			parseQueryString();
-		ConfigServer*		findServerConfig();
-
 };
