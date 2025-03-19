@@ -67,6 +67,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         }
         else if (line.find("root ") != std::string::npos && endingSemicolon(line))
             server.setRoot(line.substr(start_pos, len));
+        else if (line.find("index ") != std::string::npos && endingSemicolon(line))
+            server.setIndex(line.substr(start_pos, len));
         else if (line.find("client_max_body_size ") != std::string::npos && endingSemicolon(line))
             server.setLimitClientBodySize(line.substr(start_pos, len));
         else if (line.find("error_page ") != std::string::npos && endingSemicolon(line))
@@ -80,8 +82,6 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         } else if (line.find("}") != std::string::npos) {
             break;
         }
-
-
     }
     //Checking if server block has minimum required directives
     if (server.getRoot().empty() || server.getLocations().empty())
