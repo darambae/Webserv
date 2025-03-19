@@ -315,7 +315,7 @@ void	Response::handleUpload(struct uploadData fileData) {
 void	Response::handleDelete() {
 	LOG_INFO("Handling DELETE request");
 	std::string path = fullPath(_location->getRoot());
-	path += _request.getPath().substr(0, _request.getPath().find("?"));
+	path += _request.getPath();
 	if (remove(path.c_str()) != 0) {
 		LOG_INFO("Failed to delete the requested file");
 		setResponseStatus(400);

@@ -183,33 +183,6 @@
         "7": [
             {
                 "player_id": "10",
-<<<<<<< HEAD
-                "sq_1": 12,
-                "sq_2": 12,
-                "sq_3": 12,
-                "sq_4": 12,
-                "sq_5": 12,
-                "sq_6": 12,
-                "sq_7": 12,
-                "sq_8": 21,
-                "sq_9": 21,
-                "keys": 21,
-                "total_score": 147
-            },
-            {
-                "player_id": "11",
-                "sq_1": 1,
-                "sq_2": 12,
-                "sq_3": 12,
-                "sq_4": 12,
-                "sq_5": 12,
-                "sq_6": 12,
-                "sq_7": 21,
-                "sq_8": 12,
-                "sq_9": 21,
-                "keys": 12,
-                "total_score": 127
-=======
                 "sq_1": 10,
                 "sq_2": 8,
                 "sq_3": 20,
@@ -277,7 +250,36 @@
                 "sq_9": 1,
                 "keys": 0,
                 "total_score": 45
->>>>>>> main
+            }
+        ],
+        "8": [
+            {
+                "player_id": "1",
+                "sq_1": 5,
+                "sq_2": 5,
+                "sq_3": 5,
+                "sq_4": 4,
+                "sq_5": 4,
+                "sq_6": 4,
+                "sq_7": 4,
+                "sq_8": 4,
+                "sq_9": 4,
+                "keys": 4,
+                "total_score": 43
+            },
+            {
+                "player_id": "2",
+                "sq_1": 4,
+                "sq_2": 4,
+                "sq_3": 4,
+                "sq_4": 5,
+                "sq_5": 5,
+                "sq_6": 5,
+                "sq_7": 5,
+                "sq_8": 5,
+                "sq_9": 5,
+                "keys": 5,
+                "total_score": 47
             }
         ]
     },
@@ -293,6 +295,10 @@
                 {
                     "game_id": "2",
                     "total_score": 131
+                },
+                {
+                    "game_id": "8",
+                    "total_score": 43
                 }
             ]
         },
@@ -303,6 +309,10 @@
                 {
                     "game_id": "1",
                     "total_score": 123
+                },
+                {
+                    "game_id": "8",
+                    "total_score": 47
                 }
             ]
         },
@@ -385,36 +395,21 @@
             ]
         },
         "10": {
-<<<<<<< HEAD
-            "player_name": "teddy",
-=======
             "player_name": " banane",
->>>>>>> main
             "profile_pic": "",
             "game_history": [
                 {
                     "game_id": "7",
-<<<<<<< HEAD
-                    "total_score": 147
-=======
                     "total_score": 83
->>>>>>> main
                 }
             ]
         },
         "11": {
-<<<<<<< HEAD
-            "player_name": "antoine",
-=======
             "player_name": " cherry",
->>>>>>> main
             "profile_pic": "",
             "game_history": [
                 {
                     "game_id": "7",
-<<<<<<< HEAD
-                    "total_score": 127
-=======
                     "total_score": 189
                 }
             ]
@@ -446,7 +441,6 @@
                 {
                     "game_id": "7",
                     "total_score": 45
->>>>>>> main
                 }
             ]
         }

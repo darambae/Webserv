@@ -70,6 +70,7 @@ void	Request::parseFirstLine() {
 		_query = parseQueryString();
 	if (_path[_path.size() - 1] == '/')
 		isRequestPathDirectory = true;
+	_path = _path.substr(0, _path.find("?"));
 }
 
 std::string	Request::getValueFromHeader(const std::string& key) const {
