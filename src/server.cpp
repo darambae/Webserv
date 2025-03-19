@@ -101,7 +101,6 @@ void	Server::addFdData(int fd, std::string ip,int port, Server* server, fd_statu
 		FD_DATA[fd]->CGI = cgi;
 	else
 		FD_DATA[fd]->CGI = NULL;
-	FD_DATA[fd]->SetOfConfig.push_back(server->_config);
 }
 
 void	Server::addFdToFds(int fd_to_add) {

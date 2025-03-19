@@ -26,7 +26,7 @@ class Server {
 
 		//methods
 		void	initServerSocket(std::pair<std::string, int> ipPort);
-		void	addFdData(int fd, std::string ip, int port, Server *server, fd_status status , Request* request, Response* response, CgiManager* cgi, int serverFd);
+		void	addFdData(int fd, std::string ip, int port, Server *server, fd_status status , Request* request, Response* response, CgiManager* cgi);
 		void	addFdToFds(int fd_to_add);
 		int		createClientSocket(int fd);
 		void	decreaseClientCount();

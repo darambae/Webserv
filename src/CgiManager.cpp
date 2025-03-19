@@ -123,7 +123,6 @@ int CgiManager::check_pid() {
             int exit_code = WEXITSTATUS(_children_status);
             _children_status = exit_code; //0~255
         } else if (WIFSIGNALED(_children_status)) {
-            int signal = WTERMSIG(_children_status);
 			_children_status = -1;
         } else
 			_children_status = -1;
