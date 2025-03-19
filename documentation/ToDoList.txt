@@ -22,15 +22,6 @@ chill and watch other (way smarter) team mates work;
 DARAM:
 - logger class + Exception class (Done - if needed, additional functionality can be added afterwards)
 
-
-GAUDALY:
-- Where is Buffer_size defined ?
-	=> Buffer_size of the buffer we read in the request fd.
-GAUDALY:
-- Where is Buffer_size defined ?
-	=> Buffer_size of the buffer we read in the request fd.
-	->(Daram) : Don't we have to assign as we want??
-
 - Nb of Max_clients to define. The same for every sever ?
 
 - Does a new connection means a request with content ?
