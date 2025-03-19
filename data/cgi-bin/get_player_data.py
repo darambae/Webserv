@@ -26,7 +26,7 @@ def handle_request():
         print(response)
         return
 
-    file_path = os.path.realpath("data/cgi-bin/record_correction.json")
+    file_path = os.path.realpath("data/cgi-bin/record.json")
     #file_path = os.path.realpath("data/cgi-bin/wrong_file.json")    
     if not os.path.exists(file_path):
         response_body.append(f"<h1>Server Error</h1><a href='/' class=\"button\">Go back</a></body></html>")

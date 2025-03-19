@@ -25,6 +25,10 @@ void    ConfigServer::setRoot(const std::string& root) {
     this->_root = root;
 }
 
+void    ConfigServer::setIndex(const std::string& line) {
+    this->_index = splitString<std::vector<std::string> >(line, ' ');
+}
+
 void    ConfigServer::setLimitClientBodySize(const std::string& value) {
     unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;

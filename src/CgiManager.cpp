@@ -12,8 +12,6 @@ CgiManager::CgiManager(CGI_env*	cgi_env, Request* request, Response* response) :
 }
 
 int	CgiManager::forkProcess() {
-	// LOG_INFO("Query = "+_cgi_env->query_string);
-	//LOG_INFO("scriptname = "+_cgi_env->script_name);
 	if (socketpair(AF_UNIX, SOCK_STREAM /* | SOCK_NONBLOCK | SOCK_CLOEXEC */, 0, _sockets) == -1) {
 		LOG_ERROR("socketpair failed", true);
 		return -1;
@@ -27,8 +25,6 @@ int	CgiManager::forkProcess() {
 
 	server_cgi->addFdData(_sockets[0], "", -1, server_cgi, CGI_parent, _request, _response, this);
 	server_cgi->addFdToFds(_sockets[0]);
-	// server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
-	// server_cgi->addFdToFds(_sockets[1]);
 	if (_cgi_env->request_method == "POST") {//to follow children CGI only if we need to send something
 		server_cgi->addFdData(_sockets[1], "", -1, server_cgi, CGI_children, _request, _response, this);
 		server_cgi->addFdToFds(_sockets[1]);
@@ -46,7 +42,6 @@ int	CgiManager::forkProcess() {
 		close(_sockets[1]);
 		std::string script_path = fullPath("data/cgi-bin/" + _cgi_env->script_name);
 		std::string interpreter = isFoundIn(_cgi_env->script_name.substr(_cgi_env->script_name.find_last_of(".") + 1), _response->getLocation()->getCgiPass());
-		//LOG_DEBUG("INTERPRETER : "+interpreter);
 		std::string request_method_env = "REQUEST_METHOD=" + _cgi_env->request_method;
 		std::string query_env = "QUERY_STRING=" + _cgi_env->query_string;
 		std::string content_length_env = "CONTENT_LENGTH=" + _cgi_env->content_length;
@@ -65,7 +60,6 @@ int	CgiManager::forkProcess() {
 		char **argv;
 		if (interpreter.empty()) {
 			argv = new char*[2];
-			//LOG_DEBUG("script_path : "+script_path);
 			argv[0] = const_cast<char *>(script_path.c_str());
 			argv[1] = NULL;
 		} else {
@@ -103,12 +97,10 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 				return returnValue;
 			}
 			else if (returnValue <= 0){
-			//	_requestBody = "";
 				LOG_INFO("an error occured when Parent sent the body to Children");
 				return -1;
 			}
 		}
-		LOG_DEBUG("returnValue : " + to_string(returnValue));
 	}
 	return returnValue;
 }
@@ -129,16 +121,12 @@ int CgiManager::check_pid() {
 		_children_done = true;
         if (WIFEXITED(_children_status)) {
             int exit_code = WEXITSTATUS(_children_status);
-            LOG_INFO("Child exited with code: " + to_string(exit_code));
             _children_status = exit_code; //0~255
         } else if (WIFSIGNALED(_children_status)) {
             int signal = WTERMSIG(_children_status);
 			_children_status = -1;
-            LOG_INFO("Child was terminated by signal: " + to_string(signal));
-        } else {
-            LOG_INFO("Child exited abnormally");
+        } else
 			_children_status = -1;
-        }
     }
 	return _children_status;
 }
@@ -180,7 +168,7 @@ int	CgiManager::recvFromCgi() {
 		int	bytes = read(_sockets[0], buffer, sizeof(buffer) - 1);
 
 		if (bytes <= 0) {
-			LOG_ERROR("reading CGI answer from parent's socket failed", 1);
+			//LOG_ERROR("reading CGI answer from parent's socket failed", 1);
 			return -1;
 		}
 		else if (bytes > 0) {
@@ -192,7 +180,6 @@ int	CgiManager::recvFromCgi() {
 				std::string header = _tempBuffer.substr(0, pos + 4);
 				_tempBuffer.erase(0, pos + 4);
 				parseCgiHeader(header);
-				LOG_INFO("CONTENT LENGTH : " + to_string(_cgiContentLength));
 				_headerDoneReading = true;
 			}
 
@@ -217,5 +204,4 @@ CgiManager::~CgiManager() {
 		delete _cgi_env;
 		_cgi_env = NULL;
 	}
-	LOG_INFO("CGI handled");
 }

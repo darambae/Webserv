@@ -34,12 +34,8 @@ class Response {
 	~Response() {}
 
 	/* setters / getters */
-	void		setRequestedFile(std::string const& filePath) {
-		_requestedFilePath = filePath;
-		// _requestedFile.open(filePath.c_str(), std::ios::binary);
-	}
+	void	setRequestedFile(std::string const& filePath) {	_requestedFilePath = filePath; }
 	void	setResponseStatus(int code);
-	//void	setHeader(std::string key, std::string value) { _header[key] = value; }
 	void	setBuiltResponse(std::string responseComplete) { *_builtResponse = responseComplete; };
 	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
 	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }
@@ -56,7 +52,6 @@ class Response {
 	CgiManager*				getCgiManager() const { return _cgiManager; }
 	std::string				getRedirectionResponseHeader() const { return _redirectionResponseHeader; }
 	ConfigServer const&		getConfig() const { return _config; }
-	//std::map<std::string, std::string>	getHeader() const { return _header; }
 
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
