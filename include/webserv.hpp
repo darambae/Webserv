@@ -1,8 +1,9 @@
 #pragma once
+#include <exception>
 #define LOG_DEBUG(msg) Logger::getInstance(FILE_OUTPUT).log(DEBUG, msg)
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
 #define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
-#define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
+#define THROW(msg) throw std::exception(__FILE__, __FUNCTION__, __LINE__, msg)
 #define TIME_OUT 10000 //10s
 //colors for logs
 #define RESET   "\033[0m"
@@ -31,7 +32,6 @@
 #include <cerrno>
 #include <sys/stat.h>
 #include <ctime>
-#include <exception>
 #include <csignal>
 #include <sys/wait.h>
 #include <dirent.h>
