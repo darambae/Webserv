@@ -21,8 +21,13 @@ void	ServerManager::launchServers() {
 				continue;
 			}
 			else if (ALL_FDS[i].revents & POLLIN) {
-				handlePollin(ALL_FDS[i].fd);
-				continue;
+				if  (FD_DATA[ALL_FDS[i].fd]->response && FD_DATA[ALL_FDS[i].fd]->response->getResponseReadyToSend() && (ALL_FDS[i].revents & POLLOUT)) {
+					handlePollout(ALL_FDS[i].fd);
+					continue;
+				} else {
+					handlePollin(ALL_FDS[i].fd);
+					continue;						
+				}
 			}
 			else if (ALL_FDS[i].revents & POLLOUT) {
 				handlePollout(ALL_FDS[i].fd);
@@ -105,6 +110,7 @@ void	ServerManager::handlePollout(int FD) {
 		if (FD_DATA[FD]->response && FD_DATA[FD]->response->getResponseReadyToSend()) {
 			if (FD_DATA[FD]->response->sendResponse() == -1) {
 				cleanFd(FD);
+				return ;
 			}
 			if (FD_DATA[FD]->response->getResponseReadyToSend() == false) {
 				if (FD_DATA[FD]->CGI != NULL)

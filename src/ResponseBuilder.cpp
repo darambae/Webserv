@@ -15,9 +15,10 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 	_builtResponse = buildFirstLine();
 	_builtResponse += buildHeaders();
-	LOG_INFO("Response :\n" + std::string(YELLOW) + _builtResponse);
+//	LOG_INFO("Response :\n" + std::string(YELLOW) + _builtResponse);
 	if (!_body.empty())
 		_builtResponse += _body;
+	LOG_DEBUG("Response :\n" + std::string(YELLOW) + _builtResponse);
 
 	return &_builtResponse;
 }

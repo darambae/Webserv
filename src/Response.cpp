@@ -410,12 +410,13 @@ void	Response::handleResponse() {
 			handlePost();
 	} else if (requestMethod == "DELETE")
 		handleDelete();
-	else {
+	else if (requestMethod == "PUT" || requestMethod == "PATCH" || requestMethod == "HEAD") {
 		LOG_INFO("Method not implemented");
 		setResponseStatus(501);
 		handleError();
 		return ;
 	}
+
 }
 
 int	Response::handleCgi() {
@@ -472,10 +473,13 @@ int	Response::sendResponse() {
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
+		
 		if (_responseBuilder) {
 			delete _responseBuilder;
 			_responseBuilder = NULL;
 		}
+		if (_codeStatus >= 400)
+			return -1;
 	}
 	return 1;
 }
