@@ -22,7 +22,7 @@ int	Request::parseRequest() {
 		return -1;
 	}
 	_tempBuffer.append(buffer, bytes);
-
+	//LOG_INFO("BUFFER: " + std::string(buffer));
 	//read request's first line if not read yet
 	if (_firstLine.empty() && _tempBuffer.find("\r\n") != std::string::npos) {
 		size_t pos = _tempBuffer.find("\r\n");
@@ -40,11 +40,14 @@ int	Request::parseRequest() {
 		parseHeader(headerPart);
 		isHeaderRead = true;
 		LOG_INFO("Header received:\n" + std::string(GREEN) + headerPart + "\n" + RESET);
+		// LOG_DEBUG("Header received:\n" + headerPart + "\n");
 	}
 
 	//if body size is bigger than client max buffer size, we send error 413
-	if (_contentLength > 0 && _contentLength > FD_DATA[_clientFd]->server->getConfigServer()->getLimitClientBodySize())
+	if (_contentLength > 0 && _contentLength > FD_DATA[_clientFd]->server->getConfigServer()->getLimitClientBodySize()) {
+		isRequestComplete = true;
 		return 1;
+	}
 
 	//read body if present
 	if (isHeaderRead && _contentLength > 0) {
@@ -52,7 +55,7 @@ int	Request::parseRequest() {
 			_body = _tempBuffer.substr(0, _contentLength);
 			_tempBuffer.erase(0, _contentLength);
 			isRequestComplete = true;
-			//LOG_INFO("Body received : " + _body);
+			LOG_DEBUG("Body received in REQUEST: " + _body);
 		}
 	}
 	else if (isHeaderRead && _contentLength == 0) {

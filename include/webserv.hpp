@@ -3,7 +3,8 @@
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
 #define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
-#define TIME_OUT 10000 //10s
+//#define TIME_OUT 10000 //10s
+#define TIME_OUT 60000000 //60000s
 //colors for logs
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
