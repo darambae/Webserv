@@ -146,7 +146,7 @@ int	Request::checkHost(ConfigServer* config) {
 		if (it->second->status == SERVER && it->second->server == FD_DATA[_clientFd]->server)
 			computerIp = it->second->ip;
 	}
-	if (_hostName == computerIp || _hostName.empty() || _hostName == "localhost" || serverNames.size() == 0)
+	if (_hostName == computerIp || _hostName.empty() || _hostName == "localhost" || _hostName == "0.0.0.0" || serverNames.size() == 0)
 		return 0;
 	for (size_t i = 0; i < serverNames.size(); ++i) {
 		if (_hostName == serverNames[i])
