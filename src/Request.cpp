@@ -140,8 +140,13 @@ std::string	Request::parseQueryString() {
 
 int	Request::checkHost(ConfigServer* config) {
 	std::vector<std::string> serverNames = config->getServerNames();
-	LOG_INFO("serverNames : "+serverNames[0]);
-	if (_hostName == "localhost")
+	std::string	computerIp;
+	std::map<int, Fd_data*>::iterator	it = FD_DATA.begin();
+	for (;it != FD_DATA.end(); ++it) {
+		if (it->second->status == SERVER && it->second->server == FD_DATA[_clientFd]->server)
+			computerIp = it->second->ip;
+	}
+	if (_hostName == computerIp || _hostName.empty() || _hostName == "localhost" || serverNames.size() == 0)
 		return 0;
 	for (size_t i = 0; i < serverNames.size(); ++i) {
 		if (_hostName == serverNames[i])
