@@ -98,6 +98,13 @@ void	Request::parseHeader(std::string headerPart) {
 					_sessionID = value.substr(pos + 11, pos + 36);
 				}
 			}
+			else if (key == "Host") {
+				size_t pos = value.find(":");
+				if (pos != std::string::npos)
+					value = value.substr(0, pos);
+				_hostName = value;
+				LOG_INFO("header host : "+value);
+			}
 		}
 	}
 }
@@ -128,12 +135,31 @@ std::string	Request::parseQueryString() {
 	return "";
 }
 
+int	Request::checkHost(ConfigServer* config) {
+	std::vector<std::string> serverNames = config->getServerNames();
+	LOG_INFO("serverNames : "+serverNames[0]);
+	if (_hostName == "localhost")
+		return 0;
+	for (size_t i = 0; i < serverNames.size(); ++i) {
+		if (_hostName == serverNames[i])
+			return 0;
+	}
+	return -1;
+}
+
 int	Request::handleRequest() {
 	ConfigServer* config = FD_DATA[_clientFd]->server->getConfigServer();
 	int result_parseRequest = parseRequest();
-	if (result_parseRequest == -1) {
+	if (result_parseRequest == -1)
 		return -1;
-	} else if (result_parseRequest == 1) {
+	if (checkHost(config) == -1) {
+		LOG_INFO("bad Request host");
+		FD_DATA[_clientFd]->response = new Response(*this, *config);
+		FD_DATA[_clientFd]->response->setResponseStatus(400);
+		FD_DATA[_clientFd]->response->handleError();
+		return 0;
+	}
+	else if (result_parseRequest == 1) {
 		LOG_INFO("Request body too big");
 		FD_DATA[_clientFd]->response = new Response(*this, *config);
 		FD_DATA[_clientFd]->response->setResponseStatus(413);
