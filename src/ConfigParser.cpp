@@ -1,4 +1,4 @@
-/*By parsing configuration file following the rule of nginx config file, 
+/*By parsing configuration file following the rule of nginx config file,
 save the data in a struct and return a vector of servers info.*/
 
 #include "../include/ConfigParser.hpp"
@@ -11,7 +11,7 @@ ConfigParser::ConfigParser(const std::string& file) {
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test;
 
-	
+
 	test.open(file.c_str());
     if (!test.is_open())
         THROW("Configuration file " + file + " cannot be opened.");
@@ -36,7 +36,7 @@ void    ConfigParser::parseFile() {
             parseDirectives(file, server);
             setServers(server);
         }
-        
+
     }
     if (file.is_open())
         file.close();
@@ -50,9 +50,9 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
+        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
             if (line.find(":") != std::string::npos)
-                server.setListen(line.substr(start_pos, line.find(":") - start_pos), 
+                server.setListen(line.substr(start_pos, line.find(":") - start_pos),
                     line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
             else {
                 if (line.find(".") != std::string::npos)
@@ -146,7 +146,7 @@ void    ConfigParser::validIp(std::string ip) {
     std::string  segment;
     size_t  pos;
     int     num;
-    
+
     if (ip == "localhost" || ip == "*")
         return;
     while ((pos = ip.find(".")) != std::string::npos) {
@@ -190,7 +190,7 @@ void    ConfigParser::validErrorPage(const std::string& line) {
 
 void    ConfigParser::validReturn(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
-    if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
+	if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
         THROW("Invalid return format");
     if (tmp_vector.size() == 1) {
         const std::string& value = tmp_vector.front();
@@ -203,7 +203,7 @@ void    ConfigParser::validReturn(const std::string& line) {
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
             THROW("Invalid return status code");
         return;
-    }   
+    }
     THROW("Invalid return");
 }
 

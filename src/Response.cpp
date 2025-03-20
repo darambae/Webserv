@@ -92,7 +92,7 @@ int	Response::generateDefaultErrorHtml() {
 		return -1;
 	}
 
-	file << generateHTMLstr("Error " + to_string(_codeStatus) + " - " + _reasonPhrase, "Requested page has encountered a problem", "");
+	file << generateHTMLstr("Error Page", to_string(_codeStatus) + " - " + _reasonPhrase, "");
 	file.close();
 
 	return 0;
@@ -210,7 +210,7 @@ void	Response::handleGet() {
 
 		//If the file exists, set and serve it
 		if (!rootPath.empty() && stat(path.c_str(), &pathStat) == 0 && S_ISREG(pathStat.st_mode)) {
-		
+
 			setRequestedFile(path.c_str());
 			//If the file is not a .json file, serve it
 			if (requestPath.find(".json") != std::string::npos) {
@@ -247,7 +247,7 @@ void	Response::handlePost() {
 		LOG_INFO("Requested directory doesn't exist");
 		setResponseStatus(404);
 		handleError();
-		return ; 
+		return ;
 	}
 	//Check if the request method is allowed
 	if (_location->getAllowMethods().find("POST") == _location->getAllowMethods().end()) {
@@ -300,10 +300,10 @@ void	Response::handleUpload(struct uploadData fileData) {
 	_responseBuilder = new ResponseBuilder(*this);
 	_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("File Upload Success",
 																	"Your file has been uploaded successfully.",
-																	"<img src=\"" + _request.getPath() + "/" + fileData.fileName 
-																	+ "\" alt=\"" + fileData.fileName + "\">\n<form action=\"" 
-																	+ _request.getPath() + "/" + fileData.fileName 
-																	+ "\" method=\"delete\">\n<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n<input type=\"hidden\" name=\"fileName\" value=\"" 
+																	"<img src=\"" + _request.getPath() + "/" + fileData.fileName
+																	+ "\" alt=\"" + fileData.fileName + "\">\n<form action=\""
+																	+ _request.getPath() + "/" + fileData.fileName
+																	+ "\" method=\"delete\">\n<input type=\"hidden\" name=\"_method\" value=\"DELETE\">\n<input type=\"hidden\" name=\"fileName\" value=\""
 																	+ fileData.fileName + "\">\n<div class=\"button-container\">\n<button type=\"submit\" class=\"delete-button\">x</button>\n"));
 }
 
@@ -334,7 +334,7 @@ bool	Response::isRedirectionInfiniteLoop() {
 	std::string				currentPath;
 	std::set<std::string>	visitedPaths;
 	ConfigLocation const*	location = _location;
-	
+
 	while (isRedirection(location)) {
 		it = location->getReturn().begin();
 		currentPath = it->second;
@@ -473,7 +473,7 @@ int	Response::sendResponse() {
 	if (_totalBytesSent == responseSize) {
 		LOG_INFO("Response fully sent");
 		_responseReadyToSend = false;
-		
+
 		if (_responseBuilder) {
 			delete _responseBuilder;
 			_responseBuilder = NULL;
