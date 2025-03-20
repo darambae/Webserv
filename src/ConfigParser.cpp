@@ -79,9 +79,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             if (location.getRoot().empty() && !server.getRoot().empty())
                 location.setRoot(server.getRoot());
             server.setLocations(location);
-        } else if (line.find("}") != std::string::npos) {
+        } else if (line.find("}") != std::string::npos)
             break;
-        }
     }
     //Checking if server block has minimum required directives
     if (server.getRoot().empty() || server.getLocations().empty())
@@ -120,13 +119,12 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setCgiExtension(line.substr(start_pos, len));
         else if (line.find("cgi_pass ") != std::string::npos && endingSemicolon(line))
             location.setCgiPass(line.substr(start_pos, len));
-        else if (line.find("}") != std::string::npos) {
+        else if (line.find("}") != std::string::npos)
             break;
-        }
     }
-    //Checking if cgi location block has cgi_extension and cgi_pass
-    if (location.getPath() == "/cgi-bin" && (location.getCgiExtension().empty() || location.getCgiPass().empty()))
-        THROW("CGI location block must have cgi_extension and cgi_pass");
+    //Checking if cgi location block has both cgi_extension and cgi_pass
+    if ((!location.getCgiExtension().empty() && location.getCgiPass().empty()) || (location.getCgiExtension().empty() && !location.getCgiPass().empty()))
+        THROW("CGI location block must have both cgi_extension and cgi_pass");
     //Checking if location block has minimum required directives
     if (location.getPath() != "/cgi-bin" && location.getRoot().empty() && location.getIndex().empty() && location.getReturn().empty())
         THROW("Location block must have at least one directive");
@@ -155,7 +153,7 @@ void    ConfigParser::validIp(std::string ip) {
         segment = ip.substr(0, pos);
         num = std::atoi(segment.c_str());
         if (num < 0 || num > 255)
-            THROW("The given IP is Out of range");
+            THROW("The given IP is out of range");
         ip = ip.substr(pos + 1);
     }
     num = std::atoi(ip.c_str());

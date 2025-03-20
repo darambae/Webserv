@@ -51,9 +51,8 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
-        else {
+        else
             error_page.error_path = tmp_vector.front();
-        }
         tmp_vector.erase(tmp_vector.begin());
     }
     this->_error_pages.push_back(error_page);
