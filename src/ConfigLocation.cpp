@@ -32,7 +32,6 @@ void    ConfigLocation::setIndex(const std::string& line) {
 }
 
 void    ConfigLocation::setCgiExtension(const std::string& line) {
-    LOG_DEBUG("Valid CGI extension");
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
