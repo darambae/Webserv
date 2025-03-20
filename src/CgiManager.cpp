@@ -108,7 +108,7 @@ int	CgiManager::sendToCgi() {//if we enter in this function, it means we have a 
 				return returnValue;
 			}
 			else if (returnValue <= 0){
-				LOG_INFO("an error occured when Parent sent the body to Children");
+				LOG_ERROR("an error occured when Parent sent the body to Children", 1);
 				return -1;
 			}
 		}
@@ -135,7 +135,7 @@ int CgiManager::check_pid() {
             _children_status = exit_code; //0~255
         } else if (WIFSIGNALED(_children_status)) {
             int signal = WTERMSIG(_children_status);
-			(void)signal;
+			LOG_DEBUG("Child process received this signal : " + to_string(signal));
 			_children_status = -1;
         } else
 			_children_status = -1;
