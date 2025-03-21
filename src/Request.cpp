@@ -7,6 +7,7 @@
 // - Body (the content if needed)
 Request::Request(int fd) : isRequestComplete(false), isHeaderRead(false), isRequestPathDirectory(false), _clientFd(fd), _contentLength(0) {
 	_time_stamp = get_time();
+	_port = -1;
 }
 
 int	Request::parseRequest() {
@@ -103,8 +104,10 @@ void	Request::parseHeader(std::string headerPart) {
 			}
 			else if (key == "Host") {
 				size_t pos = value.find(":");
-				if (pos != std::string::npos)
+				if (pos != std::string::npos) {
+					_port = std::atoi(value.substr(pos + 1).c_str());
 					value = value.substr(0, pos);
+				}
 				_hostName = value;
 				LOG_INFO("header host : "+value);
 			}
@@ -139,19 +142,19 @@ std::string	Request::parseQueryString() {
 }
 
 int	Request::checkHost(ConfigServer* config) {
+	std::vector<std::pair<std::string, int> >	listen = config->getListen();
+	std::vector<std::string>	ips_usable;
+
 	std::vector<std::string> serverNames = config->getServerNames();
-	std::string	computerIp;
-	std::map<int, Fd_data*>::iterator	it = FD_DATA.begin();
-	for (;it != FD_DATA.end(); ++it) {
-		if (it->second->status == SERVER && it->second->server == FD_DATA[_clientFd]->server)
-			computerIp = it->second->ip;
+	for (size_t i = 0; i < listen.size(); ++i) {
+		if (listen[i].second == _port)
+			ips_usable.push_back(listen[i].first);
 	}
-	if (_hostName == computerIp || _hostName.empty() || _hostName == "localhost" || _hostName == "0.0.0.0" || serverNames.size() == 0)
+	ips_usable.push_back("localhost");
+	ips_usable.push_back("0.0.0.0");
+	ips_usable.insert(ips_usable.end(),serverNames.begin(), serverNames.end());
+	if (std::find(ips_usable.begin(), ips_usable.end(), _hostName) != ips_usable.end() || _hostName.empty())
 		return 0;
-	for (size_t i = 0; i < serverNames.size(); ++i) {
-		if (_hostName == serverNames[i])
-			return 0;
-	}
 	return -1;
 }
 

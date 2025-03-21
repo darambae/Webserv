@@ -35,7 +35,8 @@ class Request {
 		std::map<std::string, std::string>	_header;
 		std::string		_body;
 		std::string 	_query;
-		std::string	_hostName;
+		std::string		_hostName;
+		int				_port;
 
 		Request();
 
