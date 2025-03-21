@@ -72,4 +72,5 @@ class Request {
 		struct uploadData	setFileContent();
 		std::string			parseQueryString();
 		int					checkHost(ConfigServer* config);
+		bool				isIp(std::string host);
 };
