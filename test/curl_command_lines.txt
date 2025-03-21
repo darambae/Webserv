@@ -6,3 +6,5 @@
     curl -X DELETE http://localhost:8080/upload/coton.jpg -d "fileName=coton.jpg"
 4. PUT resquest (Not allowed)
     curl -X PUT -d "avatar=408.jpg" http://localhost:8080/upload
+5. POST request with body of plain/text
+    curl -X POST -H "Content-Type: plain/text" --data "HERE GOES BODY!" localhost:8080
