@@ -262,8 +262,7 @@ void	Response::handlePost() {
 		_responseReadyToSend = true;
 		_responseBuilder = new ResponseBuilder(*this);
 		_builtResponse = _responseBuilder->buildResponse(generateHTMLstr("Post request received",
-																		 "Body content : " + _request.getBody(),
-																		 "<p>File Name: <strong>" + _request.getPath().substr(_request.getPath().find_last_of("/") + 1) + "</strong></p>"));
+																		 "Body content : " + _request.getBody(), ""));
 		return ;
 	}
 
