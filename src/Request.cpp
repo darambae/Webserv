@@ -146,15 +146,20 @@ int	Request::checkHost(ConfigServer* config) {
 	std::vector<std::string>	ips_usable;
 
 	std::vector<std::string> serverNames = config->getServerNames();
-	for (size_t i = 0; i < listen.size(); ++i) {
-		if (listen[i].second == _port)
-			ips_usable.push_back(listen[i].first);
-	}
 	ips_usable.push_back("localhost");
 	ips_usable.push_back("0.0.0.0");
 	ips_usable.insert(ips_usable.end(),serverNames.begin(), serverNames.end());
 	if (std::find(ips_usable.begin(), ips_usable.end(), _hostName) != ips_usable.end() || _hostName.empty())
 		return 0;
+	for (size_t i = 0; i < listen.size(); ++i) {
+		if (listen[i].second == _port) {
+			if (_hostName == listen[i].first)
+				return 0;
+			// ips_usable.push_back(listen[i].first);
+			if (listen[i].first == "0.0.0.0")
+				return 0;
+		}
+	}
 	return -1;
 }
 
