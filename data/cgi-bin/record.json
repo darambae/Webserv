@@ -515,6 +515,66 @@
                 "keys": 1,
                 "total_score": 10
             }
+        ],
+        "14": [
+            {
+                "player_id": "2",
+                "sq_1": 4,
+                "sq_2": 4,
+                "sq_3": 5,
+                "sq_4": 5,
+                "sq_5": 1,
+                "sq_6": 4,
+                "sq_7": 2,
+                "sq_8": 8,
+                "sq_9": 7,
+                "keys": 5,
+                "total_score": 45
+            },
+            {
+                "player_id": "1",
+                "sq_1": 5,
+                "sq_2": 7,
+                "sq_3": 4,
+                "sq_4": 2,
+                "sq_5": 5,
+                "sq_6": 5,
+                "sq_7": 15,
+                "sq_8": 4,
+                "sq_9": 23,
+                "keys": 7,
+                "total_score": 77
+            }
+        ],
+        "15": [
+            {
+                "player_id": "3",
+                "sq_1": 8,
+                "sq_2": 8,
+                "sq_3": 8,
+                "sq_4": 8,
+                "sq_5": 8,
+                "sq_6": 8,
+                "sq_7": 8,
+                "sq_8": 8,
+                "sq_9": 84,
+                "keys": 84,
+                "total_score": 232
+            },
+            {
+                "player_id": "19",
+                "sq_1": 4,
+                "sq_2": 4,
+                "sq_3": 4,
+                "sq_4": 4,
+                "sq_5": 4,
+                "sq_6": 4,
+                "sq_7": 4,
+                "sq_8": 4,
+                "sq_9": 8,
+                "keys": 8,
+                "total_score": 48
+            }
         ]
     },
     "players": {
@@ -553,6 +613,10 @@
                 {
                     "game_id": "13",
                     "total_score": 20
+                },
+                {
+                    "game_id": "14",
+                    "total_score": 77
                 }
             ]
         },
@@ -583,6 +647,10 @@
                 {
                     "game_id": "13",
                     "total_score": 10
+                },
+                {
+                    "game_id": "14",
+                    "total_score": 45
                 }
             ]
         },
@@ -593,6 +661,10 @@
                 {
                     "game_id": "2",
                     "total_score": 116
+                },
+                {
+                    "game_id": "15",
+                    "total_score": 232
                 }
             ]
         },
@@ -795,6 +867,16 @@
                 {
                     "game_id": "10",
                     "total_score": 120
+                }
+            ]
+        },
+        "19": {
+            "player_name": "Nico",
+            "profile_pic": "",
+            "game_history": [
+                {
+                    "game_id": "15",
+                    "total_score": 48
                 }
             ]
         }
