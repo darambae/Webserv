@@ -8,7 +8,7 @@ std::string   fullPath(const std::string& name) {
     if (realpath(path.c_str(), resolved_path) == NULL)
         return "";
     //LOG_INFO("Resolved path : " + std::string(resolved_path));
-    if (stat(resolved_path, &buffer) == -1) 
+    if (stat(resolved_path, &buffer) == -1)
         return "";
     return resolved_path;
 }
@@ -20,7 +20,7 @@ bool    onlyDigits(const std::string& str) {
     return true;
 }
 
-void    removeWhitespaces(std::string& str) { 
+void    removeWhitespaces(std::string& str) {
     size_t  start = str.find_first_not_of(" \t");
     size_t  end = str.find_last_not_of(" \t");
 
@@ -74,4 +74,13 @@ std::string generateHTMLstr(const std::string& title, const std::string& message
 	responseBody << "</body>\n";
 	responseBody << "</html>\n";
     return responseBody.str();
+}
+
+int stringToInt(std::string str) {
+    std::stringstream ss(str);
+    int result = -1;
+    ss >> result;
+    if (ss.fail())
+        return -1;  // Valeur par défaut en cas d'échec
+    return result;
 }
