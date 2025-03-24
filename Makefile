@@ -3,7 +3,7 @@ SRC= $(wildcard src/*.cpp)
 OBJ_DIR= obj/
 OBJ= $(SRC:%.cpp=$(OBJ_DIR)%.o)
 CC= c++
-CPPFLAGS= -g -Wall -Wextra -Werror -std=c++98 -Iinclude
+CPPFLAGS= -Wall -Wextra -Werror -std=c++98 -Iinclude
 
 all: setup $(NAME)
 

@@ -222,7 +222,6 @@ void	Response::handleGet() {
 					handleError();
 				}
 			} else {
-
 				_requestedFile.open(path.c_str(), std::ios::binary);
 				_responseReadyToSend = true;
 				_responseBuilder = new ResponseBuilder(*this);

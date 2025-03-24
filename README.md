@@ -16,8 +16,9 @@
 
 ## Introduction
 
-**Webserv** is an Ecole 42 project that involves building a simple HTTP server in C++. Inspired by Nginx, Webserv handles client requests, serves static files, and supports dynamic content processing. Through **Webserv**, you will gain hands-on experience with socket programming, HTTP parsing, multiplexing, and server configurations.
+**Webserv** is an Ecole 42 project that involves building a simple HTTP server in C++98. Inspired by Nginx, Webserv handles client requests, serves static files, and supports dynamic content processing. Through **Webserv**, you will gain hands-on experience with socket programming, HTTP parsing, multiplexing, and server configurations.
 
+ With two great teammates, Kelly Brener-Raffali [https://github.com/KellyBRENER] and Gautier Daigneau [https://github.com/Gotgotd], we successfully completed this team project with a score of 125%.
 ---
 
 ## Features
@@ -37,18 +38,18 @@ To compile and run the server:
 
 ```bash
 make
-./webserv config_file.conf
+./webserv config/filename
 ```
 
 **Examples**:
 
 - Starting the server with a configuration file:
   ```bash
-  ./webserv config/default.conf
+  ./webserv config/filename
   ```
 - Sending a GET request to fetch an HTML file:
   ```bash
-  curl http://localhost:8080/index.html
+  curl http://localhost:8080/
   ```
 - Sending a POST request to upload data:
   ```bash
@@ -117,7 +118,7 @@ server {
 - **Usage**: Requests a resource from the server.
 - **Example**:
   ```bash
-  curl http://localhost:8080/index.html
+  curl http://localhost:8080/
   ```
 
 ### `POST`
@@ -125,7 +126,7 @@ server {
 - **Usage**: Sends data to the server (e.g., form submissions, file uploads).
 - **Example**:
   ```bash
-  curl -X POST -d "message=hello" http://localhost:8080/message
+  curl -v -F "avatar=@408.jpg" http://localhost:8080/upload
   ```
 
 ### `DELETE`
@@ -133,7 +134,7 @@ server {
 - **Usage**: Requests the removal of a resource from the server.
 - **Example**:
   ```bash
-  curl -X DELETE http://localhost:8080/file.txt
+  curl -X DELETE http://localhost:8080/upload/coton.jpg -d "fileName=coton.jpg"
   ```
 
 ---
@@ -146,15 +147,13 @@ server {
 - [Fonctionnalités](#fonctionnalités)
 - [Configuration](#configuration)
 - [Traitement des Requêtes](#traitement-des-requêtes)
-- [Gestion des Erreurs](#gestion-des-erreurs)
 - [Méthodes HTTP Prises en Charge](#méthodes-http-prises-en-charge)
-
----
 
 ## Introduction
 
-**Webserv** est un projet de l'École 42 visant à développer un serveur HTTP simple en C++. Inspiré de Nginx, Webserv gère les requêtes clients, sert des fichiers statiques et prend en charge le traitement dynamique des contenus.
+**Webserv** est un projet de l'École 42 visant à développer un serveur HTTP simple en C++98. Inspiré de Nginx, Webserv gère les requêtes clients, sert des fichiers statiques et prend en charge le traitement dynamique des contenus.
 
+Avec deux coéquipiers formidables, Kelly Brener-Raffali [https://github.com/KellyBRENER] et Gautier Daigneau [https://github.com/Gotgotd], nous avons réussi ce projet d'équipe avec un score de 125 %.
 ---
 
 ## Fonctionnalités
@@ -201,16 +200,16 @@ server {
 
 ### `GET`
 
-- **Usage** : Récupération d'une ressource.
+- **Utilisation** : Récupération d'une ressource.
 
 ### `POST`
 
-- **Usage** : Envoi de données au serveur.
+- **Utilisation** : Envoi de données au serveur (téléversement d'une image).
 
 ### `DELETE`
 
-- **Usage** : Suppression d'une ressource.
-
+- **Utilisation** : Suppression d'une ressource (suppression de l'image téléversée).
+- ***Remarque*** : Les formulaires HTML ne prennent pas en charge la méthode DELETE, donc la suppression est gérée en utilisant le nom et la valeur des champs du formulaire.
 ---
 
 # Webserv 🇰🇷
@@ -219,18 +218,17 @@ server {
 
 - [소개](#소개)
 - [기능](#기능)
-- [사용법](#사용법)
 - [설정](#설정)
-- [요청 처리](#요청-처리)
-- [오류 처리](#오류-처리)
+- [요청 처리 과정](#요청-처리-과정)
 - [지원되는 HTTP 메소드](#지원되는-http-메소드)
 
 ---
 
 ## 소개
 
-**Webserv**는 Ecole 42 프로젝트로, C++을 사용하여 간단한 HTTP 서버를 구축하는 과제입니다. Nginx에서 영감을 받아 클라이언트 요청을 처리하고 정적 파일을 제공하며 CGI를 통해 동적 콘텐츠 처리를 지원합니다.
-
+**Webserv**는 Ecole 42 프로젝트로, C++98을 사용하여 간단한 HTTP 서버를 구축하는 과제입니다. Nginx의 작동방식을 토대로 클라이언트 요청을 처리하고 정적 파일을 제공하며, python과 php로 작성한 CGI 프로그램을 통해 동적 콘텐츠를 처리하였습니다.
+ 저희는 구글 크롬을 프로젝트의 기본 브라우저로 사용하였고, 저희 프로젝트는 리눅스 우분투에서 실행이 가능합니다.
+훌륭한 두 팀원들, Kelly Brener-Raffali [https://github.com/KellyBRENER]와 Gautier Daigneau [https://github.com/Gotgotd] 덕분에 프로젝트를 성공적으로 완료하여 125%의 점수를 받았습니다.
 ---
 
 ## 기능
@@ -260,7 +258,7 @@ server {
 
 ---
 
-## 요청 처리
+## 요청 처리 과정
 
 1. **클라이언트 연결**
 2. **요청 파싱**
@@ -279,15 +277,11 @@ server {
 
 ### `POST`
 
-- **사용법**: 서버로 데이터 전송.
+- **사용법**: 이미지 파일 업로드 및 바디에 포함된 데이터 전송.
 
 ### `DELETE`
 
-- **사용법**: 리소스 삭제 요청.
-
----
-
-이 README는 **Webserv**의 기능과 사용법을 안내합니다.
-
+- **사용법**: 업로드한 이미지 파일을 삭제.
+- ***주의 사항***: html의 form은 delete method를 지원하지 않아, form의 name과 value를 이용해 delete을 처리함.
 
 

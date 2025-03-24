@@ -4,15 +4,6 @@
  1> server block : root , one location block
  2> location block : at least one directive among index, root, return, (proxy_pass is not implemented yet)
 
-2. Default-set directives if not included in the file
- 1> server block : listen & error page
- 2> location block : error page
-   ①
-   ②
-   ③
-   ④
-   ⑤
-
 
 
 

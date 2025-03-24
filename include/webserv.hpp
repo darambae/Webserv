@@ -3,12 +3,11 @@
 #define LOG_INFO(msg) Logger::getInstance(CONSOLE_OUTPUT).log(INFO, msg)
 #define LOG_ERROR(msg, errno_set) Logger::getInstance(CONSOLE_OUTPUT).log(ERROR, msg, errno_set)
 #define THROW(msg) throw Exception(__FILE__, __FUNCTION__, __LINE__, msg)
-//#define TIME_OUT 10000 //10s
-#define TIME_OUT 60000000 //60000s
+#define TIME_OUT 10000 //10s
 //colors for logs
 #define RESET   "\033[0m"
 #define RED     "\033[31m"
-#define GREEN   "\033[32m"
+#define GREEN   "\033[32m
 #define YELLOW  "\033[33m"
 #define BLUE    "\033[34m"
 
@@ -21,11 +20,11 @@
 #include <map>
 #include <vector>
 #include <string>
-#include <cstring> //memset...
-#include <cstdlib> //exit ...
-#include <sys/socket.h> // socket, bind, accept...
-#include <netinet/in.h> // sockaddr_in
-#include <unistd.h> //close...
+#include <cstring> 
+#include <cstdlib> 
+#include <sys/socket.h>
+#include <netinet/in.h>
+#include <unistd.h>
 #include <poll.h>
 #include <algorithm>
 #include <arpa/inet.h>
@@ -36,6 +35,7 @@
 #include <sys/wait.h>
 #include <dirent.h>
 #include <sys/time.h>
+#include <fcntl.h>
 
 enum fd_status
 {
@@ -57,9 +57,6 @@ enum fd_status
 #include "ConfigLocation.hpp"
 #include "Utils.hpp"
 #include "Response.hpp"
-
-#include <fcntl.h>
-
 
 class	Server;
 class	Request;
@@ -83,7 +80,6 @@ struct CGI_env
 
 };
 
-
 struct Fd_data
 {
 	fd_status		status;
@@ -93,7 +89,7 @@ struct Fd_data
 	CgiManager*		CGI;
 	int				port;
 	std::string		ip;
-	bool			just_connected; // In Mac OS to ignore POLLHUP for new clients after after new client connection is accepted
+	bool			just_connected; // In Mac OS to ignore POLLHUP for new clients after new client connection is accepted
 };
 
 extern int MAX_CLIENT;//by default but max is defined by system parameters(bash = ulimit -n)

@@ -29,7 +29,7 @@ void printContainer(const Container& container) {
     std::cout << std::endl;
 }
 
-std::string   fullPath(const std::string &directoryName);
+std::string fullPath(const std::string &directoryName);
 void        removeWhitespaces(std::string &str); // Remove whitespaces from a string in the beginning and the end
 bool        endingSemicolon(const std::string& line);
 bool        onlyDigits(const std::string& str); //Check if a string contains only digits
