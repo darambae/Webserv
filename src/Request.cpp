@@ -143,30 +143,31 @@ std::string	Request::parseQueryString() {
 
 bool	Request::isIp(std::string host) {
 	size_t	pos = host.find(".");
-	std::string first_number = host.substr(0, pos).c_str();
-	if (first_number < 0 || first_number > 255)
-		return false;
+	for (int i = 0; pos != std::string::npos; ++i) {
+		int nb = stringToInt(host.substr(0, pos));
+		if (nb < 0 || nb > 255)
+			return false;
+		host = host.substr(pos + 1, host.size() - pos - 1);
+		if (i == 2) {
+			int nb = stringToInt(host);
+			if (nb < 0 || nb > 255)
+				return false;
+			return true;
+		}
+		else if (i < 2)
+			pos = host.find(".");
+		else
+			break;
+	}
+	return false;
 }
 
 int	Request::checkHost(ConfigServer* config) {
-	std::vector<std::pair<std::string, int> >	listen = config->getListen();
-	std::vector<std::string>	ips_usable;
-
 	std::vector<std::string> serverNames = config->getServerNames();
-	if (std::find(serverNames.begin(), serverNames.end(), _hostName) != ips_usable.end() || _hostName.empty())
+	serverNames.push_back("localhost");
+	if (std::find(serverNames.begin(), serverNames.end(), _hostName) != serverNames.end()
+		|| _hostName.empty() || isIp(_hostName))
 		return 0;
-	ips_usable.push_back("localhost");
-	ips_usable.push_back("0.0.0.0");
-	for (size_t i = 0; i < listen.size(); ++i) {
-		if (listen[i].second == _port) {
-			ips_usable.push_back(listen[i].first);
-			// ips_usable.push_back(listen[i].first);
-			if (listen[i].first == "0.0.0.0" && isIp(_hostName))
-				return 0;
-		}
-	if (std::find(ips_usable.begin(), ips_usable.end(), _hostName) != ips_usable.end() || _hostName.empty())
-		return 0;
-	}
 	return -1;
 }
 
