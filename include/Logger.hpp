@@ -14,7 +14,9 @@ enum OutputType {
 };
 
 class Logger {
+
     private:
+
         std::ofstream   _logFile;
         OutputType _output_type;
         Logger(OutputType type);
@@ -22,6 +24,7 @@ class Logger {
         Logger& operator=(const Logger&); 
 
     public:
+    
         static Logger &getInstance(OutputType type);
         void log(LogType type, const std::string& msg, bool errno_set = 0);
         static std::string  getTime();

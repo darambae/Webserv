@@ -25,6 +25,10 @@ void    ConfigServer::setRoot(const std::string& root) {
     this->_root = root;
 }
 
+void    ConfigServer::setIndex(const std::string& line) {
+    this->_index = splitString<std::vector<std::string> >(line, ' ');
+}
+
 void    ConfigServer::setLimitClientBodySize(const std::string& value) {
     unsigned long num = std::strtoul(value.c_str(), NULL, 10);
     unsigned long res;
@@ -47,11 +51,8 @@ void    ConfigServer::setErrorPages(const std::string& line) {
     while (tmp_vector.size() > 0) {
         if (onlyDigits(tmp_vector.front()))
             error_page.error_codes.insert(atoi(tmp_vector.front().c_str()));
-        else {
+        else
             error_page.error_path = tmp_vector.front();
-            const char* toPrint = error_page.error_path.c_str();
-            std::cout << toPrint << std::endl;
-        }
         tmp_vector.erase(tmp_vector.begin());
     }
     this->_error_pages.push_back(error_page);

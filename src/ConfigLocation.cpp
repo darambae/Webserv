@@ -1,12 +1,12 @@
 
 #include "../include/ConfigLocation.hpp"
 
-void    ConfigLocation::setPath(const std::string& path) {
+    void    ConfigLocation::setPath(const std::string& path) {
     if (path.empty() || path[0] != '/')
         THROW("Invalid path");
     LOG_DEBUG("Valid path");
     this->_path = path;
-}
+    }
 
 void    ConfigLocation::setRoot(const std::string& root) {
     ConfigParser::validRoot(root);
@@ -32,19 +32,10 @@ void    ConfigLocation::setIndex(const std::string& line) {
 }
 
 void    ConfigLocation::setCgiExtension(const std::string& line) {
-    //ConfigParser::validCgiExtension(line);
-    LOG_DEBUG("Valid CGI extension");
     this->_cgi_extension =  splitString<std::vector<std::string> >(line, ' ');
 }
 
 void    ConfigLocation::setCgiPass(const std::string& line) {
-    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
-    while (!tmp_vector.empty()) {
-        if (access(fullPath(tmp_vector.front()).c_str(), X_OK) == -1)
-            THROW("Invalid CGI pass");
-        this->_cgi_pass.push_back(tmp_vector.front());
-        tmp_vector.erase(tmp_vector.begin());
-    }
     std::string _python_path;
 	std::string _php_path;
 	std::ifstream   python_path("python3_path.txt");
@@ -60,6 +51,16 @@ void    ConfigLocation::setCgiPass(const std::string& line) {
 	php_path.close();
 	_cgi_pass.push_back(_python_path);
 	_cgi_pass.push_back(_php_path);
+    
+    std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
+    while (!tmp_vector.empty()) {
+        if (tmp_vector.front() != _python_path && tmp_vector.front() != _php_path) {
+            if (access(fullPath(tmp_vector.front()).c_str(), X_OK) == -1)
+                THROW("Invalid CGI pass");
+            this->_cgi_pass.push_back(tmp_vector.front());
+        }
+        tmp_vector.erase(tmp_vector.begin());
+    }
     LOG_DEBUG("Valid CGI path");
 }
 

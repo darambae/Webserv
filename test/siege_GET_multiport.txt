@@ -1,0 +1,7 @@
+http://localhost:8080/
+http://localhost:8080/cgi-bin/load_game.py?dummy=1
+http://localhost:8080/upload
+http://localhost:9090/
+http://localhost:9090/static
+http://0.0.0.0:8081/
+http://0.0.0.0:8081/media

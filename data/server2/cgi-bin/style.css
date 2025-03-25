@@ -1,0 +1,182 @@
+/* Reset some default styles */
+body, h1, h2, p, ul, li {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: Arial, sans-serif;
+    line-height: 1.6;
+    background-color: #f4f4f4;
+    color: #333;
+    text-align: center;
+}
+
+header {
+    background: #333;
+    color: #fff;
+    padding: 1rem 0;
+}
+
+nav ul {
+    list-style: none;
+    padding: 0;
+}
+
+nav ul li {
+    display: inline;
+    margin: 0 15px;
+}
+
+nav ul li a {
+    color: #fff;
+    text-decoration: none;
+}
+
+main {
+    padding: 20px;
+}
+
+section {
+    margin: 20px auto;
+    max-width: 800px;
+    background: #fff;
+    padding: 20px;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+footer {
+    background: #333;
+    color: #fff;
+    padding: 10px 0;
+    margin-top: 20px;
+}
+
+img {
+    max-width: 100%;
+    height: auto;
+    display: block;
+    margin: 20px auto;
+    border-radius: 8px;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+
+.player {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 10px;
+    margin: 10px 0;
+    font-size: 1.2rem;
+    background: #e0e0e0;
+    border-radius: 5px;
+}
+
+.winner {
+    background: linear-gradient(90deg, #ffcc00, #ff9900);
+    color: white;
+    font-weight: bold;
+    padding: 20px;
+    box-shadow: 0 5px 15px rgba(255, 204, 0, 0.5);
+	font-size: 24px;
+}
+
+.trophy {
+    width: 200px;
+    height: 200px;
+}
+
+.button {
+    display: inline-block;
+    padding: 3px 6px;
+    margin: 10px 0;
+    font-size: 16px;
+    color: #fff;
+    background-color: #71abe9;
+    border: none;
+    border-radius: 3px;
+    text-decoration: none;
+    cursor: pointer;
+}
+
+.button:hover {
+    background-color: #0056b3;
+}
+
+.grid-container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+    margin-bottom: 20px;
+}
+
+.grid-container div {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+}
+
+.grid-container label {
+    margin-bottom: 5px;
+}
+
+.grid-container input {
+    width: 100%;
+    padding: 5px;
+    box-sizing: border-box;
+}
+
+button {
+    padding: 3px 6px;
+    background-color: #007bff;
+    color: #fff;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+button:hover {
+    background-color: #0056b3;
+}
+
+/* Table Styles */
+table {
+    width: 80%;
+    margin: 20px auto;
+    border-collapse: collapse;
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+table th, table td {
+    padding: 12px;
+    border: 1px solid #ddd;
+    text-align: left;
+}
+
+table th {
+    background-color: #f2f2f2;
+}
+
+table tr:nth-child(even) {
+    background-color: #f9f9f9;
+}
+
+/* Responsive Styles */
+@media (max-width: 600px) {
+    nav ul {
+        padding: 0;
+    }
+    nav ul li {
+        display: block;
+        margin: 10px 0;
+    }
+    section {
+        width: 90%;
+    }
+    table {
+        width: 100%;
+    }
+}

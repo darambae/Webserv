@@ -18,27 +18,24 @@ class Response {
 	ConfigLocation const*	_location;
 	CgiManager*				_cgiManager;
 	Request&				_request;
-	std::string				_codeStatus;
+	int						_codeStatus;
 	std::string				_reasonPhrase;
 	std::string				_requestedFilePath;
 	std::ifstream			_requestedFile;
 	//std::map<std::string, std::string>	_header;
+	std::string				_redirectionResponseHeader;
 	bool					_responseReadyToSend;
 	size_t					_totalBytesSent;
 
 	Response();
 
 	public:
-	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _responseReadyToSend(false), _totalBytesSent(0) {}
+	Response(Request& request, ConfigServer const&	config): _config(config), _location(NULL), _cgiManager(NULL),  _request(request), _codeStatus(200),_responseReadyToSend(false), _totalBytesSent(0) {}
 	~Response() {}
 
 	/* setters / getters */
-	void		setRequestedFile(std::string const& filePath) {
-		_requestedFilePath = filePath;
-		// _requestedFile.open(filePath.c_str(), std::ios::binary);
-	}
+	void	setRequestedFile(std::string const& filePath) {	_requestedFilePath = filePath; }
 	void	setResponseStatus(int code);
-	//void	setHeader(std::string key, std::string value) { _header[key] = value; }
 	void	setBuiltResponse(std::string responseComplete) { *_builtResponse = responseComplete; };
 	void	setResponseBuilder(ResponseBuilder* responseBuilder) { _responseBuilder = responseBuilder; }
 	void	setResponseReadyToSend(bool readyOrNot) { _responseReadyToSend = readyOrNot; }
@@ -46,14 +43,15 @@ class Response {
 
 	Request 				&getRequest() const { return _request; }
 	ConfigLocation const*	getLocation() const { return _location; }
-	std::string				getCodeStatus() const { return _codeStatus; }
+	int						getCodeStatus() const { return _codeStatus; }
 	std::string const&		getReasonPhrase() const { return _reasonPhrase; }
 	std::string				getRequestedFilePath() const { return _requestedFilePath; }
 	std::ifstream&			getRequestedFile() { return _requestedFile; }
 	bool					getResponseReadyToSend() { return _responseReadyToSend; }
 	ResponseBuilder*		getResponseBuilder() const { return _responseBuilder; }
 	CgiManager*				getCgiManager() const { return _cgiManager; }
-	//std::map<std::string, std::string>	getHeader() const { return _header; }
+	std::string				getRedirectionResponseHeader() const { return _redirectionResponseHeader; }
+	ConfigServer const&		getConfig() const { return _config; }
 
 	/* method */
 	ConfigLocation const*	findRequestLocation(ConfigServer const& config, std::string requestPath);
@@ -63,9 +61,12 @@ class Response {
 	int			sendResponse();
 	void		handleGet();
 	void		handlePost();
+	void		handleUpload(struct uploadData fileData);
 	void		handleDelete();
 	void		handleError();
+	void		handleRedirection();
 	void		buildCgiResponse(CgiManager* cgiManager);
 	int			generateDefaultErrorHtml();
 	std::string	generateAutoIndex(std::string path);
+	bool		isRedirectionInfiniteLoop();
 };

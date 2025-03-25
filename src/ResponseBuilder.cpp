@@ -15,25 +15,32 @@ std::string*	ResponseBuilder::buildResponse(std::string body) {
 
 	_builtResponse = buildFirstLine();
 	_builtResponse += buildHeaders();
+//	LOG_INFO("Response :\n" + std::string(YELLOW) + _builtResponse);
 	if (!_body.empty())
 		_builtResponse += _body;
+	LOG_DEBUG("Response :\n" + std::string(YELLOW) + _builtResponse);
 
 	return &_builtResponse;
 }
 
 std::string	ResponseBuilder::buildFirstLine() {
 
-	std::string	firstLine = _response.getRequest().getVersion() + " " + _response.getCodeStatus() + " " + _response.getReasonPhrase() + "\r\n";
+	if (_response.getCodeStatus() == 200) {
+		_response.setResponseStatus(200);
+	}
+	std::string	firstLine = _response.getRequest().getVersion() + " " + to_string(_response.getCodeStatus()) + " " + _response.getReasonPhrase() + "\r\n";
 	return firstLine;
 }
 
 std::string	ResponseBuilder::buildHeaders() {
 	
 	std::string	header;
-	//std::string	headerEnd = "\r\n\r\n";
 
 	_headers._timeStamp = "Date: " + buildTime() + "\r\n";
 	header += _headers._timeStamp;
+	if(!_response.getRedirectionResponseHeader().empty()) {
+		header += "location: " + _response.getRedirectionResponseHeader() + "\r\n";
+	}
 	if (!_body.empty()) {
 		_headers._contentType = "Content-Type: " + buildContentType() + "\r\n";
 		header += _headers._contentType;
@@ -43,8 +50,6 @@ std::string	ResponseBuilder::buildHeaders() {
 	_headers._connection = "Connection: keep-alive\r\n";
 	header += _headers._connection;
 
-	if (_response.getCgiManager() == NULL) 
-		LOG_INFO("CGI Manager is null\r");
 	if (_response.getCgiManager() != NULL) {
 		std::map<std::string, std::vector<std::string> >	cgiHeaders = _response.getCgiManager()->getCgiHeaders();
 		std::map<std::string, std::vector<std::string> >::iterator it = cgiHeaders.begin();
@@ -55,7 +60,7 @@ std::string	ResponseBuilder::buildHeaders() {
 		}
 	}
 	header += "\r\n";
-	//LOG_INFO("ResponseBuiler made Headers: " + header);
+
 	return (header);
 }
 
@@ -85,12 +90,10 @@ std::string	ResponseBuilder::buildTime(void) {
 
 std::string	ResponseBuilder::buildContentType() {
 	std::string	requestedFilePath = _response.getRequestedFilePath();
-	//LOG_INFO("Requested file path: " + requestedFilePath);
 	std::string	contentType;
 
 	if (requestedFilePath.find(".php") != std::string::npos || requestedFilePath.find(".py") != std::string::npos) {
 		contentType = "text/html";
-		//LOG_INFO("Content-Type: " + contentType);
 		return contentType;
 	}
 	size_t	pos = requestedFilePath.find_last_of('.');
@@ -100,7 +103,6 @@ std::string	ResponseBuilder::buildContentType() {
 		for (; it != _mimeTypes.end(); ++it) {
 			if (it->first == fileExtension) {
 				contentType = it->second;
-				//LOG_INFO("Content-Type: " + contentType);
 				break ;
 			}
 		}

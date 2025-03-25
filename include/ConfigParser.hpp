@@ -7,17 +7,20 @@ class ConfigLocation;
 
 class   ConfigParser {
     private:
+
         std::vector<ConfigServer>  _servers;
         std::string _filePath;
 
     public:
+
         ConfigParser(const std::string& filePath);
         ~ConfigParser() {};
 
-        void    setFilePath(const std::string& file);
-        void    setServers(const ConfigServer& server);
         const   std::string&    getFilePath() const { return this->_filePath; }
         std::vector<ConfigServer>    getServers() const { return this->_servers; }
+
+        void    setFilePath(const std::string& file);
+        void    setServers(const ConfigServer& server);
 
         void    parseFile();
         void    parseLocation(std::ifstream &file, std::string line, ConfigLocation &location);

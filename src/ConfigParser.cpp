@@ -1,4 +1,4 @@
-/*By parsing configuration file following the rule of nginx config file, 
+/*By parsing configuration file following the rule of nginx config file,
 save the data in a struct and return a vector of servers info.*/
 
 #include "../include/ConfigParser.hpp"
@@ -10,6 +10,7 @@ ConfigParser::ConfigParser(const std::string& file) {
 
 void    ConfigParser::setFilePath(const std::string& file) {
     std::ifstream   test;
+
 
 	test.open(file.c_str());
     if (!test.is_open())
@@ -35,7 +36,7 @@ void    ConfigParser::parseFile() {
             parseDirectives(file, server);
             setServers(server);
         }
-        
+
     }
     if (file.is_open())
         file.close();
@@ -49,9 +50,9 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         size_t end_pos = line.find(";");
         size_t len = end_pos - start_pos; //string length from space to semicolon
         if (line.empty() || line[0] == '#') { continue; }
-        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) { 
+        if (line.find("listen ") != std::string::npos && endingSemicolon(line)) {
             if (line.find(":") != std::string::npos)
-                server.setListen(line.substr(start_pos, line.find(":") - start_pos), 
+                server.setListen(line.substr(start_pos, line.find(":") - start_pos),
                     line.substr(line.find(":") + 1, end_pos - line.find(":") - 1));
             else {
                 if (line.find(".") != std::string::npos)
@@ -66,6 +67,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
         }
         else if (line.find("root ") != std::string::npos && endingSemicolon(line))
             server.setRoot(line.substr(start_pos, len));
+        else if (line.find("index ") != std::string::npos && endingSemicolon(line))
+            server.setIndex(line.substr(start_pos, len));
         else if (line.find("client_max_body_size ") != std::string::npos && endingSemicolon(line))
             server.setLimitClientBodySize(line.substr(start_pos, len));
         else if (line.find("error_page ") != std::string::npos && endingSemicolon(line))
@@ -76,11 +79,8 @@ void    ConfigParser::parseDirectives(std::ifstream &file, ConfigServer &server)
             if (location.getRoot().empty() && !server.getRoot().empty())
                 location.setRoot(server.getRoot());
             server.setLocations(location);
-        } else if (line.find("}") != std::string::npos) {
+        } else if (line.find("}") != std::string::npos)
             break;
-        }
-
-
     }
     //Checking if server block has minimum required directives
     if (server.getRoot().empty() || server.getLocations().empty())
@@ -119,13 +119,12 @@ void    ConfigParser::parseLocation(std::ifstream &file, std::string line, Confi
             location.setCgiExtension(line.substr(start_pos, len));
         else if (line.find("cgi_pass ") != std::string::npos && endingSemicolon(line))
             location.setCgiPass(line.substr(start_pos, len));
-        else if (line.find("}") != std::string::npos) {
+        else if (line.find("}") != std::string::npos)
             break;
-        }
     }
-    //Checking if cgi location block has cgi_extension and cgi_pass
-    if (location.getPath() == "/cgi-bin" && (location.getCgiExtension().empty() || location.getCgiPass().empty()))
-        THROW("CGI location block must have cgi_extension and cgi_pass");
+    //Checking if cgi location block has both cgi_extension and cgi_pass
+    if ((!location.getCgiExtension().empty() && location.getCgiPass().empty()) || (location.getCgiExtension().empty() && !location.getCgiPass().empty()))
+        THROW("CGI location block must have both cgi_extension and cgi_pass");
     //Checking if location block has minimum required directives
     if (location.getPath() != "/cgi-bin" && location.getRoot().empty() && location.getIndex().empty() && location.getReturn().empty())
         THROW("Location block must have at least one directive");
@@ -147,7 +146,7 @@ void    ConfigParser::validIp(std::string ip) {
     std::string  segment;
     size_t  pos;
     int     num;
-    
+
     if (ip == "localhost" || ip == "*")
         return;
     while ((pos = ip.find(".")) != std::string::npos) {
@@ -155,6 +154,7 @@ void    ConfigParser::validIp(std::string ip) {
         num = std::atoi(segment.c_str());
         if (num < 0 || num > 255)
             THROW("The given IP is out of range");
+
         ip = ip.substr(pos + 1);
     }
     num = std::atoi(ip.c_str());
@@ -191,7 +191,7 @@ void    ConfigParser::validErrorPage(const std::string& line) {
 
 void    ConfigParser::validReturn(const std::string& line) {
     std::vector<std::string> tmp_vector = splitString<std::vector<std::string> >(line, ' ');
-    if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
+	if (tmp_vector.size() > 2 || tmp_vector.size() == 0)
         THROW("Invalid return format");
     if (tmp_vector.size() == 1) {
         const std::string& value = tmp_vector.front();
@@ -204,7 +204,7 @@ void    ConfigParser::validReturn(const std::string& line) {
         if (!onlyDigits(status_code) || std::atoi(status_code.c_str()) < 300 || std::atoi(status_code.c_str()) > 599)
             THROW("Invalid return status code");
         return;
-    }   
+    }
     THROW("Invalid return");
 }
 

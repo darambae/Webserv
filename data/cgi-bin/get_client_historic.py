@@ -14,7 +14,7 @@ def error_message(message):
     response_body.append(message)
     response_body.append(f"</h1><a href='/' class=\"button\">Go back</a></body></html>")
     response_body = "\n".join(response_body)
-    response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
     print("Status: 200")
     print(response)
     return
@@ -64,7 +64,7 @@ def handle_request():
             cookies = json.load(file)
         game_ids = cookies.get(session_id)
         if game_ids == None:
-            error_message(f"For session id {session_id}, no historic for this client")
+            error_message(f"For session id {session_id}, no history for this client")
             return
         file_path = os.path.realpath("data/cgi-bin/record.json")
         with open(file_path, "r") as file:
@@ -84,15 +84,17 @@ def handle_request():
             response_body.append(f'<div><img src="data:image/png;base64,{print_gameids(data, game_id)}"></div>')
 
     else:
-        response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
-        response_body = "\n".join(response_body)
-        response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+        error_message("no session ID found, you have to accept cookies")
+        return
+        # response_body.append(f"<h1>Input Error</h1><a href='/' class=\"button\">Go back</a></body></html>")
+        # response_body = "\n".join(response_body)
+        # response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
 
     response_body.append("<a href='/' class=\"button\">Go back</a>")
     response_body.append("</body></html>")
     response_body = "\n".join(response_body)
 
-    response = f"Content-Type: text/html\r\nContent-Length: {len(response_body)}\r\n\r\n{response_body}"
+    response = f"Content-Length: {len(response_body)}\r\n\r\n{response_body}"
     print("Status: 200")
     print(response)
     exit(0)

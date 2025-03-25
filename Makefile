@@ -3,7 +3,7 @@ SRC= $(wildcard src/*.cpp)
 OBJ_DIR= obj/
 OBJ= $(SRC:%.cpp=$(OBJ_DIR)%.o)
 CC= c++
-CPPFLAGS= -g -Wall -Wextra -Werror -std=c++98 -Iinclude
+CPPFLAGS= -Wall -Wextra -Werror -std=c++98 -Iinclude
 
 all: setup $(NAME)
 
@@ -17,7 +17,7 @@ setup:
 	@chmod +x data/cgi-bin/*.py
 	@chmod 777 data/cgi-bin/record.json
 	@chmod +x data/cgi-bin/*.php
-	
+
 $(OBJ_DIR)%.o: %.cpp
 	@mkdir -p $(dir $@)
 	$(CC) $(CPPFLAGS) -c $< -o $@

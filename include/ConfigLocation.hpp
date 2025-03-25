@@ -7,6 +7,7 @@ struct ErrorPage;
 
 class ConfigLocation {
     private:
+
         std::string _path;
         std::string _root;
         bool _autoindex;
@@ -16,7 +17,9 @@ class ConfigLocation {
         std::vector<std::string> _cgi_pass;
         std::vector<ErrorPage> _error_pages;
         std::map<int, std::string> _return_value;
+
     public:
+    
         ConfigLocation() : _autoindex(false) {};
         ~ConfigLocation() {};
 
@@ -28,7 +31,7 @@ class ConfigLocation {
         std::vector<std::string> getCgiExtension() const { return _cgi_extension; };
         std::vector<std::string> getCgiPass() const { return _cgi_pass; };
         std::vector<ErrorPage> getErrorPages() const { return _error_pages; };
-        std::map<int, std::string> getReturn() const { return _return_value; };
+        std::map<int, std::string> const& getReturn() const { return _return_value; };
 
         void setPath(const std::string& path);
         void setRoot(const std::string& root);

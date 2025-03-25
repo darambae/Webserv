@@ -5,8 +5,10 @@
 class Request;
 class Response;
 struct CGI_env;
+
 class	CgiManager {
 	private:
+
 		CGI_env*	_cgi_env;
 		Request*	_request;
 		Response*	_response;
@@ -24,23 +26,25 @@ class	CgiManager {
 		std::map<std::string, std::vector<std::string> >	_cgiHeaders;
 
 	public:
+
 		CgiManager(CGI_env*	cgi_env, Request* request, Response* response);
+		~CgiManager();
+		
 		int		getSocketsParent() {return _sockets[0];}
 		int		getSocketsChildren() {return _sockets[1];}
 		int		getCgiResponseStatus() { return _cgiResponseStatus; }
 		std::map<std::string, std::vector<std::string> >	getCgiHeaders() const { return _cgiHeaders; }
 		std::string	getCgiBody() const { return _cgiBody; }
+		pid_t	getPid() {return _children_pid;}
+		int		getStatus() {return _children_status;}
+		
+		void setCgiContentType(std::string contentType) { _cgiContentType = contentType; }
+		void setCgiContentLength(int contentLength) { _cgiContentLength = contentLength; }
+		char**	setEnv();
 		int		forkProcess();
 		int		sendToCgi();
 		int		recvFromCgi();
-		void	findContentLength(std::string header);
 		void	parseCgiHeader(std::string header);
-		pid_t	getPid() {return _children_pid;}
-		int		getStatus() {return _children_status;}
-		int	check_pid();
-		// char**	convertVectorToChartab(std::vector<std::string>	vectorToConvert);
-		~CgiManager();
+		int		check_pid();
 
-		void setCgiContentType(std::string contentType) { _cgiContentType = contentType; }
-		void setCgiContentLength(int contentLength) { _cgiContentLength = contentLength; }
 };

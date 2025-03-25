@@ -1,9 +1,13 @@
+
 #pragma once
 
+#include <exception>
 #include "webserv.hpp"
-
+ 
 class Exception : public std::exception {
+
     private:
+
         std::string _message;
         std::string _fileName;
         std::string _functionName;
@@ -11,6 +15,7 @@ class Exception : public std::exception {
         std::string _fullMessage;
         
     public:
+    
         Exception(const std::string& fileName, const std::string& function, int line, const std::string& message)
         : _message(message), _fileName(fileName), _functionName(function), _lineNumber(line) {
             std::ostringstream oss;
@@ -19,4 +24,4 @@ class Exception : public std::exception {
         }
         virtual ~Exception() throw() {}
         virtual const char* what() const throw() {return _fullMessage.c_str();}
-};
+ };
