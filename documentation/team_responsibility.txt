@@ -1,0 +1,56 @@
+Roles and Responsibilities
+
+Team Member 1: Core Server & Networking & Logger
+Tasks:
+Set up the server socket to listen for connections on specified ports.
+Implement the event loop using non-blocking sockets or epoll/select/poll for handling multiple clients.
+Manage incoming connections, request parsing, and routing to handlers.
+Implement HTTP response generation basics (status codes, headers).
+Handle persistent connections (keep-alive) and timeouts.
+Create a logger class. (Logging connection statuses, incoming requests, and socket errors aligns naturally with their responsibilities.)
+Deliverables:
+A functioning server that can accept multiple client connections.
+A request/response structure for communication.
+Skills Needed: Networking basics (sockets, epoll/select), low-level C++.
+
+Team Member 2: HTTP Protocol and File Handling
+Tasks:
+Parse incoming HTTP requests (request line, headers, and body).
+Implement file handling for serving static files:
+Determine requested file paths based on the URI.
+Handle directory traversal issues.
+Serve error pages for missing/forbidden files.
+Handle supported HTTP methods (GET, POST, DELETE, etc.).
+Implement proper status codes and headers in responses (e.g., Content-Type, Content-Length).
+Deliverables:
+A robust HTTP parser.
+File-serving logic for static content.
+Proper handling of HTTP status codes and headers.
+Skills Needed: String manipulation, file I/O, HTTP protocol.
+
+Team Member 3: Configuration, CGI, and Testing
+Tasks:
+Implement the configuration file parser to:
+Parse server settings (e.g., port, root directory, error pages).
+Support multiple virtual hosts.
+Integrate CGI handling:
+Set environment variables for CGI scripts.
+Execute scripts and capture their output using pipes.
+Develop automated tests to validate:
+Handling of valid and invalid requests.
+Performance under load.
+HTTP methods and status codes.
+Deliverables:
+A fully working configuration system.
+CGI functionality for dynamic content generation.
+A suite of test cases for the server.
+Skills Needed: Parsing, process management, and debugging.
+
+Collaboration and Integration plan
+
+Step 1: Team Member 1 builds the basic server, Team Member 2 designs the request/response structure, and Team Member 3 creates a basic configuration file parser.
+Step 2: Integrate file-serving and request parsing with the server. Start testing the configuration system and CGI integration.
+Step 3: Finalize HTTP methods, implement virtual hosts, and run performance/load tests.
+
+Documentation:
+Assign everyone to document their code and functionality for smooth handover and project presentation.
