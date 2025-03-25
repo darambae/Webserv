@@ -231,6 +231,7 @@ server {
 
 **Webserv**는 Ecole 42 프로젝트로, C++98을 사용하여 간단한 HTTP 서버를 구축하는 과제입니다. Nginx의 작동방식을 토대로 클라이언트 요청을 처리하고 정적 파일을 제공하며, python과 php로 작성한 CGI 프로그램을 통해 동적 콘텐츠를 처리하였습니다. 저희는 구글 크롬을 프로젝트의 기본 브라우저로 사용하였고, 리눅스 우분투에서 실행이 가능합니다.
 훌륭한 두 팀원들, Kelly Brener-Raffali [https://github.com/KellyBRENER]와 Gautier Daigneau [https://github.com/Gotgotd] 덕분에 프로젝트를 성공적으로 완료하여 125%의 점수를 받았습니다.
+
 ---
 
 ## 기능
