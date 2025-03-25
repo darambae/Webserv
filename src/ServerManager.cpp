@@ -179,8 +179,8 @@ void	ServerManager::closeCgi(int errorNumber, int FdClient) {
 	delete FD_DATA[FdClient]->CGI;
 	FD_DATA[FdClient]->CGI = NULL;
 	LOG_INFO("CGI is close");
-	if (errorNumber > 0)
-		cleanFd(FdClient);
+	// if (errorNumber > 0)
+	// 	cleanFd(FdClient);
 }
 
 void	ServerManager::print_all_FD_DATA() {
